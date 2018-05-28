@@ -33,17 +33,10 @@ func resourceCceClusterV1() *schema.Resource {
 				Computed: true,
 				ForceNew: true,
 			},
-			"kind": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"api_version": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew:true,
 				ValidateFunc:validateClusterName,
 			},
 			"description": &schema.Schema{
@@ -62,24 +55,25 @@ func resourceCceClusterV1() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"cluster_type": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"publicip_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"id": &schema.Schema{
 				Type:     schema.TypeString,
-				Optional: true,
 				Computed:true,
 			},
 			"status": &schema.Schema{
 				Type:     schema.TypeString,
-				Optional: true,
 				Computed:true,
 			},
 			"k8s_version": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
-				Optional:true,
 			},
 			"az": &schema.Schema{
 				Type:     schema.TypeString,
@@ -89,11 +83,9 @@ func resourceCceClusterV1() *schema.Resource {
 			"cpu": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
-				Optional:true,
 			},
 			"vpc_name": &schema.Schema{
 				Type:     schema.TypeString,
-				Optional: true,
 				Computed:true,
 			},
 			"endpoint": &schema.Schema{
@@ -103,10 +95,6 @@ func resourceCceClusterV1() *schema.Resource {
 			"external_endpoint": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
-			},
-			"type": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
 			},
 			"hosts": &schema.Schema{
 				Type:     schema.TypeList,
@@ -163,8 +151,8 @@ func resourceCceClusterV1Create(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	createOpts := clusters.CreateOpts{
-		Kind:       d.Get("kind").(string),
-		ApiVersion: d.Get("api_version").(string),
+		Kind:       "cluster",
+		ApiVersion: "v1",
 		Metadata:   clusters.CreateMetadataspec{Name: d.Get("name").(string)},
 		Spec: clusters.CreateSpec{
 			Description:     d.Get("description").(string),
@@ -172,12 +160,14 @@ func resourceCceClusterV1Create(d *schema.ResourceData, meta interface{}) error 
 			Subnet:          d.Get("subnet_id").(string),
 			Region:          GetRegion(d, config),
 			SecurityGroupId: d.Get("security_group_id").(string),
-			ClusterType:     d.Get("type").(string),
+			ClusterType:     d.Get("cluster_type").(string),
 		},
 	}
 
 	log.Printf("[DEBUG] Create Options: %#v", createOpts)
-
+	if _, ok := d.GetOk("publicip_id"); ok {
+		return fmt.Errorf("Can not assign PublicIp Id To a empty cluster,add atleast one node to assign public ip" )
+	}
 	create := clusters.Create(cceClient, createOpts).ExtractErr()
 
 	if create != nil {
@@ -206,9 +196,6 @@ func resourceCceClusterV1Create(d *schema.ResourceData, meta interface{}) error 
 	_, err = stateConf.WaitForState()
 	d.SetId(n.Metadata.ID)
 
-	if _, ok := d.GetOk("publicip_id"); ok {
-		resourceCceClusterV1Update(d, meta)
-	}
 	return resourceCceClusterV1Read(d, meta)
 
 }
@@ -232,16 +219,6 @@ func resourceCceClusterV1Read(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] Retrieved cluster %s: %+v", d.Id(), n)
 
-	/*var volumespec []map[string]interface{}
-	for _, volume := range n.Clusterspec.ClusterHostList.HostListSpec.HostList[0].Hostspec.Volume {
-		mapping := map[string]interface{}{
-			"disk_type":        volume.DiskSize,
-			"disk_size":        volume.DiskType,
-			"volume_type": 		volume.VolumeType,
-		}
-		volumespec = append(volumespec, mapping)
-	}*/
-
 	var hostspec []map[string]interface{}
 	for _, hosts := range n.Clusterspec.ClusterHostList.HostListSpec.HostList {
 		mapping := map[string]interface{}{
@@ -253,7 +230,6 @@ func resourceCceClusterV1Read(d *schema.ResourceData, meta interface{}) error {
 			"az":         hosts.Hostspec.AZ,
 			"sshkey":     hosts.Hostspec.SshKey,
 			"status":     hosts.NodeStatus,
-			//"volume":     volumespec,
 		}
 		hostspec = append(hostspec, mapping)
 	}
@@ -288,13 +264,21 @@ func resourceCceClusterV1Update(d *schema.ResourceData, meta interface{}) error 
 
 	var updateOpts clusters.UpdateOpts
 
-	updateOpts.Kind = d.Get("kind").(string)
-	updateOpts.ApiVersion = d.Get("api_version").(string)
+	updateOpts.Kind = "cluster"
+	updateOpts.ApiVersion = "v1"
 
 	if d.HasChange("description") {
 		updateOpts.Spec.Description = d.Get("description").(string)
 	}
-	updateOpts.Spec.EIP = d.Get("publicip_id").(string)
+
+	host,err:=clusters.Get(cceClient,d.Id()).Extract()
+	if _, ok := d.GetOk("publicip_id"); ok {
+		if host.ClusterStatus.Status == "EMPTY" {
+			return fmt.Errorf("Can not assign PublicIp Id To cluster because it is in EMPTY state", )
+		} else {
+			updateOpts.Spec.EIP = d.Get("publicip_id").(string)
+		}
+	}
 
 	log.Printf("[DEBUG] Updating CCE %s with options: %+v", d.Id(), updateOpts)
 
