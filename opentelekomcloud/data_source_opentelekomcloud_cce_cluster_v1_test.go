@@ -17,10 +17,9 @@ func TestAccOpenTelekomCloudCCEClusterV1DataSource_basic(t *testing.T) {
 				Config: testAccOpenTelekomCloudRtsStackV1DataSource_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRtsStackV1DataSourceID("data.opentelekomcloud_cce_cluster_v1.clusters"),
-					resource.TestCheckResourceAttr("data.opentelekomcloud_cce_cluster_v1.clusters", "name", "disha-test"),
-					resource.TestCheckResourceAttr("data.opentelekomcloud_cce_cluster_v1.clusters", "status", "AVAILABLE"),
-					resource.TestCheckResourceAttr("data.opentelekomcloud_cce_cluster_v1.clusters", "vpc_name", "vpc-disha"),
-					resource.TestCheckResourceAttr("data.opentelekomcloud_cce_cluster_v1.clusters", "subnet", "subnet-28a5"),
+					resource.TestCheckResourceAttr("data.opentelekomcloud_cce_cluster_v1.clusters", "name", "opentelekomcloud-cce"),
+					resource.TestCheckResourceAttr("data.opentelekomcloud_cce_cluster_v1.clusters", "status", "EMPTY"),
+					resource.TestCheckResourceAttr("data.opentelekomcloud_cce_cluster_v1.clusters", "type", "Single"),
 				),
 			},
 		},
@@ -43,17 +42,29 @@ func testAccCheckRtsStackV1DataSourceID(n string) resource.TestCheckFunc {
 }
 
 var testAccOpenTelekomCloudRtsStackV1DataSource_basic = `
-resource "opentelekomcloud_cce_cluster_v1" "cce_1" {
+resource "opentelekomcloud_vpc_v1" "vpc_1" {
+  name = "opentelekomcloud-vpc"
+  cidr = "192.168.0.0/16"
+}
+
+resource "opentelekomcloud_vpc_subnet_v1" "subnet_1" {
+  name = "opentelekomcloud-subnet"
+  cidr = "192.168.0.0/16"
+  gateway_ip = "192.168.20.1"
+  dhcp_enable = "true"
+  vpc_id = "${opentelekomcloud_vpc_v1.vpc_1.id}"
+}
+
+resource "opentelekomcloud_cce_cluster_v1" "cluster_1" {
   kind = "cluster"
-  name = "test"
+  name = "opentelekomcloud-cce"
   api_version = "v1"
-  vpc_id = "579a63b6-9fac-4d03-9658-d5718c7301ad"
-  subnet_id = "25fb66de-4846-4a4f-9417-d710ae6f22dd"
+  vpc_id = "${opentelekomcloud_vpc_v1.vpc_1.id}"
+  subnet_id = "${opentelekomcloud_vpc_subnet_v1.subnet_1.id}"
   type = "Single"
-  description = "jadoo"
 }
 
 data "opentelekomcloud_cce_cluster_v1" "clusters" {
-        name = "${opentelekomcloud_cce_cluster_v1.cluster_1.name}"
+  name = "${opentelekomcloud_cce_cluster_v1.cluster_1.name}"
 }
 `

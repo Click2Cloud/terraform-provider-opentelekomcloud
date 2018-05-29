@@ -210,7 +210,6 @@ func Provider() terraform.ResourceProvider {
 			"opentelekomcloud_vpc_peering_connection_accepter_v2": resourceVpcPeeringConnectionAccepterV2(),
 			"opentelekomcloud_vpc_route_v2":                       resourceVPCRouteV2(),
 			"opentelekomcloud_vpc_subnet_v1":                      resourceVpcSubnetV1(),
-
 			"opentelekomcloud_cce_cluster_v1":		            resourceCceClusterV1(),
 		},
 

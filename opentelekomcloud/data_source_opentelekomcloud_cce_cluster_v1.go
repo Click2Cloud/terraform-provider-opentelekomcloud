@@ -99,7 +99,7 @@ func dataSourceCCEClusterV1() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"volume": &schema.Schema{
+						/*"volume": &schema.Schema{
 							Type:     schema.TypeList,
 							Computed: true,
 							Elem: &schema.Resource{
@@ -118,7 +118,7 @@ func dataSourceCCEClusterV1() *schema.Resource {
 									},
 								},
 							},
-						},
+						},*/
 						"sshkey": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
@@ -178,7 +178,7 @@ func dataSourceCCEClusterV1Read(d *schema.ResourceData, meta interface{}) error 
 
 	Cluster := refinedClusters[0]
 
-	var volumespec []map[string]interface{}
+	/*var volumespec []map[string]interface{}
 	for _, volume := range Cluster.Clusterspec.ClusterHostList.HostListSpec.HostList[0].Hostspec.Volume{
 		mapping := map[string]interface{}{
 			"disk_type":   volume.DiskType,
@@ -186,7 +186,7 @@ func dataSourceCCEClusterV1Read(d *schema.ResourceData, meta interface{}) error 
 			"volume_type": volume.VolumeType,
 		}
 		volumespec = append(volumespec, mapping)
-	}
+	}*/
 
 	var hostspec []map[string]interface{}
 	for _, hosts := range Cluster.Clusterspec.ClusterHostList.HostListSpec.HostList{
@@ -199,11 +199,15 @@ func dataSourceCCEClusterV1Read(d *schema.ResourceData, meta interface{}) error 
 			"az":         hosts.Hostspec.AZ,
 			"sshkey":     hosts.Hostspec.SshKey,
 			"status":     hosts.Status,
-			"volume":     volumespec,
+			//"volume" : volumespec,
+			"volume" : map[string]interface{}{
+				"disk_type":   hosts.Hostspec.Volume[0].DiskType,
+				"disk_size":   hosts.Hostspec.Volume[0].DiskSize,
+				"volume_type": hosts.Hostspec.Volume[0].VolumeType,
+			},
 		}
 		hostspec = append(hostspec, mapping)
 	}
-
 	log.Printf("[DEBUG] Retrieved Clusters using given filter %s: %+v", Cluster.Metadata.ID, Cluster)
 	d.SetId(Cluster.Metadata.ID)
 
