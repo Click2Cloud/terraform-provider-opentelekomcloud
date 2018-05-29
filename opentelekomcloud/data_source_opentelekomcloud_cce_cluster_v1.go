@@ -50,7 +50,7 @@ func dataSourceCCEClusterV1() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"subnet": &schema.Schema{
+			"subnet_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -151,13 +151,13 @@ func dataSourceCCEClusterV1Read(d *schema.ResourceData, meta interface{}) error 
 	cceClient, err := config.cceV1Client(GetRegion(d, config))
 
 	listOpts := clusters.ListOpts{
-		ID:     d.Get("id").(string),
-		Name:   d.Get("name").(string),
-		Status: d.Get("status").(string),
-		Type:	d.Get("type").(string),
-		AZ:     d.Get("az").(string),
-		VPC:    d.Get("vpc_name").(string),
-		VpcId:  d.Get("vpc_id").(string),
+		ID:      d.Get("id").(string),
+		Name:    d.Get("name").(string),
+		Status:  d.Get("status").(string),
+		Type:	 d.Get("type").(string),
+		AZ:      d.Get("az").(string),
+		VpcName: d.Get("vpc_name").(string),
+		VpcId:   d.Get("vpc_id").(string),
 	}
 
 	refinedClusters, err := clusters.List(cceClient).ExtractCluster(listOpts)
@@ -214,9 +214,9 @@ func dataSourceCCEClusterV1Read(d *schema.ResourceData, meta interface{}) error 
 	d.Set("az", Cluster.Clusterspec.AZ)
 	d.Set("cpu", Cluster.Clusterspec.CPU)
 	d.Set("type", Cluster.Clusterspec.ClusterType)
-	d.Set("vpc_name", Cluster.Clusterspec.VPC)
+	d.Set("vpc_name", Cluster.Clusterspec.VpcName)
 	d.Set("vpc_id", Cluster.Clusterspec.VpcId)
-	d.Set("subnet", Cluster.Clusterspec.Subnet)
+	d.Set("subnet_id", Cluster.Clusterspec.Subnet)
 	d.Set("endpoint", Cluster.Clusterspec.Endpoint)
 	d.Set("external_endpoint", Cluster.Clusterspec.ExternalEndpoint)
 	d.Set("security_group_id", Cluster.Clusterspec.SecurityGroupId)
@@ -225,7 +225,7 @@ func dataSourceCCEClusterV1Read(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	n, err := clusters.GetCertificate(cceClient,Cluster.Metadata.ID).Extract()
+	n, err := clusters.GetCertificate(cceClient,Cluster.Metadata.ID).ExtractCerts()
 	log.Printf("[DEBUG] Retrieved n %+v", n)
 	d.Set("cacrt", n.Cacrt)
 	d.Set("client_crt", n.ClientCrt)

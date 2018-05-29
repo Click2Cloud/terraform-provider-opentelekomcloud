@@ -43,9 +43,16 @@ func testAccCheckRtsStackV1DataSourceID(n string) resource.TestCheckFunc {
 }
 
 var testAccOpenTelekomCloudRtsStackV1DataSource_basic = `
-resource "opentelekomcloud_cce_cluster_v1" "cluster_1" {
-  
+resource "opentelekomcloud_cce_cluster_v1" "cce_1" {
+  kind = "cluster"
+  name = "test"
+  api_version = "v1"
+  vpc_id = "579a63b6-9fac-4d03-9658-d5718c7301ad"
+  subnet_id = "25fb66de-4846-4a4f-9417-d710ae6f22dd"
+  type = "Single"
+  description = "jadoo"
 }
+
 data "opentelekomcloud_cce_cluster_v1" "clusters" {
         name = "${opentelekomcloud_cce_cluster_v1.cluster_1.name}"
 }
