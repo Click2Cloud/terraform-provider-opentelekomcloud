@@ -200,11 +200,11 @@ func dataSourceCCEClusterV1Read(d *schema.ResourceData, meta interface{}) error 
 			"sshkey":     hosts.Hostspec.SshKey,
 			"status":     hosts.Status,
 			//"volume" : volumespec,
-			"volume" : map[string]interface{}{
+			/*"volume" : map[string]interface{}{
 				"disk_type":   hosts.Hostspec.Volume[0].DiskType,
 				"disk_size":   hosts.Hostspec.Volume[0].DiskSize,
 				"volume_type": hosts.Hostspec.Volume[0].VolumeType,
-			},
+			},*/
 		}
 		hostspec = append(hostspec, mapping)
 	}
