@@ -163,6 +163,7 @@ func Provider() terraform.ResourceProvider {
 			"opentelekomcloud_kms_key_v1":             dataSourceKmsKeyV1(),
 			"opentelekomcloud_kms_data_key_v1":        dataSourceKmsDataKeyV1(),
 			"opentelekomcloud_rds_flavors_v1":         dataSourceRdsFlavorV1(),
+			"opentelekomcloud_rts_stack_v1":           dataSourceRTSStackV1(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
