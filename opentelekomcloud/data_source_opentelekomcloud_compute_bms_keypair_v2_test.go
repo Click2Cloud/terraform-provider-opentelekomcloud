@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-func TestAccBMSV2KeyPairDataSource_basic(t *testing.T) {
+func TestAccOTCBMSV2KeyPairDataSource_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccBmsKeyPairPreCheck(t) },
 		Providers: testAccProviders,
