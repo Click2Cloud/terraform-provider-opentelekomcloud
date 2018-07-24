@@ -9,7 +9,7 @@ import (
 )
 
 // PASS
-func TestAccOpenTelekomCloudBMSNicV2DataSource_basic(t *testing.T) {
+func TestAccOTCBMSNicV2DataSource_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheckBMSNic(t) },
 		Providers: testAccProviders,

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-func TestAccBMSV2FlavorDataSource_basic(t *testing.T) {
+func TestAccOTCBMSV2FlavorDataSource_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccBmsFlavorPreCheck(t) },
 		Providers: testAccProviders,
