@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-// PASS
+
 func TestAccOpenTelekomCloudCCEClusterV1DataSource_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },

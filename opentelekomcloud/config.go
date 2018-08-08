@@ -460,12 +460,7 @@ func (c *Config) loadCESClient(region string) (*golangsdk.ServiceClient, error) 
 	})
 }
 
-func (c *Config) cceV1Client(region string) (*golangsdk.ServiceClient, error) {
-	return huaweisdk.NewCCEV1(c.HwClient, golangsdk.EndpointOpts{
-		Region:       c.determineRegion(region),
-		Availability: c.getHwEndpointType(),
-	})
-}
+
 
 func (c *Config) cceV3Client(region string) (*golangsdk.ServiceClient, error) {
 	return huaweisdk.NewCCEV3(c.HwClient, golangsdk.EndpointOpts{

@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccOTCCCEClusterV1_basic(t *testing.T) {
-	var cluster clusters.Clusters
+	var cluster clusters.RetrievedCluster
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -33,9 +33,8 @@ func TestAccOTCCCEClusterV1_basic(t *testing.T) {
 	})
 }
 
-// PASS
 func TestAccOTCCCEClusterV1_timeout(t *testing.T) {
-	var cluster clusters.Clusters
+	var cluster clusters.RetrievedCluster
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -73,7 +72,7 @@ func testAccOTCCheckCCEClusterV1Destroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccOTCCheckCCEClusterV1Exists(n string, cluster *clusters.Clusters) resource.TestCheckFunc {
+func testAccOTCCheckCCEClusterV1Exists(n string, cluster *clusters.RetrievedCluster) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
