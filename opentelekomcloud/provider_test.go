@@ -346,10 +346,10 @@ func testAccBmsFlavorPreCheck(t *testing.T) {
 	}
 }
 
-//to remove
-//func testAccPreCheckBMSServer(t *testing.T) {
-//	testAccPreCheckRequiredEnvVars(t)
-//	if OS_SERVER_ID == "" {
-//		t.Fatalf("Provide the BMS Server ID")
-//	}
-//}
+
+func testAccPreCheckBMSServer(t *testing.T) {
+	testAccPreCheckRequiredEnvVars(t)
+	if OS_SERVER_ID == "" {
+		t.Skip("Provide the BMS Server ID")
+	}
+}

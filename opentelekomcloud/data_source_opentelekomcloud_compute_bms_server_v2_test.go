@@ -41,6 +41,18 @@ func testAccCheckBMSServerV2DataSourceID(n string) resource.TestCheckFunc {
 }
 
 var testAccOTCBMSServerV2DataSource_basic = fmt.Sprintf(`
+resource "opentelekomcloud_vpc_v1" "vpc_1" {
+  name = "vpc_otc123"
+  cidr = "192.168.0.0/16"
+}
+
+resource "opentelekomcloud_vpc_subnet_v1" "subnet_1" {
+  name = "sub_otc123"
+  cidr = "192.168.0.0/16"
+  gateway_ip = "192.168.0.1"go 
+  vpc_id = "${opentelekomcloud_vpc_v1.vpc_1.id}"
+  availability_zone = "eu-de-01"
+}
 resource "opentelekomcloud_compute_instance_v2" "instance_1" {
   name = "BMSinstance_1"
   image_id = "%s"
@@ -51,7 +63,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance_1" {
     foo = "bar"
   }
   network {
-    uuid = "%s"
+    uuid = "${opentelekomcloud_vpc_subnet_v1.subnet_1.id}"
   }
 }
 
