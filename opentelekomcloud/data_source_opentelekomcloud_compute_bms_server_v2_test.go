@@ -17,7 +17,6 @@ func TestAccOTCBMSServerV2DataSource_basic(t *testing.T) {
 				Config: testAccOTCBMSServerV2DataSource_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckBMSServerV2DataSourceID("data.opentelekomcloud_compute_bms_server_v2.server1"),
-					resource.TestCheckResourceAttr("data.opentelekomcloud_compute_bms_server_v2.server1", "id", OS_SERVER_ID),
 					resource.TestCheckResourceAttr("data.opentelekomcloud_compute_bms_server_v2.server1", "status", "ACTIVE"),
 				),
 			},
@@ -49,9 +48,9 @@ resource "opentelekomcloud_vpc_v1" "vpc_1" {
 resource "opentelekomcloud_vpc_subnet_v1" "subnet_1" {
   name = "sub_otc123"
   cidr = "192.168.0.0/16"
-  gateway_ip = "192.168.0.1"go 
+  gateway_ip = "192.168.0.1"
   vpc_id = "${opentelekomcloud_vpc_v1.vpc_1.id}"
-  availability_zone = "eu-de-01"
+  availability_zone = "%s"
 }
 resource "opentelekomcloud_compute_instance_v2" "instance_1" {
   name = "BMSinstance_1"
@@ -70,4 +69,4 @@ resource "opentelekomcloud_compute_instance_v2" "instance_1" {
 data "opentelekomcloud_compute_bms_server_v2" "server1" {
   id = "${opentelekomcloud_compute_instance_v2.instance_1.id}"
 }
-`, OS_IMAGE_ID,OS_AVAILABILITY_ZONE)
+`, OS_AVAILABILITY_ZONE, OS_IMAGE_ID, OS_AVAILABILITY_ZONE)
