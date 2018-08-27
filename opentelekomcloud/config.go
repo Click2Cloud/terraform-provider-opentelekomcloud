@@ -465,3 +465,13 @@ func (c *Config) sfsV2Client(region string) (*golangsdk.ServiceClient, error) {
 		Availability: c.getHwEndpointType(),
 	})
 }
+
+func (c *Config) backupV1Client(region string) (*golangsdk.ServiceClient, error) {
+	return huaweisdk.NewCSBSServiceV1(c.HwClient, golangsdk.EndpointOpts{
+		Region:       c.determineRegion(region),
+		Availability: c.getHwEndpointType(),
+	})
+}
+
+
+
