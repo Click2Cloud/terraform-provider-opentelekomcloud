@@ -13,7 +13,7 @@ func TestAccVBSBackupPolicyV2_basic(t *testing.T) {
 	var policy policies.Policy
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
+		PreCheck:     func() { testAccPreCheckRequiredEnvVars(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccVBSBackupPolicyV2Destroy,
 		Steps: []resource.TestStep{
@@ -72,8 +72,8 @@ func testAccVBSBackupPolicyV2Destroy(s *terraform.State) error {
 		}
 
 		_, err := policies.List(vbsClient, policies.ListOpts{PolicyID: rs.Primary.ID})
-		if err == nil {
-			return fmt.Errorf("Share File still exists")
+		if err != nil {
+			return fmt.Errorf("Backup Policy still exists")
 		}
 	}
 
@@ -117,7 +117,7 @@ resource "opentelekomcloud_vbs_backup_policy_v2" "vbs" {
   backup_policy_name = "policy_001"
   start_time  = "12:00"
   status  = "ON"
-  retain_first_backup = "Y"
+  retain_first_backup = "N"
   rentention_num = 2
   frequency = 1
       tags =[
@@ -133,7 +133,7 @@ resource "opentelekomcloud_vbs_backup_policy_v2" "vbs" {
   backup_policy_name = "policy_002"
   start_time  = "12:00"
   status  = "ON"
-  retain_first_backup = "Y"
+  retain_first_backup = "N"
   rentention_num = 2
   frequency = 1
       tags =[
@@ -149,7 +149,7 @@ resource "opentelekomcloud_vbs_backup_policy_v2" "vbs" {
   backup_policy_name = "policy_002"
   start_time  = "12:00"
   status  = "ON"
-  retain_first_backup = "Y"
+  retain_first_backup = "N"
   rentention_num = 2
   frequency = 1
       tags =[

@@ -22,8 +22,8 @@ func resourceVBSBackupPolicyV2() *schema.Resource {
 		},
 
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(1 * time.Minute),
-			Delete: schema.DefaultTimeout(2 * time.Minute),
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -115,7 +115,7 @@ func resourceVBSBackupPolicyV2Create(d *schema.ResourceData, meta interface{}) e
 	log.Printf("[DEBUG] Waiting for OpenTelekomcomCloud Backup Policy (%s) to become available", d.Id())
 
 	stateConf := &resource.StateChangeConf{
-		Pending:    []string{"creating"},
+		//	Pending:    []string{"creating"},
 		Target:     []string{"ON", "OFF"},
 		Refresh:    waitForVBSPolicyActive(vbsClient, d.Id()),
 		Timeout:    d.Timeout(schema.TimeoutCreate),
@@ -297,9 +297,9 @@ func waitForVBSPolicyActive(vbsClient *golangsdk.ServiceClient, policyID string)
 			return nil, "", err
 		}
 		n := policies[0]
-		if n.ScheduledPolicy.Status != "ON" || n.ScheduledPolicy.Status != "OFF" {
-			return n, "creating", nil
-		}
+		//if n.ScheduledPolicy.Status != "ON" || n.ScheduledPolicy.Status != "OFF" {
+		//	return n, "creating", nil
+		//}
 
 		return n, n.ScheduledPolicy.Status, nil
 	}
