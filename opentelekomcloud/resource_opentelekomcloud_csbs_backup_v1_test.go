@@ -11,7 +11,7 @@ import (
 )
 
 func TestAccCSBSBackupV1_basic(t *testing.T) {
-	var backups backup.Backup
+	var backups backup.CheckpointItem
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -23,27 +23,17 @@ func TestAccCSBSBackupV1_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCSBSBackupV1Exists("opentelekomcloud_csbs_backup_v1.csbs", &backups),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_csbs_backup_v1.csbs", "backup_name", "csbs-test"),
+						"opentelekomcloud_csbs_backup_v1.csbs", "backup_name", "csbs-test1"),
 					resource.TestCheckResourceAttr(
 						"opentelekomcloud_csbs_backup_v1.csbs", "description", "test-code"),
 				),
 			},
-			/*resource.TestStep{
-				Config: testAccCSBSBackupV1_update,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCSBSBackupV1Exists("opentelekomcloud_csbs_backup_v1.csbs", &backups),
-					resource.TestCheckResourceAttr(
-						"opentelekomcloud_csbs_backup_v1.csbs", "backup_policy_name", "policy_002"),
-					resource.TestCheckResourceAttr(
-						"opentelekomcloud_csbs_backup_v1.csbs", "status", "ON"),
-				),
-			},*/
 		},
 	})
 }
 
 func TestAccCSBSBackupV1_timeout(t *testing.T) {
-	var backups backup.Backup
+	var backups backup.CheckpointItem
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -62,9 +52,9 @@ func TestAccCSBSBackupV1_timeout(t *testing.T) {
 
 func testAccCSBSBackupV1Destroy(s *terraform.State) error {
 	config := testAccProvider.Meta().(*Config)
-	vbsClient, err := config.backupV1Client(OS_REGION_NAME)
+	backupClient, err := config.backupV1Client(OS_REGION_NAME)
 	if err != nil {
-		return fmt.Errorf("Error creating opentelekomcloud sfs client: %s", err)
+		return fmt.Errorf("Error creating opentelekomcloud backup client: %s", err)
 	}
 
 	for _, rs := range s.RootModule().Resources {
@@ -72,8 +62,8 @@ func testAccCSBSBackupV1Destroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := backup.List(vbsClient, backup.ListOpts{CheckpointId: rs.Primary.ID})
-		if err == nil {
+		_, err := backup.List(backupClient, backup.ListOpts{CheckpointId: rs.Primary.Attributes["backup_id"]})
+		if err != nil {
 			return fmt.Errorf("Backup still exists")
 		}
 	}
@@ -81,34 +71,34 @@ func testAccCSBSBackupV1Destroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCSBSBackupV1Exists(n string, backups *backup.Backup) resource.TestCheckFunc {
+func testAccCSBSBackupV1Exists(n string, backups *backup.CheckpointItem) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("Backup not found: %s", n)
 		}
 
-		if rs.Primary.ID == "" {
+		if rs.Primary.Attributes["backup_id"] == "" {
 			return fmt.Errorf("No ID is set")
 		}
 
 		config := testAccProvider.Meta().(*Config)
-		vbsClient, err := config.backupV1Client(OS_REGION_NAME)
+		backupClient, err := config.backupV1Client(OS_REGION_NAME)
 		if err != nil {
 			return fmt.Errorf("Error creating opentelekomcloud csbs client: %s", err)
 		}
 
-		policyList, err := backup.List(vbsClient, backup.ListOpts{CheckpointId: rs.Primary.ID})
+		backupList, err := backup.List(backupClient, backup.ListOpts{CheckpointId: rs.Primary.Attributes["backup_id"]})
 		if err != nil {
 			return err
 		}
-		found := policyList[0]
-		if found.CheckpointId != rs.Primary.ID {
-			return fmt.Errorf("backup policy not found")
+		found := backupList[0]
+		log.Printf("[DEBUG] found : %s", found)
+		if found.CheckpointId != rs.Primary.Attributes["backup_id"] {
+			return fmt.Errorf("backup  not found")
 		}
 
-		//*backups = found
-		log.Printf("found : %#v", found)
+		*backups = found
 
 		return nil
 	}
@@ -116,37 +106,18 @@ func testAccCSBSBackupV1Exists(n string, backups *backup.Backup) resource.TestCh
 
 var testAccCSBSBackupV1_basic = fmt.Sprintf(`
 resource "opentelekomcloud_csbs_backup_v1" "csbs" {
-  backup_name      = "csbs-test"
+  backup_name      = "csbs-test1"
   description      = "test-code"
   resource_id = "92cc41e5-a761-4828-9b19-247076aa4e55"
   resource_type = "OS::Nova::Server"
 }
 `)
 
-/*var testAccCSBSBackupV1_update = fmt.Sprintf(`
-resource "opentelekomcloud_csbs_backup_v1" "csbs" {
-  backup_policy_name = "policy_002"
-  start_time  = "12:00"
-  status  = "ON"
-  retain_first_backup = "Y"
-  rentention_num = 2
-  frequency = 1
-      tags =[
-        {
-          key = "k2"
-          value = "v2"
-          }] 
-}
-`)*/
-
 var testAccCSBSBackupV1_timeout = fmt.Sprintf(`
 resource "opentelekomcloud_csbs_backup_v1" "csbs" {
-  backup_name      = "csbs-test"
+  backup_name      = "csbs-test1"
   description      = "test-code"
   resource_id = "92cc41e5-a761-4828-9b19-247076aa4e55"
   resource_type = "OS::Nova::Server"
-  timeouts {
-    create = "5m"
-    delete = "5m"
-  }
-}`)
+}
+`)

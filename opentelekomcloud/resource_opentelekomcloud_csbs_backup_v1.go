@@ -31,7 +31,7 @@ func resourceCSBSBackupV1() *schema.Resource {
 				ForceNew: true,
 				Computed: true,
 			},
-			"backup_id": {
+			"backup_record_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -200,7 +200,7 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 		n := backupItems[0]
 
 		d.SetId(n.Id)
-		d.Set("backup_id",create.Checkpoint.Id)
+		d.Set("backup_record_id",create.Checkpoint.Id)
 		log.Printf("[DEBUG] set ID: %s", d.Id())
 
 		stateConf := &resource.StateChangeConf{
@@ -265,7 +265,7 @@ func resourceCSBSBackupV1Delete(d *schema.ResourceData, meta interface{}) error 
 	stateConf := &resource.StateChangeConf{
 		Pending:    []string{"available","deleting"},
 		Target:     []string{"deleted"},
-		Refresh:    waitForCSBSBackupDelete(backupClient, d.Id(),d.Get("backup_id").(string)),
+		Refresh:    waitForCSBSBackupDelete(backupClient, d.Id(),d.Get("backup_record_id").(string)),
 		Timeout:    d.Timeout(schema.TimeoutDelete),
 		Delay:      5 * time.Second,
 		MinTimeout: 3 * time.Second,
