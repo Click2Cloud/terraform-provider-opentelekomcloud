@@ -62,7 +62,7 @@ func testAccCSBSBackupV1Destroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := backup.List(backupClient, backup.ListOpts{CheckpointId: rs.Primary.Attributes["backup_id"]})
+		_, err := backup.List(backupClient, backup.ListOpts{CheckpointId: rs.Primary.Attributes["backup_record_id"]})
 		if err != nil {
 			return fmt.Errorf("Backup still exists")
 		}
@@ -78,7 +78,7 @@ func testAccCSBSBackupV1Exists(n string, backups *backup.CheckpointItem) resourc
 			return fmt.Errorf("Backup not found: %s", n)
 		}
 
-		if rs.Primary.Attributes["backup_id"] == "" {
+		if rs.Primary.Attributes["backup_record_id"] == "" {
 			return fmt.Errorf("No ID is set")
 		}
 
@@ -88,13 +88,13 @@ func testAccCSBSBackupV1Exists(n string, backups *backup.CheckpointItem) resourc
 			return fmt.Errorf("Error creating opentelekomcloud csbs client: %s", err)
 		}
 
-		backupList, err := backup.List(backupClient, backup.ListOpts{CheckpointId: rs.Primary.Attributes["backup_id"]})
+		backupList, err := backup.List(backupClient, backup.ListOpts{CheckpointId: rs.Primary.Attributes["backup_record_id"]})
 		if err != nil {
 			return err
 		}
 		found := backupList[0]
 		log.Printf("[DEBUG] found : %s", found)
-		if found.CheckpointId != rs.Primary.Attributes["backup_id"] {
+		if found.CheckpointId != rs.Primary.Attributes["backup_record_id"] {
 			return fmt.Errorf("backup  not found")
 		}
 
