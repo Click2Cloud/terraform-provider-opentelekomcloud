@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 )
 
-func TestAccBackupPolicyV2_importBasic(t *testing.T) {
+func TestAccVBSBackupPolicyV2_importBasic(t *testing.T) {
 	resourceName := "opentelekomcloud_vbs_backup_policy_v2.vbs"
 
 	resource.Test(t, resource.TestCase{

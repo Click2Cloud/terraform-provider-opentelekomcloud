@@ -2,13 +2,14 @@ package opentelekomcloud
 
 import (
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/huaweicloud/golangsdk"
 	"github.com/huaweicloud/golangsdk/openstack/vbs/v2/policies"
 	"github.com/huaweicloud/golangsdk/openstack/vbs/v2/tags"
-	"log"
-	"time"
 )
 
 func resourceVBSBackupPolicyV2() *schema.Resource {
@@ -94,7 +95,7 @@ func resourceVBSBackupPolicyV2Create(d *schema.ResourceData, meta interface{}) e
 	}
 
 	createOpts := policies.CreateOpts{
-		PolicyName: d.Get("backup_policy_name").(string),
+		Name: d.Get("backup_policy_name").(string),
 		ScheduledPolicy: policies.CreateSchedule{
 			StartTime:         d.Get("start_time").(string),
 			Frequency:         d.Get("frequency").(int),
@@ -110,12 +111,11 @@ func resourceVBSBackupPolicyV2Create(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return fmt.Errorf("Error creating OpenTelekomCloud Backup Policy: %s", err)
 	}
-	d.SetId(create.PolicyID)
+	d.SetId(create.ID)
 
 	log.Printf("[DEBUG] Waiting for OpenTelekomcomCloud Backup Policy (%s) to become available", d.Id())
 
 	stateConf := &resource.StateChangeConf{
-		//	Pending:    []string{"creating"},
 		Target:     []string{"ON", "OFF"},
 		Refresh:    waitForVBSPolicyActive(vbsClient, d.Id()),
 		Timeout:    d.Timeout(schema.TimeoutCreate),
@@ -139,7 +139,7 @@ func resourceVBSBackupPolicyV2Read(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error creating OpenTelekomCloud Backup Policy Client: %s", err)
 	}
 
-	PolicyOpts := policies.ListOpts{PolicyID: d.Id()} //shares.Get(vbsV2Client, d.Id()).Extract()
+	PolicyOpts := policies.ListOpts{ID: d.Id()}
 	policies, err := policies.List(vbsClient, PolicyOpts)
 	if err != nil {
 		if _, ok := err.(golangsdk.ErrDefault404); ok {
@@ -152,7 +152,7 @@ func resourceVBSBackupPolicyV2Read(d *schema.ResourceData, meta interface{}) err
 
 	n := policies[0]
 
-	d.Set("backup_policy_name", n.PolicyName)
+	d.Set("backup_policy_name", n.Name)
 	d.Set("start_time", n.ScheduledPolicy.StartTime)
 	d.Set("frequency", n.ScheduledPolicy.Frequency)
 	d.Set("rentention_num", n.ScheduledPolicy.RententionNum)
@@ -192,7 +192,7 @@ func resourceVBSBackupPolicyV2Update(d *schema.ResourceData, meta interface{}) e
 	if d.HasChange("backup_policy_name") || d.HasChange("start_time") || d.HasChange("frequency") ||
 		d.HasChange("rentention_num") || d.HasChange("retain_first_backup") || d.HasChange("status") {
 		if d.HasChange("backup_policy_name") {
-			updateOpts.PolicyName = d.Get("backup_policy_name").(string)
+			updateOpts.Name = d.Get("backup_policy_name").(string)
 		}
 		if d.HasChange("start_time") {
 			updateOpts.ScheduledPolicy.StartTime = d.Get("start_time").(string)
@@ -215,16 +215,13 @@ func resourceVBSBackupPolicyV2Update(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 	if d.HasChange("tags") {
-		//on tags update , delete the old ones and add new tags.
-		// first get the list of old tags
 		oldTags, _ := tags.Get(vbsClient, d.Id()).Extract()
-		//delete the old tags
 		deleteopts := tags.BatchOpts{Action: "delete", Tags: oldTags.Tag}
-		delete := tags.BatchAction(vbsClient, d.Id(), deleteopts)
-		if delete.Err != nil {
-			return fmt.Errorf("Error updating OpenTelekomCloud backup policy tags: %s", delete.Err)
+		deleteTags := tags.BatchAction(vbsClient, d.Id(), deleteopts)
+		if deleteTags.Err != nil {
+			return fmt.Errorf("Error updating OpenTelekomCloud backup policy tags: %s", deleteTags.Err)
 		}
-		//add the new new tags
+
 		createTags := tags.BatchAction(vbsClient, d.Id(), tags.BatchOpts{Action: "create", Tags: resourceVBSUpdateTagsV2(d)})
 		if createTags.Err != nil {
 			return fmt.Errorf("Error updating OpenTelekomCloud backup policy tags: %s", createTags.Err)
@@ -261,7 +258,7 @@ func resourceVBSBackupPolicyV2Delete(d *schema.ResourceData, meta interface{}) e
 func waitForVBSPolicyDelete(vbsClient *golangsdk.ServiceClient, policyID string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 
-		r, err := policies.List(vbsClient, policies.ListOpts{PolicyID: policyID})
+		r, err := policies.List(vbsClient, policies.ListOpts{ID: policyID})
 
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
@@ -291,15 +288,12 @@ func waitForVBSPolicyDelete(vbsClient *golangsdk.ServiceClient, policyID string)
 
 func waitForVBSPolicyActive(vbsClient *golangsdk.ServiceClient, policyID string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
-		PolicyOpts := policies.ListOpts{PolicyID: policyID} //shares.Get(vbsV2Client, d.Id()).Extract()
+		PolicyOpts := policies.ListOpts{ID: policyID}
 		policies, err := policies.List(vbsClient, PolicyOpts)
 		if err != nil {
 			return nil, "", err
 		}
 		n := policies[0]
-		//if n.ScheduledPolicy.Status != "ON" || n.ScheduledPolicy.Status != "OFF" {
-		//	return n, "creating", nil
-		//}
 
 		return n, n.ScheduledPolicy.Status, nil
 	}

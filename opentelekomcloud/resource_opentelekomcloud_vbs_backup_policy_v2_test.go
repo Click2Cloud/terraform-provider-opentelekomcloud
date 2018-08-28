@@ -2,11 +2,13 @@ package opentelekomcloud
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 
-	"github.com/huaweicloud/golangsdk/openstack/vbs/v2/policies"
 	"testing"
+
+	"github.com/huaweicloud/golangsdk/openstack/vbs/v2/policies"
 )
 
 func TestAccVBSBackupPolicyV2_basic(t *testing.T) {
@@ -71,7 +73,7 @@ func testAccVBSBackupPolicyV2Destroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := policies.List(vbsClient, policies.ListOpts{PolicyID: rs.Primary.ID})
+		_, err := policies.List(vbsClient, policies.ListOpts{ID: rs.Primary.ID})
 		if err != nil {
 			return fmt.Errorf("Backup Policy still exists")
 		}
@@ -97,12 +99,12 @@ func testAccVBSBackupPolicyV2Exists(n string, policy *policies.Policy) resource.
 			return fmt.Errorf("Error creating opentelekomcloud vbs client: %s", err)
 		}
 
-		policyList, err := policies.List(vbsClient, policies.ListOpts{PolicyID: rs.Primary.ID})
+		policyList, err := policies.List(vbsClient, policies.ListOpts{ID: rs.Primary.ID})
 		if err != nil {
 			return err
 		}
 		found := policyList[0]
-		if found.PolicyID != rs.Primary.ID {
+		if found.ID != rs.Primary.ID {
 			return fmt.Errorf("backup policy not found")
 		}
 
