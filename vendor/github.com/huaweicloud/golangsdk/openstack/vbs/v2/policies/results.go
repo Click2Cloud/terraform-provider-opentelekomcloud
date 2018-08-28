@@ -7,17 +7,13 @@ import (
 
 type Policy struct {
 	//Backup policy ID
-	PolicyID string `json:"backup_policy_id"`
+	ID string `json:"backup_policy_id"`
 	//Backup policy name
-	PolicyName string `json:"backup_policy_name"`
+	Name string `json:"backup_policy_name"`
 	//Details about the scheduling policy
 	ScheduledPolicy Schedule `json:"scheduled_policy"`
 	//Number of volumes associated with the backup policy
 	ResourceCount int `json:"policy_resource_count"`
-	//Error message returned after an error occurs
-	Message string `json:"message"`
-	//Error code returned after an error occurs
-	Code string `json:"code"`
 }
 
 type Schedule struct {
@@ -39,10 +35,6 @@ type Resources struct {
 	SuccessResources []ResultResources `json:"success_resources"`
 	//List of the resources that fail to be associated/disassociated
 	FailResources []ResultResources `json:"fail_resources"`
-	//Error message returned after an error occurs
-	Message string `json:"message"`
-	//Error code returned after an error occurs
-	Code string `json:"code"`
 }
 
 type ResultResources struct {

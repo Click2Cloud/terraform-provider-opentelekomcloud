@@ -19,7 +19,7 @@ type CreateOptsBuilder interface {
 // documentation
 type CreateOpts struct {
 	//Backup policy name.It cannot start with default.
-	PolicyName string `json:"backup_policy_name" required:"true"`
+	Name string `json:"backup_policy_name" required:"true"`
 	//Details about the scheduling policy
 	ScheduledPolicy CreateSchedule `json:"scheduled_policy" required:"true"`
 	// Tags to be configured for the backup policy
@@ -77,7 +77,7 @@ type UpdateOptsBuilder interface {
 // UpdateOpts contains the options for Update a Policy.
 type UpdateOpts struct {
 	//Backup policy name.It cannot start with default.
-	PolicyName string `json:"backup_policy_name,omitempty"`
+	Name string `json:"backup_policy_name,omitempty"`
 	//Details about the scheduling policy
 	ScheduledPolicy UpdateSchedule `json:"scheduled_policy,omitempty"`
 }
@@ -126,21 +126,11 @@ func Delete(c *golangsdk.ServiceClient, policyID string) (r DeleteResult) {
 //ListOpts allows filtering policies
 type ListOpts struct {
 	//Backup policy ID
-	PolicyID string `json:"backup_policy_id"`
+	ID string `json:"backup_policy_id"`
 	//Backup policy name
-	PolicyName string `json:"backup_policy_name"`
-	//number of retained backups
-	RetentionNum int `json:"rentention_num"`
-	//Whether it is the first backup in the current month
-	RemainFirstBackup string `json:"remain_first_backup_of_curMonth"`
+	Name string `json:"backup_policy_name"`
 	//Backup policy status
 	Status string `json:"status"`
-	//Start time points of the backup jobsstart time
-	StartTime string `json:"start_time"`
-	//Backup interval
-	Frequency int `json:"frequency"`
-	//Number of volumes associated with the backup policy
-	ResourceCount int `json:"policy_resource_count"`
 }
 
 // ListOptsBuilder allows extensions to add parameters to the List request.
@@ -175,55 +165,52 @@ func FilterPolicies(policies []Policy, opts ListOpts) ([]Policy, error) {
 
 	var refinedPolicies []Policy
 	var matched bool
-	m := map[string]interface{}{}
 
-	if opts.PolicyID != "" {
-		m["PolicyID"] = opts.PolicyID
+	m := map[string]FilterStruct{}
+
+	if opts.ID != "" {
+		m["ID"] = FilterStruct{Value: opts.ID}
 	}
-	if opts.PolicyName != "" {
-		m["PolicyName"] = opts.PolicyName
+	if opts.Name != "" {
+		m["Name"] = FilterStruct{Value: opts.Name}
 	}
+
 	if opts.Status != "" {
-		m["Status"] = opts.Status
+		m["Status"] = FilterStruct{Value: opts.Status, Driller: []string{"ScheduledPolicy"}}
 	}
-	if opts.RemainFirstBackup != "" {
-		m["RemainFirstBackup"] = opts.RemainFirstBackup
-	}
-	if opts.StartTime != "" {
-		m["StartTime"] = opts.StartTime
-	}
-	if opts.ResourceCount != 0 {
-		m["ResourceCount"] = opts.ResourceCount
-	}
-	if opts.Frequency != 0 {
-		m["Frequency"] = opts.Frequency
-	}
+
 	if len(m) > 0 && len(policies) > 0 {
-		for _, policy := range policies {
+		for _, policies := range policies {
 			matched = true
 
 			for key, value := range m {
-				if sVal := getStructPolicyField(&policy, key); !(sVal == value) {
+				if sVal := GetStructNestedField(&policies, key, value.Driller); !(sVal == value.Value) {
 					matched = false
 				}
 			}
-
 			if matched {
-				refinedPolicies = append(refinedPolicies, policy)
+				refinedPolicies = append(refinedPolicies, policies)
 			}
 		}
-
 	} else {
 		refinedPolicies = policies
 	}
-
 	return refinedPolicies, nil
 }
 
-func getStructPolicyField(v *Policy, field string) string {
+func GetStructNestedField(v *Policy, field string, structDriller []string) string {
 	r := reflect.ValueOf(v)
-	f := reflect.Indirect(r).FieldByName(field)
-	return string(f.String())
+	for _, drillField := range structDriller {
+		f := reflect.Indirect(r).FieldByName(drillField).Interface()
+		r = reflect.ValueOf(f)
+	}
+	f1 := reflect.Indirect(r).FieldByName(field)
+	return string(f1.String())
+}
+
+type FilterStruct struct {
+	Value   string
+	Driller []string
 }
 
 // AssociateOptsBuilder allows extensions to add additional parameters to the

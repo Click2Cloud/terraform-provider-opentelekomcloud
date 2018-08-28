@@ -6,7 +6,7 @@ import (
 
 type Tags struct {
 	//contains list of tags, i.e.key value pair
-	Tag []ActionTags `json:"tags"` // replaced Tag with ActionTags
+	Tag []ActionTags `json:"tags"`
 }
 
 type Tag struct {
