@@ -47,6 +47,6 @@ resource "opentelekomcloud_csbs_backup_v1" "csbs" {
   resource_type = "OS::Nova::Server"
 }
 data "opentelekomcloud_csbs_backup_v1" "csbs" {
-  id = "${opentelekomcloud_csbs_backup_v1.csbs.backup_id}"
+  backup_id = "${opentelekomcloud_csbs_backup_v1.csbs.id}"
 }
 `
