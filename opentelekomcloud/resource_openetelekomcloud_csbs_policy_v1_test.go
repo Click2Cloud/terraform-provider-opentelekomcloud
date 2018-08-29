@@ -8,61 +8,61 @@ import (
 	"testing"
 )
 
-func TestAccCSBSBackupPoliciesV1_basic(t *testing.T) {
+func TestAccCSBSBackupPolicyV1_basic(t *testing.T) {
 	var policy policies.PolicyResp
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckCSBSBackupPoliciesV1Destroy,
+		CheckDestroy: testAccCheckCSBSBackupPolicyV1Destroy,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccCSBSBackupPoliciesV1_basic,
+				Config: testAccCSBSBackupPolicyV1_basic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckCSBSBackupPoliciesV1Exists("opentelekomcloud_csbs_backup_policies_v1.backup_policy_v1", &policy),
+					testAccCheckCSBSBackupPolicyV1Exists("opentelekomcloud_csbs_backup_policy_v1.backup_policy_v1", &policy),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_csbs_backup_policies_v1.backup_policy_v1", "name", "backup-policy"),
+						"opentelekomcloud_csbs_backup_policy_v1.backup_policy_v1", "name", "backup-policy"),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_csbs_backup_policies_v1.backup_policy_v1", "description", "test-code"),
+						"opentelekomcloud_csbs_backup_policy_v1.backup_policy_v1", "description", "test-code"),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_csbs_backup_policies_v1.backup_policy_v1", "provider_id", "fc4d5750-22e7-4798-8a46-f48f62c4c1da"),
+						"opentelekomcloud_csbs_backup_policy_v1.backup_policy_v1", "provider_id", "fc4d5750-22e7-4798-8a46-f48f62c4c1da"),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_csbs_backup_policies_v1.backup_policy_v1", "resources.#", "3"),
+						"opentelekomcloud_csbs_backup_policy_v1.backup_policy_v1", "resources.#", "3"),
 				),
 			},
 			resource.TestStep{
-				Config: testAccCSBSBackupPoliciesV1_update,
+				Config: testAccCSBSBackupPolicyV1_update,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckCSBSBackupPoliciesV1Exists("opentelekomcloud_csbs_backup_policies_v1.backup_policy_v1", &policy),
+					testAccCheckCSBSBackupPolicyV1Exists("opentelekomcloud_csbs_backup_policy_v1.backup_policy_v1", &policy),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_csbs_backup_policies_v1.backup_policy_v1", "name", "backup-policy-update"),
+						"opentelekomcloud_csbs_backup_policy_v1.backup_policy_v1", "name", "backup-policy-update"),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_csbs_backup_policies_v1.backup_policy_v1", "description", "test-code-update"),
+						"opentelekomcloud_csbs_backup_policy_v1.backup_policy_v1", "description", "test-code-update"),
 				),
 			},
 		},
 	})
 }
 
-func TestAccCSBSBackupPoliciesV1_timeout(t *testing.T) {
+func TestAccCSBSBackupPolicyV1_timeout(t *testing.T) {
 	var policy policies.PolicyResp
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckCSBSBackupPoliciesV1Destroy,
+		CheckDestroy: testAccCheckCSBSBackupPolicyV1Destroy,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccCSBSBackupPoliciesV1_timeout,
+				Config: testAccCSBSBackupPolicyV1_timeout,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckCSBSBackupPoliciesV1Exists("opentelekomcloud_csbs_backup_policies_v1.backup_policy_v1", &policy),
+					testAccCheckCSBSBackupPolicyV1Exists("opentelekomcloud_csbs_backup_policy_v1.backup_policy_v1", &policy),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckCSBSBackupPoliciesV1Destroy(s *terraform.State) error {
+func testAccCheckCSBSBackupPolicyV1Destroy(s *terraform.State) error {
 	config := testAccProvider.Meta().(*Config)
 	policyClient, err := config.backupV1Client(OS_REGION_NAME)
 	if err != nil {
@@ -70,7 +70,7 @@ func testAccCheckCSBSBackupPoliciesV1Destroy(s *terraform.State) error {
 	}
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "opentelekomcloud_csbs_backup_policies_v1" {
+		if rs.Type != "opentelekomcloud_csbs_backup_policy_v1" {
 			continue
 		}
 
@@ -83,7 +83,7 @@ func testAccCheckCSBSBackupPoliciesV1Destroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckCSBSBackupPoliciesV1Exists(n string, policy *policies.PolicyResp) resource.TestCheckFunc {
+func testAccCheckCSBSBackupPolicyV1Exists(n string, policy *policies.PolicyResp) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -115,8 +115,8 @@ func testAccCheckCSBSBackupPoliciesV1Exists(n string, policy *policies.PolicyRes
 	}
 }
 
-const testAccCSBSBackupPoliciesV1_basic = `
-resource "opentelekomcloud_csbs_backup_policies_v1" "backup_policy_v1" {
+const testAccCSBSBackupPolicyV1_basic = `
+resource "opentelekomcloud_csbs_backup_policy_v1" "backup_policy_v1" {
 	name            = "backup-policy"
   	description      = "test-code"
   	provider_id = "fc4d5750-22e7-4798-8a46-f48f62c4c1da"
@@ -137,8 +137,8 @@ resource "opentelekomcloud_csbs_backup_policies_v1" "backup_policy_v1" {
 }
 `
 
-var testAccCSBSBackupPoliciesV1_update = `
-resource "opentelekomcloud_csbs_backup_policies_v1" "backup_policy_v1" {
+var testAccCSBSBackupPolicyV1_update = `
+resource "opentelekomcloud_csbs_backup_policy_v1" "backup_policy_v1" {
 	name            = "backup-policy-update"
   	description      = "test-code-update"
   	provider_id = "fc4d5750-22e7-4798-8a46-f48f62c4c1da"
@@ -159,8 +159,8 @@ resource "opentelekomcloud_csbs_backup_policies_v1" "backup_policy_v1" {
 }
 `
 
-var testAccCSBSBackupPoliciesV1_timeout = `
-resource "opentelekomcloud_csbs_backup_policies_v1" "backup_policy_v1" {
+var testAccCSBSBackupPolicyV1_timeout = `
+resource "opentelekomcloud_csbs_backup_policy_v1" "backup_policy_v1" {
 	name            = "backup-policy"
   	description      = "test-code"
   	provider_id = "fc4d5750-22e7-4798-8a46-f48f62c4c1da"
