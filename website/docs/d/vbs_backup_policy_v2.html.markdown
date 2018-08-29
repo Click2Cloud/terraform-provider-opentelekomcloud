@@ -61,6 +61,6 @@ The following attributes are exported:
 
 * `frequency` - Specifies the backup interval. The value is in the range of 1 to 14 days.
 
-**tags** **- ** Represents the list of tag details associated with the backup policy.
+**tags** - Represents the list of tag details associated with the backup policy.
 * `key` - Specifies the tag key. 
 * `value` - Specifies the tag value. 
