@@ -111,7 +111,7 @@ func resourceVBSBackupV2() *schema.Resource {
 	}
 }
 
-func resourceVBSTagsV2(d *schema.ResourceData) []backups.Tags {
+func resourceVBSBackupTagsV2(d *schema.ResourceData) []backups.Tags {
 	rawTags := d.Get("tags").([]interface{})
 	tags := make([]backups.Tags, len(rawTags))
 	for i, raw := range rawTags {
@@ -137,7 +137,7 @@ func resourceVBSBackupV2Create(d *schema.ResourceData, meta interface{}) error {
 		VolumeId:    d.Get("volume_id").(string),
 		SnapshotId:  d.Get("snapshot_id").(string),
 		Description: d.Get("description").(string),
-		Tags:        resourceVBSTagsV2(d),
+		Tags:        resourceVBSBackupTagsV2(d),
 	}
 
 	n, err := backups.Create(vbsClient, createOpts).ExtractJobResponse()
