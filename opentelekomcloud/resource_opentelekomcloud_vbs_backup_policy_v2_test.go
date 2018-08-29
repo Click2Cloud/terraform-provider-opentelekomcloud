@@ -24,7 +24,7 @@ func TestAccVBSBackupPolicyV2_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccVBSBackupPolicyV2Exists("opentelekomcloud_vbs_backup_policy_v2.vbs", &policy),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_vbs_backup_policy_v2.vbs", "backup_policy_name", "policy_001"),
+						"opentelekomcloud_vbs_backup_policy_v2.vbs", "name", "policy_001"),
 					resource.TestCheckResourceAttr(
 						"opentelekomcloud_vbs_backup_policy_v2.vbs", "status", "ON"),
 				),
@@ -34,7 +34,7 @@ func TestAccVBSBackupPolicyV2_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccVBSBackupPolicyV2Exists("opentelekomcloud_vbs_backup_policy_v2.vbs", &policy),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_vbs_backup_policy_v2.vbs", "backup_policy_name", "policy_002"),
+						"opentelekomcloud_vbs_backup_policy_v2.vbs", "name", "policy_002"),
 					resource.TestCheckResourceAttr(
 						"opentelekomcloud_vbs_backup_policy_v2.vbs", "status", "ON"),
 				),
@@ -116,7 +116,7 @@ func testAccVBSBackupPolicyV2Exists(n string, policy *policies.Policy) resource.
 
 var testAccVBSBackupPolicyV2_basic = fmt.Sprintf(`
 resource "opentelekomcloud_vbs_backup_policy_v2" "vbs" {
-  backup_policy_name = "policy_001"
+  name = "policy_001"
   start_time  = "12:00"
   status  = "ON"
   retain_first_backup = "N"
@@ -132,7 +132,7 @@ resource "opentelekomcloud_vbs_backup_policy_v2" "vbs" {
 
 var testAccVBSBackupPolicyV2_update = fmt.Sprintf(`
 resource "opentelekomcloud_vbs_backup_policy_v2" "vbs" {
-  backup_policy_name = "policy_002"
+  name = "policy_002"
   start_time  = "12:00"
   status  = "ON"
   retain_first_backup = "N"
@@ -148,7 +148,7 @@ resource "opentelekomcloud_vbs_backup_policy_v2" "vbs" {
 
 var testAccVBSBackupPolicyV2_timeout = fmt.Sprintf(`
 resource "opentelekomcloud_vbs_backup_policy_v2" "vbs" {
-  backup_policy_name = "policy_002"
+  name = "policy_002"
   start_time  = "12:00"
   status  = "ON"
   retain_first_backup = "N"

@@ -20,7 +20,7 @@ type Schedule struct {
 	//Start time points of the backup job, which are expressed in the UTC format
 	// and separated from each other by commas (,).
 	StartTime string `json:"start_time"`
-	//Backup interva
+	//Backup interval
 	Frequency int `json:"frequency"`
 	//Number of retained backups
 	RententionNum int `json:"rentention_num"`
@@ -113,7 +113,7 @@ func ExtractPolicies(r pagination.Page) ([]Policy, error) {
 	return s.Policies, err
 }
 
-// Extract will get the Association/disassociation of resources from the commonResult
+// ExtractResource will get the Association/disassociation of resources from the ResourceResult
 func (r ResourceResult) ExtractResource() (*Resources, error) {
 	var response Resources
 	err := r.ExtractInto(&response)

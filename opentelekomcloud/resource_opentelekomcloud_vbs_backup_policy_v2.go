@@ -34,7 +34,7 @@ func resourceVBSBackupPolicyV2() *schema.Resource {
 				ForceNew: true,
 				Computed: true,
 			},
-			"backup_policy_name": &schema.Schema{
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -95,7 +95,7 @@ func resourceVBSBackupPolicyV2Create(d *schema.ResourceData, meta interface{}) e
 	}
 
 	createOpts := policies.CreateOpts{
-		Name: d.Get("backup_policy_name").(string),
+		Name: d.Get("name").(string),
 		ScheduledPolicy: policies.CreateSchedule{
 			StartTime:         d.Get("start_time").(string),
 			Frequency:         d.Get("frequency").(int),
@@ -152,12 +152,13 @@ func resourceVBSBackupPolicyV2Read(d *schema.ResourceData, meta interface{}) err
 
 	n := policies[0]
 
-	d.Set("backup_policy_name", n.Name)
+	d.Set("name", n.Name)
 	d.Set("start_time", n.ScheduledPolicy.StartTime)
 	d.Set("frequency", n.ScheduledPolicy.Frequency)
 	d.Set("rentention_num", n.ScheduledPolicy.RententionNum)
 	d.Set("retain_first_backup", n.ScheduledPolicy.RemainFirstBackup)
 	d.Set("status", n.ScheduledPolicy.Status)
+	d.Set("policy_resource_count", n.ResourceCount)
 
 	tags, err := tags.Get(vbsClient, d.Id()).Extract()
 
@@ -189,10 +190,10 @@ func resourceVBSBackupPolicyV2Update(d *schema.ResourceData, meta interface{}) e
 	}
 	var updateOpts policies.UpdateOpts
 
-	if d.HasChange("backup_policy_name") || d.HasChange("start_time") || d.HasChange("frequency") ||
+	if d.HasChange("name") || d.HasChange("start_time") || d.HasChange("frequency") ||
 		d.HasChange("rentention_num") || d.HasChange("retain_first_backup") || d.HasChange("status") {
-		if d.HasChange("backup_policy_name") {
-			updateOpts.Name = d.Get("backup_policy_name").(string)
+		if d.HasChange("name") {
+			updateOpts.Name = d.Get("name").(string)
 		}
 		if d.HasChange("start_time") {
 			updateOpts.ScheduledPolicy.StartTime = d.Get("start_time").(string)
@@ -216,13 +217,13 @@ func resourceVBSBackupPolicyV2Update(d *schema.ResourceData, meta interface{}) e
 	}
 	if d.HasChange("tags") {
 		oldTags, _ := tags.Get(vbsClient, d.Id()).Extract()
-		deleteopts := tags.BatchOpts{Action: "delete", Tags: oldTags.Tag}
+		deleteopts := tags.BatchOpts{Action: tags.ActionDelete, Tags: oldTags.Tag}
 		deleteTags := tags.BatchAction(vbsClient, d.Id(), deleteopts)
 		if deleteTags.Err != nil {
 			return fmt.Errorf("Error updating OpenTelekomCloud backup policy tags: %s", deleteTags.Err)
 		}
 
-		createTags := tags.BatchAction(vbsClient, d.Id(), tags.BatchOpts{Action: "create", Tags: resourceVBSUpdateTagsV2(d)})
+		createTags := tags.BatchAction(vbsClient, d.Id(), tags.BatchOpts{Action: tags.ActionCreate, Tags: resourceVBSUpdateTagsV2(d)})
 		if createTags.Err != nil {
 			return fmt.Errorf("Error updating OpenTelekomCloud backup policy tags: %s", createTags.Err)
 		}

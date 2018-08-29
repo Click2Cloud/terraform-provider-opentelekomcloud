@@ -4,10 +4,13 @@ import (
 	"github.com/huaweicloud/golangsdk"
 )
 
+// CreateOptsBuilder allows extensions to add additional parameters to the
+// Create request.
 type CreateOptsBuilder interface {
 	ToTagsCreateMap() (map[string]interface{}, error)
 }
 
+// CreateOpts contains all the values needed to create or add a new tag.
 type CreateOpts struct {
 	Tag ActionTags `json:"tag" required:"true"`
 }
@@ -21,18 +24,21 @@ type ActionTags struct {
 	Value string `json:"value" required:"true"`
 }
 
+// ToTagsCreateMap builds a create request body from CreateOpts.
 func (opts CreateOpts) ToTagsCreateMap() (map[string]interface{}, error) {
 	return golangsdk.BuildRequestBody(opts, "")
 }
 
-//adds a tag for a backup policy.
+//adds a tag to a backup policy based on the values in CreateOpts. To extract
+// the tag object from the response, call the Extract method on the
+// CreateResult.
 func Create(client *golangsdk.ServiceClient, policyID string, opts CreateOptsBuilder) (r CreateResult) {
 	b, err := opts.ToTagsCreateMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = client.Post(createURL(client, policyID), b, nil, &golangsdk.RequestOpts{
+	_, r.Err = client.Post(commonURL(client, policyID), b, nil, &golangsdk.RequestOpts{
 		OkCodes: []int{204},
 	})
 	return
@@ -48,14 +54,17 @@ func Delete(c *golangsdk.ServiceClient, policyID string, key string) (r DeleteRe
 
 // Get retrieves the tags of a specific backup policy.
 func Get(client *golangsdk.ServiceClient, policyID string) (r GetResult) {
-	_, r.Err = client.Get(createURL(client, policyID), &r.Body, nil)
+	_, r.Err = client.Get(commonURL(client, policyID), &r.Body, nil)
 	return
 }
 
+// QueryOptsBuilder allows extensions to add additional parameters to the
+// Query request.
 type QueryOptsBuilder interface {
 	ToTagsQueryMap() (map[string]interface{}, error)
 }
 
+// QueryOpts contains all the values needed to Query the policy details based on tags.
 type QueryOpts struct {
 	//Number of queried records. This parameter is not displayed if action is set to count.
 	Limit string `json:"limit,omitempty"`
@@ -80,11 +89,14 @@ type QueryTags struct {
 	Values []string `json:"values" required:"true"`
 }
 
+// ToTagsQueryMap builds a Query request body from QueryOpts.
 func (opts QueryOpts) ToTagsQueryMap() (map[string]interface{}, error) {
 	return golangsdk.BuildRequestBody(opts, "")
 }
 
-//retrives a backup policy details using tags.
+//Query retrives a backup policy details using tags.To extract
+// the tag object from the response, call the ExtractResources method on the
+// QueryResults.
 func Query(client *golangsdk.ServiceClient, opts QueryOptsBuilder) (r QueryResults) {
 	b, err := opts.ToTagsQueryMap()
 	if err != nil {
@@ -97,10 +109,13 @@ func Query(client *golangsdk.ServiceClient, opts QueryOptsBuilder) (r QueryResul
 	return
 }
 
+// BatchOptsBuilder allows extensions to add additional parameters to the
+// BatchAction request.
 type BatchOptsBuilder interface {
 	ToTagsBatchMap() (map[string]interface{}, error)
 }
 
+// BatchOpts contains all the values needed to perform BatchAction on the policy tags.
 type BatchOpts struct {
 	//List of tags to perform batch operation
 	Tags []ActionTags `json:"tags,omitempty"`
@@ -120,6 +135,7 @@ var (
 	ActionUpdate ActionType = "update"
 )
 
+// ToTagsBatchMap builds a BatchAction request body from BatchOpts.
 func (opts BatchOpts) ToTagsBatchMap() (map[string]interface{}, error) {
 	return golangsdk.BuildRequestBody(opts, "")
 }

@@ -17,7 +17,7 @@ type Tag struct {
 }
 
 type Resources struct {
-	//List of resources
+	//List of resources i.e. policies
 	Resource []Resource `json:"resources"`
 	//Total number of resources
 	TotalCount int `json:"total_count"`
