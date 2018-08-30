@@ -310,11 +310,21 @@ func resourceCSBSBackupPolicyUpdate(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("Error updating OpenTelekomCloud Share File: %s", err)
 	}
 	var updateOpts policies.UpdateOpts
+	if d.HasChange("name") {
+		updateOpts.Policy.Name = d.Get("name").(string)
+	}
+	if d.HasChange("description") {
+		updateOpts.Policy.Description = d.Get("description").(string)
+	}
+	updateOpts.Policy.Parameters.Common =map[string]interface {}{}
 
-	updateOpts.Policy.Name = d.Get("name").(string)
-	updateOpts.Policy.Description = d.Get("description").(string)
-	//updateOpts.Policy.Resources = resourceVBSResourceUpdateV2(d)
-	updateOpts.Policy.ScheduledOperations = resourceVBSScheduleUpdateV2(d)
+	if d.HasChange("resources") {
+		updateOpts.Policy.Resources = resourceVBSResourceUpdateV2(d)
+	}
+	if d.HasChange("scheduled_operations") {
+		updateOpts.Policy.ScheduledOperations = resourceVBSScheduleUpdateV2(d)
+	}
+	log.Printf("[DEBUG] updateopts :  %#v",  updateOpts)
 
 	log.Printf("[DEBUG] resourceVBSScheduleUpdateV2 :  %#v", resourceVBSScheduleUpdateV2(d))
 	_, err = policies.Update(policyClient, d.Id(), updateOpts).Extract()
@@ -483,3 +493,4 @@ func resourceVBSResourceUpdateV2(d *schema.ResourceData) []policies.ResourceUpda
 	}
 	return tags
 }
+

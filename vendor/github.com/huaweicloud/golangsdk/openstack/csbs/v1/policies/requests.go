@@ -211,7 +211,7 @@ type PolicyUpdate struct {
 }
 
 type PolicyParamUpdate struct {
-	Common map[string]interface{} `json:"common" required:"true"`
+	Common map[string]interface{} `json:"common"  required:"true"`
 }
 
 type ResourceUpdate struct {
