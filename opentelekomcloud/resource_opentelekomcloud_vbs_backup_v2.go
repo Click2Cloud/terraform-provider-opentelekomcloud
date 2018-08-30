@@ -2,12 +2,13 @@ package opentelekomcloud
 
 import (
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/huaweicloud/golangsdk"
 	"github.com/huaweicloud/golangsdk/openstack/vbs/v2/backups"
-	"log"
-	"time"
 )
 
 func resourceVBSBackupV2() *schema.Resource {
@@ -34,6 +35,7 @@ func resourceVBSBackupV2() *schema.Resource {
 			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
+				ForceNew:     true,
 				Computed:     true,
 				ValidateFunc: validateName,
 			},
@@ -45,11 +47,13 @@ func resourceVBSBackupV2() *schema.Resource {
 			"snapshot_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				ForceNew: true,
 				Computed: true,
 			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				ForceNew: true,
 				Computed: true,
 			},
 			"container": &schema.Schema{
@@ -91,18 +95,18 @@ func resourceVBSBackupV2() *schema.Resource {
 			"tags": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
-				Computed: true,
+				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"key": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
-							ForceNew: false,
+							ForceNew: true,
 						},
 						"value": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
-							ForceNew: false,
+							ForceNew: true,
 						},
 					},
 				},
@@ -154,8 +158,10 @@ func resourceVBSBackupV2Create(d *schema.ResourceData, meta interface{}) error {
 
 	if id, ok := entity.(string); ok {
 		d.SetId(id)
+		return resourceVBSBackupV2Read(d, meta)
 	}
-	return resourceVBSBackupV2Read(d, meta)
+
+	return fmt.Errorf("Unexpected conversion error in resourceELoadBalancerCreate.")
 }
 
 func resourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
@@ -220,33 +226,26 @@ func resourceVBSBackupV2Delete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func waitForBackupDelete(vbsClient *golangsdk.ServiceClient, backupId string) resource.StateRefreshFunc {
+func waitForBackupDelete(client *golangsdk.ServiceClient, backupID string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
-
-		r, err := backups.Get(vbsClient, backupId).Extract()
+		v, err := backups.Get(client, backupID).Extract()
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				log.Printf("[INFO] Successfully deleted OpenTelekomCloud backup %s", backupId)
-				return r, "deleted", nil
+				return v, "deleted", nil
 			}
-			return r, "available", err
+			return nil, "available", err
 		}
 
-		err = backups.Delete(vbsClient, backupId).ExtractErr()
-
-		if err != nil {
-			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				log.Printf("[INFO] Successfully deleted OpenTelekomCloud backup %s", backupId)
-				return r, "deleted", nil
-			}
-			if errCode, ok := err.(golangsdk.ErrUnexpectedResponseCode); ok {
-				if errCode.Actual == 409 {
-					return r, "available", nil
+		if v.Status != "deleting" {
+			err := backups.Delete(client, backupID).ExtractErr()
+			if err != nil {
+				if _, ok := err.(golangsdk.ErrDefault404); ok {
+					log.Printf("[INFO] Successfully deleted OpenTelekomCloud backup %s", backupID)
+					return v, "deleted", nil
 				}
+				return v, v.Status, err
 			}
-			return r, "available", err
 		}
-
-		return r, "available", nil
+		return v, v.Status, nil
 	}
 }

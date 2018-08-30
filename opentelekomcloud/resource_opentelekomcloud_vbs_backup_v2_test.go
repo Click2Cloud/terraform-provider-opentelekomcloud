@@ -87,7 +87,7 @@ func testAccCheckVBSBackupV2Exists(n string, configs *backups.Backup) resource.T
 		config := testAccProvider.Meta().(*Config)
 		vbsClient, err := config.vbsV2Client(OS_REGION_NAME)
 		if err != nil {
-			return fmt.Errorf("Error creating OpenTelekomCloud orchestration client: %s", err)
+			return fmt.Errorf("Error creating OpenTelekomCloud vbs client: %s", err)
 		}
 
 		found, err := backups.Get(vbsClient, rs.Primary.ID).Extract()
@@ -106,44 +106,18 @@ func testAccCheckVBSBackupV2Exists(n string, configs *backups.Backup) resource.T
 }
 
 const testAccVBSBackupV2_basic = `
-resource "opentelekomcloud_blockstorage_volume_v2" "volume_1" {
-  name = "volume_1"
-  description = "first test volume"
-  metadata {
-    foo = "bar"
-  }
-  size = 1
-}
-
-resource "opentelekomcloud_vbs_backup_v2" "vbs" {
-  volume_id = "${opentelekomcloud_blockstorage_volume_v2.volume_1.id}"
+resource "opentelekomcloud_vbs_backup_v2" "backup_1" {
+  volume_id = "b02b11ea-4eab-4bcb-96b7-9c872adfdafc"
   name = "opentelekomcloud-backup"
   description = "Backup_Demo"
-  tags =[{
-          key = "key1"
-          value = "value1"
-     }]
 }
 `
 
 const testAccVBSBackupV2_timeout = `
-resource "opentelekomcloud_blockstorage_volume_v2" "volume_1" {
-  name = "volume_1"
-  description = "first test volume"
-  metadata {
-    foo = "bar"
-  }
-  size = 1
-}
-
-resource "opentelekomcloud_vbs_backup_v2" "vbs" {
-  volume_id = "${opentelekomcloud_blockstorage_volume_v2.volume_1.id}"
+resource "opentelekomcloud_vbs_backup_v2" "backup_1" {
+  volume_id = "b02b11ea-4eab-4bcb-96b7-9c872adfdafc"
   name = "opentelekomcloud-backup"
   description = "Backup_Demo"
-  tags =[{
-          key = "key1"
-          value = "value1"
-     }]
 
   timeouts {
     create = "5m"

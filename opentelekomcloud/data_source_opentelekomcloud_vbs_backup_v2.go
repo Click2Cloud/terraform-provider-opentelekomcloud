@@ -23,10 +23,6 @@ func dataSourceVBSBackupV2() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			/*"share_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-			},*/
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -63,10 +59,6 @@ func dataSourceVBSBackupV2() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			/*"to_tenant_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},*/
 			"service_metadata": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -128,50 +120,6 @@ func dataSourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
 	d.Set("object_count", Backup.ObjectCount)
 	d.Set("volume_id", Backup.VolumeId)
 	d.Set("region", GetRegion(d, config))
-
-	/*listOpts1 := shares.ListOpts{
-		Id:     d.Get("share_id").(string),
-		Name:   d.Get("name").(string),
-		Status: d.Get("status").(string),
-		VolumeId:   d.Get("volume_id").(string),
-		SnapshotId:   d.Get("snapshot_id").(string),
-		BackupId: d.Get("id").(string),
-		AZ:d.Get("snapshot_id").(string),
-	}
-
-	refinedShares, err := shares.List(vbsClient, listOpts1)
-	if err != nil {
-		return fmt.Errorf("Unable to retrieve shares: %s", err)
-	}
-
-	if len(refinedShares) < 1 {
-		return fmt.Errorf("Your query returned no results. " +
-			"Please change your search criteria and try again.")
-	}
-
-	if len(refinedShares) > 1 {
-		return fmt.Errorf("Your query returned more than one result." +
-			" Please try a more specific search criteria")
-	}
-	Share := refinedShares[0]
-
-	log.Printf("[INFO] Retrieved Share using given filter %s: %+v", Share.Id, Share)
-	d.SetId(Share.Id)
-
-	d.Set("from_tenant_id", Share.FromProjectId)
-	d.Set("to_tenant_id", Share.ToProjectId)
-	d.Set("name", Share.Backup.Name)
-	d.Set("description", Share.Backup.Description)
-	d.Set("status", Share.Backup.Status)
-	d.Set("availability_zone", Share.Backup.AZ)
-	d.Set("snapshot_id", Share.Backup.SnapshotId)
-	d.Set("service_metadata", Share.Backup.ServiceMetadata)
-	d.Set("size", Share.Backup.Size)
-	d.Set("fail_reason", Share.Backup.FailReason)
-	d.Set("container", Share.Backup.Container)
-	d.Set("object_count", Share.Backup.ObjectCount)
-	d.Set("volume_id", Share.Backup.VolumeId)
-	d.Set("region", GetRegion(d, config))*/
 
 	return nil
 }
