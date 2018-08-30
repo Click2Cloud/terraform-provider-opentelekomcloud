@@ -186,7 +186,7 @@ func resourceVBSBackupPolicyV2Update(d *schema.ResourceData, meta interface{}) e
 	config := meta.(*Config)
 	vbsClient, err := config.vbsV2Client(GetRegion(d, config))
 	if err != nil {
-		return fmt.Errorf("Error updating OpenTelekomCloud Share File: %s", err)
+		return fmt.Errorf("Error updating OpenTelekomCloud backup policy: %s", err)
 	}
 	var updateOpts policies.UpdateOpts
 
@@ -263,7 +263,7 @@ func waitForVBSPolicyDelete(vbsClient *golangsdk.ServiceClient, policyID string)
 
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				log.Printf("[INFO] Successfully deleted OpenTelekomCloud shared File %s", policyID)
+				log.Printf("[INFO] Successfully deleted OpenTelekomCloud backup policy %s", policyID)
 				return r, "deleted", nil
 			}
 			return r, "available", err
@@ -272,7 +272,7 @@ func waitForVBSPolicyDelete(vbsClient *golangsdk.ServiceClient, policyID string)
 		err = delete.Err
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				log.Printf("[INFO] Successfully deleted OpenTelekomCloud shared File %s", policyID)
+				log.Printf("[INFO] Successfully deleted OpenTelekomCloud backup policy %s", policyID)
 				return r, "deleted", nil
 			}
 			if errCode, ok := err.(golangsdk.ErrUnexpectedResponseCode); ok {
