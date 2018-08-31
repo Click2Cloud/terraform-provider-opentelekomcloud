@@ -1,9 +1,11 @@
 package opentelekomcloud
+
 import (
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/huaweicloud/golangsdk/openstack/csbs/v1/backup"
 	"fmt"
 	"log"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/huaweicloud/golangsdk/openstack/csbs/v1/backup"
 )
 
 func dataSourceCSBSBackupV1() *schema.Resource {
@@ -145,6 +147,22 @@ func dataSourceCSBSBackupV1() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"tags": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"key": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"value": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -175,6 +193,15 @@ func dataSourceCSBSBackupV1Read(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	backups := refinedbackups[0]
+
+	var t []map[string]interface{}
+	for _, tags := range backups.Tags {
+		mapping := map[string]interface{}{
+			"key":   tags.Key,
+			"value": tags.Value,
+		}
+		t = append(t, mapping)
+	}
 
 	log.Printf("[INFO] Retrieved Shares using given filter %s: %+v", backups.Id, backups)
 	d.SetId(backups.Id)
@@ -208,9 +235,10 @@ func dataSourceCSBSBackupV1Read(d *schema.ResourceData, meta interface{}) error 
 	d.Set("vcpus", backups.BackupData.Vcpus)
 	d.Set("eip", backups.BackupData.Eip)
 	d.Set("private_ip", backups.BackupData.PrivateIp)
+	if err := d.Set("tags", t); err != nil {
+		return err
+	}
 	d.Set("region", GetRegion(d, config))
-
-
 
 	return nil
 }

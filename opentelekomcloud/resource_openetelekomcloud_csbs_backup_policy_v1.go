@@ -1,11 +1,13 @@
 package opentelekomcloud
+
 import (
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/huaweicloud/golangsdk"
-	"log"
-	"time"
 	"github.com/huaweicloud/golangsdk/openstack/csbs/v1/policies"
 )
 
@@ -62,44 +64,57 @@ func resourceCSBSBackupPolicyV1() *schema.Resource {
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"so_name": &schema.Schema{
+						"scheduled_period_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 							//ForceNew:     false,
 						},
-						"so_description": &schema.Schema{
+						"scheduled_period_description": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
-							ForceNew:     false,
+							ForceNew: false,
 						},
 						"enabled": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
-							Default: true,
-							ForceNew:     false,
+							Default:  true,
+							ForceNew: false,
 						},
 						"max_backups": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
-							ForceNew:     false,
+							ForceNew: false,
+						},
+						"retention_duration_days": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"permanent": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"plan_id": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
 						},
 						"pattern": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
-							ForceNew:     false,
+							ForceNew: false,
 						},
 						"operation_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"id": &schema.Schema{
+						"scheduled_period_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 						"trigger_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
-							//ForceNew:false,
+							Computed: true,
 						},
 						"scheduler_id": &schema.Schema{
 							Type:     schema.TypeString,
@@ -121,23 +136,22 @@ func resourceCSBSBackupPolicyV1() *schema.Resource {
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": &schema.Schema{
+						"resource_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"type": &schema.Schema{
+						"resource_type": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"r_name": &schema.Schema{
+						"resource_name": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
 						},
-
 					},
 				},
 			},
-			/*"tags": &schema.Schema{
+			"tags": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -145,21 +159,20 @@ func resourceCSBSBackupPolicyV1() *schema.Resource {
 						"key": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
-							ForceNew:true,
+							ForceNew: true,
 						},
 						"value": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
-							ForceNew:true,
+							ForceNew: true,
 						},
 					},
 				},
-			},*/
+			},
 		},
 	}
 
-	}
-
+}
 
 func resourceCSBSBackupPolicyCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
@@ -168,9 +181,8 @@ func resourceCSBSBackupPolicyCreate(d *schema.ResourceData, meta interface{}) er
 	if err != nil {
 		return fmt.Errorf("Error creating OpenTelekomCloud backup policy Client: %s", err)
 	}
-	log.Printf("[INFO] create opts ")
 
-	createOpts:=policies.CreateOpts{
+	createOpts := policies.CreateOpts{
 		Policy: policies.PolicyCreate{
 			Name:        d.Get("name").(string),
 			Description: d.Get("description").(string),
@@ -178,19 +190,27 @@ func resourceCSBSBackupPolicyCreate(d *schema.ResourceData, meta interface{}) er
 			Parameters: policies.PolicyParam{
 				Common: map[string]interface{}{},
 			},
-			ScheduledOperations: resourceVBSScheduleV2(d),
+			ScheduledOperations: resourceCSBSScheduleV1(d),
 
-			Resources: resourceVBSResourceV2(d),
+			Resources: resourceCSBSResourceV1(d),
+			Tags:      resourceCSBSPolicyTagsV1(d),
 		},
 	}
-	log.Printf("[INFO] create opts to create: %#v ",createOpts)
-	log.Printf("[DEBUG] CreateOpts: %#v", createOpts)
+
 	create, err := policies.Create(policyClient, createOpts).Extract()
 
 	if err != nil {
-		return fmt.Errorf("Error creating OpenTelekomCloud Backup: %s", err)
+		return fmt.Errorf("Error creating OpenTelekomCloud Backup Policy : %s", err)
 	}
-	log.Printf("[DEBUG] Create: %#v %s", create, create.Id)
+	/*if err != nil {
+		if _, ok := err.(gophercloud.ErrDefault500); ok {
+			return fmt.Errorf("Server (%s) is already in service.", createOpts.Policy.Resources[0].Id)
+		}
+		return fmt.Errorf("Error creating OpenTelekomCloud Backup : %s", err)
+	} else {
+		log.Printf("[DEBUG] Create Id (%s): %s", create.Id)
+	}*/
+
 	d.SetId(create.Id)
 
 	stateConf := &resource.StateChangeConf{
@@ -203,10 +223,8 @@ func resourceCSBSBackupPolicyCreate(d *schema.ResourceData, meta interface{}) er
 	}
 	_, StateErr := stateConf.WaitForState()
 	if StateErr != nil {
-		return fmt.Errorf("Error waiting for Backup Policy (%s) to become available: %s",	create.Id, StateErr)
+		return fmt.Errorf("Error waiting for Backup Policy (%s) to become available: %s", create.Id, StateErr)
 	}
-
-	log.Printf("[DEBUG] Waiting for OpenTelekomCloud Backup (%s) to become available", create.Id)
 
 	return resourceCSBSBackupPolicyRead(d, meta)
 
@@ -230,40 +248,44 @@ func resourceCSBSBackupPolicyRead(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Error retrieving OpenTelekomCloud backup policy: %s", err)
 	}
 	var resourcelist []map[string]interface{}
-	for _, hosts := range n.Resources{
+	for _, resources := range n.Resources {
 		mapping := map[string]interface{}{
-			"id":		  hosts.Id,
-			"type":         hosts.Type,
-			"r_name": hosts.Name,
-
+			"resource_id":   resources.Id,
+			"resource_type": resources.Type,
+			"resource_name": resources.Name,
 		}
 		resourcelist = append(resourcelist, mapping)
 	}
 
 	var scheduledlist []map[string]interface{}
-	for _, hosts := range n.ScheduledOperations{
+	for _, schedule := range n.ScheduledOperations {
 		mapping := map[string]interface{}{
-			"so_description":		  hosts.Description,
-			"enabled":         hosts.Enabled,
-			//"trigger_id":         hosts.TriggerId,
-			"so_name":         hosts.Name,
-			"operation_type":         hosts.OperationType,
-			"max_backups":         hosts.OperationDefinition.MaxBackups,
-			//"retention_duration_days":         hosts.OperationDefinition.RetentionDurationDays,
-			//"permanent":         hosts.OperationDefinition.Permanent,
-			//"plan_id":         hosts.OperationDefinition.PlanId,
-			//"provider_id":         hosts.OperationDefinition.ProviderId,
-			"scheduler_id":         hosts.Trigger.Id,
-			"scheduler_name":         hosts.Trigger.Name,
-			"scheduler_type":         hosts.Trigger.Type,
-			"pattern":         hosts.Trigger.Properties.Pattern,
-			"id": hosts.Id,
-
+			"scheduled_period_description": schedule.Description,
+			"enabled":                      schedule.Enabled,
+			"trigger_id":                   schedule.TriggerId,
+			"scheduled_period_name":        schedule.Name,
+			"operation_type":               schedule.OperationType,
+			"max_backups":                  schedule.OperationDefinition.MaxBackups,
+			"retention_duration_days":      schedule.OperationDefinition.RetentionDurationDays,
+			"permanent":                    schedule.OperationDefinition.Permanent,
+			"plan_id":                      schedule.OperationDefinition.PlanId,
+			"scheduler_id":                 schedule.Trigger.Id,
+			"scheduler_name":               schedule.Trigger.Name,
+			"scheduler_type":               schedule.Trigger.Type,
+			"pattern":                      schedule.Trigger.Properties.Pattern,
+			"scheduled_period_id":          schedule.Id,
 		}
 		scheduledlist = append(scheduledlist, mapping)
 	}
 
-
+	var tagslist []map[string]interface{}
+	for _, tag := range n.Tags {
+		mapping := map[string]interface{}{
+			"key":   tag.Key,
+			"value": tag.Value,
+		}
+		tagslist = append(tagslist, mapping)
+	}
 
 	d.Set("description", n.Description)
 	d.Set("id", n.Id)
@@ -271,34 +293,17 @@ func resourceCSBSBackupPolicyRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("common", n.Parameters.Common)
 	d.Set("project_id", n.ProjectId)
 	d.Set("provider_id", n.ProviderId)
-	//d.Set("id", n.Resources[0].Id)
-	//d.Set("type", n.Resources[0].Type)
-	//d.Set("name", n.Resources[0].Name)
-	//d.Set("extra_info", n.Resources[0].ExtraInfo)
-	//d.Set("description", n.ScheduledOperations[0].Description)
-	//d.Set("enabled", n.ScheduledOperations[0].Enabled)
-	//d.Set("trigger_id", n.ScheduledOperations[0].TriggerId)
-	//d.Set("name", n.ScheduledOperations[0].Name)
-	//d.Set("operation_type", n.ScheduledOperations[0].OperationType)
-	//d.Set("max_backups", n.ScheduledOperations[0].OperationDefinition.MaxBackups)
-	//d.Set("retention_duration_days", n.ScheduledOperations[0].OperationDefinition.RetentionDurationDays)
-	//d.Set("permanent", n.ScheduledOperations[0].OperationDefinition.Permanent)
-	//d.Set("plan_id", n.ScheduledOperations[0].OperationDefinition.PlanId)
-	//d.Set("pattern", n.ScheduledOperations[0].Trigger.Properties.Pattern)
-	//d.Set("type", n.ScheduledOperations[0].Trigger.Type)
-	//d.Set("id", n.ScheduledOperations[0].Trigger.Id)
-	//d.Set("name", n.ScheduledOperations[0].Trigger.Name)
-	//d.Set("id", n.ScheduledOperations[0].Id)
 	d.Set("status", n.Status)
-	d.Set("region", GetRegion(d, config))
 	if err := d.Set("resources", resourcelist); err != nil {
 		return err
 	}
 	if err := d.Set("scheduled_operations", scheduledlist); err != nil {
 		return err
 	}
-
-
+	if err := d.Set("tags", tagslist); err != nil {
+		return err
+	}
+	d.Set("region", GetRegion(d, config))
 
 	return nil
 }
@@ -307,7 +312,7 @@ func resourceCSBSBackupPolicyUpdate(d *schema.ResourceData, meta interface{}) er
 	config := meta.(*Config)
 	policyClient, err := config.backupV1Client(GetRegion(d, config))
 	if err != nil {
-		return fmt.Errorf("Error updating OpenTelekomCloud Share File: %s", err)
+		return fmt.Errorf("Error updating OpenTelekomCloud Backup Policy: %s", err)
 	}
 	var updateOpts policies.UpdateOpts
 	if d.HasChange("name") {
@@ -316,30 +321,26 @@ func resourceCSBSBackupPolicyUpdate(d *schema.ResourceData, meta interface{}) er
 	if d.HasChange("description") {
 		updateOpts.Policy.Description = d.Get("description").(string)
 	}
-	updateOpts.Policy.Parameters.Common =map[string]interface {}{}
+	updateOpts.Policy.Parameters.Common = map[string]interface{}{}
 
 	if d.HasChange("resources") {
-		updateOpts.Policy.Resources = resourceVBSResourceUpdateV2(d)
+		updateOpts.Policy.Resources = resourceCSBSResourceUpdateV1(d)
 	}
 	if d.HasChange("scheduled_operations") {
-		updateOpts.Policy.ScheduledOperations = resourceVBSScheduleUpdateV2(d)
+		updateOpts.Policy.ScheduledOperations = resourceCSBScheduleUpdateV1(d)
 	}
-	log.Printf("[DEBUG] updateopts :  %#v",  updateOpts)
 
-	log.Printf("[DEBUG] resourceVBSScheduleUpdateV2 :  %#v", resourceVBSScheduleUpdateV2(d))
 	_, err = policies.Update(policyClient, d.Id(), updateOpts).Extract()
 	if err != nil {
 		return fmt.Errorf("Error updating OpenTelekomCloud RTS Software Deployment: %s", err)
 	}
-	log.Printf("[DEBUG] err :  %#v",  err)
+
 	return resourceCSBSBackupPolicyRead(d, meta)
 }
 
-
-
 func resourceCSBSBackupPolicyDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	vbsClient, err := config.backupV1Client(GetRegion(d, config))
+	policyClient, err := config.backupV1Client(GetRegion(d, config))
 	if err != nil {
 		return fmt.Errorf("Error creating OpenTelekomCloud Backup Policy: %s", err)
 	}
@@ -347,7 +348,7 @@ func resourceCSBSBackupPolicyDelete(d *schema.ResourceData, meta interface{}) er
 	stateConf := &resource.StateChangeConf{
 		Pending:    []string{"available"},
 		Target:     []string{"deleted"},
-		Refresh:    waitForVBSPolicyDelete(vbsClient, d.Id()),
+		Refresh:    waitForVBSPolicyDelete(policyClient, d.Id()),
 		Timeout:    d.Timeout(schema.TimeoutDelete),
 		Delay:      5 * time.Second,
 		MinTimeout: 3 * time.Second,
@@ -362,9 +363,9 @@ func resourceCSBSBackupPolicyDelete(d *schema.ResourceData, meta interface{}) er
 	return nil
 }
 
-func waitForCSBSBackupPolicyActive(policyClient *golangsdk.ServiceClient, shareID string) resource.StateRefreshFunc {
+func waitForCSBSBackupPolicyActive(policyClient *golangsdk.ServiceClient, policyID string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
-		n, err := policies.Get(policyClient, shareID).Extract()
+		n, err := policies.Get(policyClient, policyID).Extract()
 		if err != nil {
 			return nil, "", err
 		}
@@ -376,24 +377,24 @@ func waitForCSBSBackupPolicyActive(policyClient *golangsdk.ServiceClient, shareI
 	}
 }
 
-func waitForVBSPolicyDelete(vbsClient *golangsdk.ServiceClient, policyID string) resource.StateRefreshFunc {
+func waitForVBSPolicyDelete(policyClient *golangsdk.ServiceClient, policyID string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 
-		r, err := policies.Get(vbsClient, policyID).Extract()
+		r, err := policies.Get(policyClient, policyID).Extract()
 
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				log.Printf("[INFO] Successfully deleted OpenTelekomCloud shared File %s", policyID)
+				log.Printf("[INFO] Successfully deleted OpenTelekomCloud Backup Policy %s", policyID)
 				return r, "deleted", nil
 			}
 			return r, "available", err
 		}
 
-		policy := policies.Delete(vbsClient, policyID)
+		policy := policies.Delete(policyClient, policyID)
 		err = policy.Err
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				log.Printf("[INFO] Successfully deleted OpenTelekomCloud shared File %s", policyID)
+				log.Printf("[INFO] Successfully deleted OpenTelekomCloud Backup Policy %s", policyID)
 				return r, "deleted", nil
 			}
 			if errCode, ok := err.(golangsdk.ErrUnexpectedResponseCode); ok {
@@ -408,89 +409,95 @@ func waitForVBSPolicyDelete(vbsClient *golangsdk.ServiceClient, policyID string)
 	}
 }
 
-
-
-
-
-func resourceVBSScheduleV2(d *schema.ResourceData) []policies.ScheduledOperations {
+func resourceCSBSScheduleV1(d *schema.ResourceData) []policies.ScheduledOperations {
 	rawTags := d.Get("scheduled_operations").([]interface{})
-	tags := make([]policies.ScheduledOperations, len(rawTags))
+	schedule := make([]policies.ScheduledOperations, len(rawTags))
 	for i, raw := range rawTags {
 		rawMap := raw.(map[string]interface{})
-		tags[i] = policies.ScheduledOperations{
-			Name:   rawMap["so_name"].(string),
-			Description: rawMap["so_description"].(string),
-			Enabled: rawMap["enabled"].(bool),
-			OperationType:rawMap["operation_type"].(string),
+		schedule[i] = policies.ScheduledOperations{
+			Name:          rawMap["scheduled_period_name"].(string),
+			Description:   rawMap["scheduled_period_description"].(string),
+			TriggerId:     rawMap["trigger_id"].(string),
+			Enabled:       rawMap["enabled"].(bool),
+			OperationType: rawMap["operation_type"].(string),
 			Trigger: policies.Trigger{
-				Properties : policies.TriggerProperties{
-					Pattern : rawMap["pattern"].(string),
+				Properties: policies.TriggerProperties{
+					Pattern: rawMap["pattern"].(string),
 				},
 			},
 			OperationDefinition: policies.OperationDefinition{
-				MaxBackups: rawMap["max_backups"].(string),
+				MaxBackups:            rawMap["max_backups"].(string),
+				RetentionDurationDays: rawMap["retention_duration_days"].(string),
+				Permanent:             rawMap["permanent"].(string),
+				PlanId:                rawMap["plan_id"].(string),
 			},
-
 		}
 	}
-	return tags
+	return schedule
 }
 
-func resourceVBSResourceV2(d *schema.ResourceData) []policies.Resource {
+func resourceCSBSResourceV1(d *schema.ResourceData) []policies.Resource {
 	rawTags := d.Get("resources").([]interface{})
-	tags := make([]policies.Resource, len(rawTags))
+	resources := make([]policies.Resource, len(rawTags))
 	for i, raw := range rawTags {
 		rawMap := raw.(map[string]interface{})
-		tags[i] = policies.Resource{
-			Name:   rawMap["r_name"].(string),
-			Id: rawMap["id"].(string),
-			Type: rawMap["type"].(string),
+		resources[i] = policies.Resource{
+			Name: rawMap["resource_name"].(string),
+			Id:   rawMap["resource_id"].(string),
+			Type: rawMap["resource_type"].(string),
+		}
+	}
+	return resources
+}
 
+func resourceCSBSPolicyTagsV1(d *schema.ResourceData) []policies.ResourceTag {
+	rawTags := d.Get("tags").([]interface{})
+	tags := make([]policies.ResourceTag, len(rawTags))
+	for i, raw := range rawTags {
+		rawMap := raw.(map[string]interface{})
+		tags[i] = policies.ResourceTag{
+			Key:   rawMap["key"].(string),
+			Value: rawMap["value"].(string),
 		}
 	}
 	return tags
 }
 
-
-
-
-func resourceVBSScheduleUpdateV2(d *schema.ResourceData) []policies.ScheduledOperationsUpdate {
+func resourceCSBScheduleUpdateV1(d *schema.ResourceData) []policies.ScheduledOperationsUpdate {
 	rawTags := d.Get("scheduled_operations").([]interface{})
-	tags := make([]policies.ScheduledOperationsUpdate, len(rawTags))
+	schedule := make([]policies.ScheduledOperationsUpdate, len(rawTags))
 	for i, raw := range rawTags {
 		rawMap := raw.(map[string]interface{})
-		tags[i] = policies.ScheduledOperationsUpdate{
-			Id:		rawMap["id"].(string),
-			Name:   rawMap["so_name"].(string),
-			Description: rawMap["so_description"].(string),
-			Enabled: rawMap["enabled"].(bool),
-			//TriggerId: rawMap["trigger_id"].(string),
+		schedule[i] = policies.ScheduledOperationsUpdate{
+			Id:          rawMap["scheduled_period_id"].(string),
+			Name:        rawMap["scheduled_period_name"].(string),
+			Description: rawMap["scheduled_period_description"].(string),
+			Enabled:     rawMap["enabled"].(bool),
 			Trigger: policies.TriggerUpdate{
-				Properties : policies.TriggerPropertiesUpdate{
-					Pattern : rawMap["pattern"].(string),
+				Properties: policies.TriggerPropertiesUpdate{
+					Pattern: rawMap["pattern"].(string),
 				},
 			},
 			OperationDefinition: policies.OperationDefinitionUpdate{
-				MaxBackups: rawMap["max_backups"].(string),
+				MaxBackups:            rawMap["max_backups"].(string),
+				RetentionDurationDays: rawMap["retention_duration_days"].(string),
+				Permanent:             rawMap["permanent"].(string),
 			},
-
 		}
 	}
-	return tags
+	return schedule
 }
 
-func resourceVBSResourceUpdateV2(d *schema.ResourceData) []policies.ResourceUpdate {
+func resourceCSBSResourceUpdateV1(d *schema.ResourceData) []policies.ResourceUpdate {
 	rawTags := d.Get("resources").([]interface{})
-	tags := make([]policies.ResourceUpdate, len(rawTags))
+	resources := make([]policies.ResourceUpdate, len(rawTags))
 	for i, raw := range rawTags {
 		rawMap := raw.(map[string]interface{})
-		tags[i] = policies.ResourceUpdate{
-			Name:   rawMap["r_name"].(string),
-			Id: rawMap["id"].(string),
-			Type: rawMap["type"].(string),
-
+		resources[i] = policies.ResourceUpdate{
+			Name: rawMap["resource_name"].(string),
+			Id:   rawMap["resource_id"].(string),
+			Type: rawMap["resource_type"].(string),
 		}
 	}
-	return tags
+	return resources
 }
-

@@ -2,12 +2,14 @@ package opentelekomcloud
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 
-	"github.com/huaweicloud/golangsdk/openstack/csbs/v1/backup"
-	"testing"
 	"log"
+	"testing"
+
+	"github.com/huaweicloud/golangsdk/openstack/csbs/v1/backup"
 )
 
 func TestAccCSBSBackupV1_basic(t *testing.T) {

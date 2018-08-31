@@ -2,9 +2,10 @@ package opentelekomcloud
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"testing"
 )
 
 func TestAccCSBSBackupPolicyV1DataSource_basic(t *testing.T) {
@@ -41,7 +42,7 @@ func testAccCheckCSBSBackupPolicyV1DataSourceID(n string) resource.TestCheckFunc
 }
 
 var testAccCSBSBackupPolicyV1DataSource_basic = `
-resource "opentelekomcloud_csbs_backup_policy_v1" "backup_policy_v1" {
+resource "opentelekomcloud_csbs_backup_policy_v1" "csbs_policy" {
   name            = "csbs-policy"
   description      = "test-code"
   provider_id = "fc4d5750-22e7-4798-8a46-f48f62c4c1da"
@@ -61,6 +62,6 @@ resource "opentelekomcloud_csbs_backup_policy_v1" "backup_policy_v1" {
   }]
 }
 data "opentelekomcloud_csbs_backup_policy_v1" "csbs_policy" {  
-  id = "40c754f5-df48-4fdb-bbf8-d90296ca7077"
+  id = "${opentelekomcloud_csbs_backup_policy_v1.csbs_policy.id}"
 }
 `

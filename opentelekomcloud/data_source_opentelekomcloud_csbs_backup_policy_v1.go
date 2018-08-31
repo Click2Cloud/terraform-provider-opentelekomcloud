@@ -1,10 +1,11 @@
 package opentelekomcloud
+
 import (
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/huaweicloud/golangsdk/openstack/csbs/v1/policies"
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/huaweicloud/golangsdk/openstack/csbs/v1/policies"
 )
 
 func dataSourceCSBSBackupPolicyV1() *schema.Resource {
@@ -26,12 +27,12 @@ func dataSourceCSBSBackupPolicyV1() *schema.Resource {
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
-				Computed:true,
+				Computed: true,
 			},
 			"id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
-				Computed:true,
+				Computed: true,
 			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
@@ -66,7 +67,6 @@ func dataSourceCSBSBackupPolicyV1() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-
 					},
 				},
 			},
@@ -184,9 +184,9 @@ func dataSourceCSBSBackupPolicyV1Read(d *schema.ResourceData, meta interface{}) 
 	var r []map[string]interface{}
 	for _, resource := range policy.Resources {
 		mapping := map[string]interface{}{
-			"resource_id": resource.Id,
-			"resource_type":     resource.Type,
-			"resource_name":     resource.Name,
+			"resource_id":   resource.Id,
+			"resource_type": resource.Type,
+			"resource_name": resource.Name,
 		}
 		r = append(r, mapping)
 	}
@@ -194,21 +194,20 @@ func dataSourceCSBSBackupPolicyV1Read(d *schema.ResourceData, meta interface{}) 
 	var s []map[string]interface{}
 	for _, scheduled_operation := range policy.ScheduledOperations {
 		mapping := map[string]interface{}{
-			//"id": scheduled_operation.Id,
-			"scheduled_period_description":     scheduled_operation.Description,
-			"enabled":     scheduled_operation.Enabled,
-			"scheduled_period_name":     scheduled_operation.Name,
-			"operation_type":     scheduled_operation.OperationType,
-			"max_backups":     scheduled_operation.OperationDefinition.MaxBackups,
-			"retention_duration_days":     scheduled_operation.OperationDefinition.RetentionDurationDays,
-			"permanent":     scheduled_operation.OperationDefinition.Permanent,
-			"plan_id":     scheduled_operation.OperationDefinition.PlanId,
-			"pattern":     scheduled_operation.Trigger.Properties.Pattern,
-			"scheduler_id":     scheduled_operation.Trigger.Id,
-			"scheduler_name":     scheduled_operation.Trigger.Name,
-			"scheduler_type":     scheduled_operation.Trigger.Type,
-			"scheduled_period_id":     scheduled_operation.Id,
-			"trigger_id":     scheduled_operation.TriggerId,
+			"scheduled_period_description": scheduled_operation.Description,
+			"enabled":                      scheduled_operation.Enabled,
+			"scheduled_period_name":        scheduled_operation.Name,
+			"operation_type":               scheduled_operation.OperationType,
+			"max_backups":                  scheduled_operation.OperationDefinition.MaxBackups,
+			"retention_duration_days":      scheduled_operation.OperationDefinition.RetentionDurationDays,
+			"permanent":                    scheduled_operation.OperationDefinition.Permanent,
+			"plan_id":                      scheduled_operation.OperationDefinition.PlanId,
+			"pattern":                      scheduled_operation.Trigger.Properties.Pattern,
+			"scheduler_id":                 scheduled_operation.Trigger.Id,
+			"scheduler_name":               scheduled_operation.Trigger.Name,
+			"scheduler_type":               scheduled_operation.Trigger.Type,
+			"scheduled_period_id":          scheduled_operation.Id,
+			"trigger_id":                   scheduled_operation.TriggerId,
 		}
 		s = append(s, mapping)
 	}
@@ -216,10 +215,10 @@ func dataSourceCSBSBackupPolicyV1Read(d *schema.ResourceData, meta interface{}) 
 	var t []map[string]interface{}
 	for _, resource := range policy.Tags {
 		mapping := map[string]interface{}{
-			"key": resource.Key,
-			"value":     resource.Value,
+			"key":   resource.Key,
+			"value": resource.Value,
 		}
-		r = append(r, mapping)
+		t = append(t, mapping)
 	}
 
 	log.Printf("[INFO] Retrieved Shares using given filter %s: %+v", policy.Id, policy)
@@ -241,8 +240,6 @@ func dataSourceCSBSBackupPolicyV1Read(d *schema.ResourceData, meta interface{}) 
 	if err := d.Set("tags", t); err != nil {
 		return err
 	}
-
-
 
 	return nil
 }

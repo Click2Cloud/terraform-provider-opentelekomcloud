@@ -112,6 +112,7 @@ type PolicyCreate struct {
 	ProviderId          string                `json:"provider_id" required:"true"`
 	Resources           []Resource            `json:"resources" required:"true"`
 	ScheduledOperations []ScheduledOperations `json:"scheduled_operations" required:"true"`
+	Tags []ResourceTag `json:"tags,omitempty"`
 }
 
 type PolicyParam struct {
@@ -233,7 +234,7 @@ type ScheduledOperationsUpdate struct {
 
 type OperationDefinitionUpdate struct {
 	MaxBackups            string `json:"max_backups,omitempty"`
-	RetentionDurationDays int `json:"retention_duration_days,omitempty"`
+	RetentionDurationDays string `json:"retention_duration_days,omitempty"`
 	Permanent             string `json:"permanent,omitempty"`
 	PlanId                string `json:"plan_id,omitempty"`
 	ProviderId            string `json:"provider_id,omitempty"`

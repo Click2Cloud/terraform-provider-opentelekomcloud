@@ -1,13 +1,14 @@
 package opentelekomcloud
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
-	"time"
 	"fmt"
-	"github.com/huaweicloud/golangsdk/openstack/csbs/v1/backup"
-	"github.com/huaweicloud/golangsdk"
-	"github.com/hashicorp/terraform/helper/resource"
 	"log"
+	"time"
+
+	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/huaweicloud/golangsdk"
+	"github.com/huaweicloud/golangsdk/openstack/csbs/v1/backup"
 )
 
 func resourceCSBSBackupV1() *schema.Resource {
@@ -53,6 +54,7 @@ func resourceCSBSBackupV1() *schema.Resource {
 			"resource_type": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Default:  "OS::Nova::Server",
 				ForceNew: true,
 			},
 			"tags": &schema.Schema{
@@ -64,10 +66,12 @@ func resourceCSBSBackupV1() *schema.Resource {
 						"key": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
+							ForceNew: true,
 						},
 						"value": &schema.Schema{
 							Type:     schema.TypeString,
 							Required: true,
+							ForceNew: true,
 						},
 					},
 				},
@@ -133,10 +137,10 @@ func resourceCSBSBackupV1() *schema.Resource {
 								},
 							},
 						},
-			"resource_type":&schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-					},
+						"resource_type": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
 					},
 				},
 			},
@@ -154,8 +158,8 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 	queryOpts := backup.QueryResourceOpts{
 		CheckProtectable: []backup.ProtectableParam{
 			{
-				ResourceId:	d.Get("resource_id").(string),
-				ResourceType:	d.Get("resource_type").(string),
+				ResourceId:   d.Get("resource_id").(string),
+				ResourceType: d.Get("resource_type").(string),
 			},
 		},
 	}
@@ -164,29 +168,25 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 
 	query, err := backup.QueryResourceCreate(backupClient, queryOpts).ExtractQueryResponse()
 	log.Printf("[DEBUG] query backup: %s", query.Protectable[0].ResourceId)
-
-
-	createOpts := backup.CreateOpts{
-		Protect:       backup.ProtectParam{
-			BackupName: d.Get("backup_name").(string),
-			Description: d.Get("description").(string),
-			ResourceType: d.Get("resource_type").(string),
-			ExtraInfo: d.Get("extra_info").(string),
-		},
-	}
-
-	log.Printf("[DEBUG] CreateOpts: %s", createOpts)
 	if query.Protectable[0].Result == true {
 
-		create, err := backup.Create(backupClient, query.Protectable[0].ResourceId, createOpts).Extract()
+		createOpts := backup.CreateOpts{
+			Protect: backup.ProtectParam{
+				BackupName:   d.Get("backup_name").(string),
+				Description:  d.Get("description").(string),
+				ResourceType: d.Get("resource_type").(string),
+				ExtraInfo:    d.Get("extra_info").(string),
+				Tags:         resourceCSBSTagsV1(d),
+			},
+		}
 
-		log.Printf("[DEBUG] create backup: %s", create)
+		create, err := backup.Create(backupClient, query.Protectable[0].ResourceId, createOpts).Extract()
 		if err != nil {
 			return fmt.Errorf("Error creating OpenTelekomCloud backup: %s", err)
 		}
 
 		backupOpts := backup.ListOpts{CheckpointId: create.Checkpoint.Id}
-		backupItems,err := backup.List(backupClient,backupOpts)
+		backupItems, err := backup.List(backupClient, backupOpts)
 
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
@@ -194,14 +194,13 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 				return nil
 			}
 
-			return fmt.Errorf("Error retrieving OpenTelekomCloud Backup Policy: %s", err)
+			return fmt.Errorf("Error retrieving OpenTelekomCloud Backup : %s", err)
 		}
 
 		n := backupItems[0]
 
 		d.SetId(n.Id)
-		d.Set("backup_record_id",create.Checkpoint.Id)
-		log.Printf("[DEBUG] set ID: %s", d.Id())
+		d.Set("backup_record_id", create.Checkpoint.Id)
 
 		stateConf := &resource.StateChangeConf{
 			Pending:    []string{"protecting"},
@@ -219,9 +218,9 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 		}
 
 		log.Printf("[DEBUG] Waiting for OpenTelekomCloud Backup (%s) to become available", create.Checkpoint.Id)
-	}else {
+	} else {
 		return fmt.Errorf("Server (%s) is already in service : %s",
-					query.Protectable[0].ResourceId,query.Protectable[0].ErrorMsg)
+			query.Protectable[0].ResourceId, query.Protectable[0].ErrorMsg)
 	}
 
 	return resourceCSBSBackupV1Read(d, meta)
@@ -237,8 +236,6 @@ func resourceCSBSBackupV1Read(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	n, err := backup.Get(backupClient, d.Id()).ExtractBackup()
-	log.Printf("[DEBUG] get backup: %s", n)
-
 	if err != nil {
 		if _, ok := err.(golangsdk.ErrDefault404); ok {
 			d.SetId("")
@@ -251,7 +248,6 @@ func resourceCSBSBackupV1Read(d *schema.ResourceData, meta interface{}) error {
 	d.Set("id", n.CheckpointId)
 	d.Set("region", GetRegion(d, config))
 
-
 	return nil
 }
 
@@ -263,9 +259,9 @@ func resourceCSBSBackupV1Delete(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	stateConf := &resource.StateChangeConf{
-		Pending:    []string{"available","deleting"},
+		Pending:    []string{"available", "deleting"},
 		Target:     []string{"deleted"},
-		Refresh:    waitForCSBSBackupDelete(backupClient, d.Id(),d.Get("backup_record_id").(string)),
+		Refresh:    waitForCSBSBackupDelete(backupClient, d.Id(), d.Get("backup_record_id").(string)),
 		Timeout:    d.Timeout(schema.TimeoutDelete),
 		Delay:      5 * time.Second,
 		MinTimeout: 3 * time.Second,
@@ -294,14 +290,14 @@ func waitForCSBSBackupActive(backupClient *golangsdk.ServiceClient, checkpointIt
 	}
 }
 
-func waitForCSBSBackupDelete(backupClient *golangsdk.ServiceClient, backupId string, backupRecordID string ) resource.StateRefreshFunc {
+func waitForCSBSBackupDelete(backupClient *golangsdk.ServiceClient, backupId string, backupRecordID string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 
 		r, err := backup.Get(backupClient, backupId).ExtractBackup()
 
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				log.Printf("[INFO] Successfully deleted OpenTelekomCloud shared File %s", backupId)
+				log.Printf("[INFO] Successfully deleted OpenTelekomCloud Backup %s", backupId)
 				return r, "deleted", nil
 			}
 			return r, "deleting", err
@@ -311,7 +307,7 @@ func waitForCSBSBackupDelete(backupClient *golangsdk.ServiceClient, backupId str
 
 		if backups.Err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				log.Printf("[INFO] Successfully deleted OpenTelekomCloud shared File %s", backupId)
+				log.Printf("[INFO] Successfully deleted OpenTelekomCloud Backup %s", backupId)
 				return r, "deleted", nil
 			}
 			if errCode, ok := err.(golangsdk.ErrUnexpectedResponseCode); ok {
@@ -326,3 +322,15 @@ func waitForCSBSBackupDelete(backupClient *golangsdk.ServiceClient, backupId str
 	}
 }
 
+func resourceCSBSTagsV1(d *schema.ResourceData) []backup.ResourceTag {
+	rawTags := d.Get("tags").([]interface{})
+	tags := make([]backup.ResourceTag, len(rawTags))
+	for i, raw := range rawTags {
+		rawMap := raw.(map[string]interface{})
+		tags[i] = backup.ResourceTag{
+			Key:   rawMap["key"].(string),
+			Value: rawMap["value"].(string),
+		}
+	}
+	return tags
+}

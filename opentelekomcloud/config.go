@@ -472,6 +472,3 @@ func (c *Config) backupV1Client(region string) (*golangsdk.ServiceClient, error)
 		Availability: c.getHwEndpointType(),
 	})
 }
-
-
-
