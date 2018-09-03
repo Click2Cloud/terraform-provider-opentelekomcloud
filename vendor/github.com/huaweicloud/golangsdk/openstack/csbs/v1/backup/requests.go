@@ -1,44 +1,38 @@
 package backup
 
 import (
-	"reflect"
-
 	"github.com/huaweicloud/golangsdk"
 	"github.com/huaweicloud/golangsdk/pagination"
 )
 
-// SortDir is a type for specifying in which direction to sort a list of Backup.
-type SortDir string
-
-var (
-	// SortAsc is used to sort a list of Shares in ascending order.
-	SortAsc SortDir = "asc"
-	// SortDesc is used to sort a list of Shares in descending order.
-	SortDesc SortDir = "desc"
-)
+type ResourceTag struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
 
 // ListOpts allows the filtering and sorting of paginated collections through
 // the API. Filtering is achieved by passing in struct field values that map to
-// the attributes you want to see returned. SortKey allows you to
-// sort by a particular  attribute. SortDir sets the direction, and is
-// either `asc' or `desc'. Marker and Limit are used for pagination.
+// the attributes you want to see returned. Marker and Limit are used for pagination.
 type ListOpts struct {
 	Status       string `q:"status"`
 	Limit        string `q:"limit"`
 	Marker       string `q:"marker"`
 	Sort         string `q:"sort"`
+	AllTenants   string `q:"all_tenants"`
 	Name         string `q:"name"`
 	ResourceId   string `q:"resource_id"`
+	ResourceName string `q:"resource_name"`
+	PolicyId     string `q:"policy_id"`
+	VmIp         string `q:"ip"`
 	CheckpointId string `q:"checkpoint_id"`
 	ID           string
 	ResourceType string `q:"resource_type"`
-	Description  string
 }
 
 // List returns collection of
 // backups. It accepts a ListOpts struct, which allows you to filter and sort
 // the returned collection for greater efficiency.
-func List(c *golangsdk.ServiceClient, opts ListOpts) ([]CheckpointItem, error) {
+func List(c *golangsdk.ServiceClient, opts ListOpts) ([]Backup, error) {
 	q, err := golangsdk.BuildQueryString(&opts)
 	if err != nil {
 		return nil, err
@@ -53,48 +47,26 @@ func List(c *golangsdk.ServiceClient, opts ListOpts) ([]CheckpointItem, error) {
 		return nil, err
 	}
 
-	return FilterBackups(allBackups, opts)
+	if opts.ID != "" {
+		return FilterBackupsById(allBackups, opts.ID)
+	}
+
+	return allBackups, nil
+
 }
 
-func FilterBackups(backups []CheckpointItem, opts ListOpts) ([]CheckpointItem, error) {
+func FilterBackupsById(backups []Backup, filterId string) ([]Backup, error) {
 
-	var refinedBackups []CheckpointItem
-	var matched bool
-	m := map[string]interface{}{}
+	var refinedBackups []Backup
 
-	if opts.ID != "" {
-		m["Id"] = opts.ID
-	}
-	if opts.Description != "" {
-		m["Description"] = opts.Description
-	}
+	for _, backup := range backups {
 
-	if len(m) > 0 && len(backups) > 0 {
-		for _, backup := range backups {
-			matched = true
-
-			for key, value := range m {
-				if sVal := getStructField(&backup, key); !(sVal == value) {
-					matched = false
-				}
-			}
-
-			if matched {
-				refinedBackups = append(refinedBackups, backup)
-			}
+		if filterId == backup.Id {
+			refinedBackups = append(refinedBackups, backup)
 		}
-
-	} else {
-		refinedBackups = backups
 	}
 
 	return refinedBackups, nil
-}
-
-func getStructField(v *CheckpointItem, field string) string {
-	r := reflect.ValueOf(v)
-	f := reflect.Indirect(r).FieldByName(field)
-	return string(f.String())
 }
 
 // CreateOptsBuilder allows extensions to add additional parameters to the
@@ -106,68 +78,65 @@ type CreateOptsBuilder interface {
 // CreateOpts contains the options for create a Backup. This object is
 // passed to backup.Create().
 type CreateOpts struct {
-	Protect ProtectParam `json:"protect" required:"true"`
-}
-
-type ProtectParam struct {
 	BackupName   string        `json:"backup_name,omitempty"`
 	Description  string        `json:"description,omitempty"`
 	ResourceType string        `json:"resource_type,omitempty"`
 	Tags         []ResourceTag `json:"tags,omitempty"`
-	ExtraInfo    string        `json:"extra_info,omitempty"`
+	ExtraInfo    interface{}   `json:"extra_info,omitempty"`
 }
 
 // ToBackupCreateMap assembles a request body based on the contents of a
 // CreateOpts.
 func (opts CreateOpts) ToBackupCreateMap() (map[string]interface{}, error) {
-	return golangsdk.BuildRequestBody(opts, "")
+	return golangsdk.BuildRequestBody(opts, "protect")
 }
 
 // Create will create a new backup based on the values in CreateOpts. To extract
-// the Backup object from the response, call the Extract method on the
+// the checkpoint object from the response, call the Extract method on the
 // CreateResult.
-func Create(client *golangsdk.ServiceClient, resourceid string, opts CreateOptsBuilder) (r CreateResult) {
+func Create(client *golangsdk.ServiceClient, resourceId string, opts CreateOptsBuilder) (r CreateResult) {
 	b, err := opts.ToBackupCreateMap()
 	if err != nil {
 		r.Err = err
 		return
 	}
-	_, r.Err = client.Post(rootURL(client, resourceid), b, &r.Body, &golangsdk.RequestOpts{
+	_, r.Err = client.Post(rootURL(client, resourceId), b, &r.Body, &golangsdk.RequestOpts{
 		OkCodes: []int{200},
 	})
 	return
 }
 
-// QueryOptsBuilder allows extensions to add additional parameters to the
-// QueryResourceCreate request.
-type QueryOptsBuilder interface {
+// ResourceBackupCapabilityOptsBuilder allows extensions to add additional parameters to the
+// QueryResourceBackupCapability request.
+type ResourceBackupCapabilityOptsBuilder interface {
 	ToQueryResourceCreateMap() (map[string]interface{}, error)
 }
 
-// QueryResourceOpts contains the options for querying whether resources can be backed up. This object is
-// passed to backup.QueryResourceCreate().
-type QueryResourceOpts struct {
-	CheckProtectable []ProtectableParam `json:"check_protectable" required:"true"`
+// ResourceBackupCapOpts contains the options for querying whether resources can be backed up. This object is
+// passed to backup.QueryResourceBackupCapability().
+type ResourceBackupCapOpts struct {
+	CheckProtectable []ResourceCapQueryParams `json:"check_protectable" required:"true"`
 }
 
-type ProtectableParam struct {
+type ResourceCapQueryParams struct {
 	ResourceId   string `json:"resource_id" required:"true"`
 	ResourceType string `json:"resource_type" required:"true"`
 }
 
 // ToQueryResourceCreateMap assembles a request body based on the contents of a
-// QueryResourceOpts.
-func (opts QueryResourceOpts) ToQueryResourceCreateMap() (map[string]interface{}, error) {
+// ResourceBackupCapOpts.
+func (opts ResourceBackupCapOpts) ToQueryResourceCreateMap() (map[string]interface{}, error) {
 	return golangsdk.BuildRequestBody(opts, "")
 }
 
-// QueryResourceCreate will query whether resources can be backed up based on the values in QueryResourceOpts. To extract
-// the Backup object from the response, call the Extract method on the
+// QueryResourceBackupCapability will query whether resources can be backed up based on the values in ResourceBackupCapOpts. To extract
+// the ResourceCap object from the response, call the ExtractQueryResponse method on the
 // QueryResult.
-func QueryResourceCreate(client *golangsdk.ServiceClient, opts QueryOptsBuilder) (r QueryResult) {
+func QueryResourceBackupCapability(client *golangsdk.ServiceClient, opts ResourceBackupCapabilityOptsBuilder) (r QueryResult) {
 	b, err := opts.ToQueryResourceCreateMap()
 	if err != nil {
 		r.Err = err
+
 		return
 	}
 	_, r.Err = client.Post(resourceURL(client), b, &r.Body, &golangsdk.RequestOpts{
@@ -176,9 +145,10 @@ func QueryResourceCreate(client *golangsdk.ServiceClient, opts QueryOptsBuilder)
 	return
 }
 
-// Get will get a single backup with specific ID.
-func Get(client *golangsdk.ServiceClient, checkpoint_item_id string) (r GetResult) {
-	_, r.Err = client.Get(getURL(client, checkpoint_item_id), &r.Body, nil)
+// Get will get a single backup with specific ID. To extract the Backup object from the response,
+// call the ExtractBackup method on the GetResult.
+func Get(client *golangsdk.ServiceClient, backupId string) (r GetResult) {
+	_, r.Err = client.Get(getURL(client, backupId), &r.Body, nil)
 
 	return
 

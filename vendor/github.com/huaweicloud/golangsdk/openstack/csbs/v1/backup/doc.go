@@ -13,23 +13,23 @@ Example to List Backup
 
 
 Example to Create a Backup
-	createBackup:=backup.CreateOpts{Protect:backup.ProtectParam{BackupName: "c2c-backup", Description: "mybackup"}}
+	createBackup:=backup.CreateOpts{BackupName: "c2c-backup", Description: "mybackup"}
 	out,err:=backup.Create(client,"fc4d5750-22e7-4798-8a46-f48f62c4c1da", "f8ddc472-cf00-4384-851e-5f2a68c33762",
 							createBackup).Extract()
 	fmt.Println(out)
 	fmt.Println(err)
 
 Example to Query if resources can be backed up
-	createQuery:=backup.QueryResourceOpts{CheckProtectable:[]backup.ProtectableParam{{ResourceId: "069e678a-f1d1-4a38-880b-459bde82fcc6",
+	createQuery:=backup.ResourceBackupCapOpts{CheckProtectable:[]backup.ResourceCapQueryParams{{ResourceId: "069e678a-f1d1-4a38-880b-459bde82fcc6",
 											ResourceType: "OS::Nova::Server"}}}
-	out,err:=backup.QueryResourceCreate(client,"fc4d5750-22e7-4798-8a46-f48f62c4c1da",
+	out,err:=backup.QueryResourceBackupCapability(client,"fc4d5750-22e7-4798-8a46-f48f62c4c1da",
 		createQuery).ExtractQueryResponse()
 	fmt.Println(out)
 	fmt.Println(err)
 
 
 Example to Delete a Backup
-	out:=backup.Delete(client,"fc4d5750-22e7-4798-8a46-f48f62c4c1da", "4fbc6a06-c5f3-4b5f-baf8-ee3ea1dfeaae")
+	out:=backup.Delete(client,"fc4d5750-22e7-4798-8a46-f48f62c4c1da")
 	fmt.Println(out)
 	if err != nil {
 		panic(err)

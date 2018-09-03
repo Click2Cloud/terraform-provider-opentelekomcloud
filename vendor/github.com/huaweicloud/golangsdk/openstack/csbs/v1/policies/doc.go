@@ -14,33 +14,32 @@ Example to List Backup Policies
 
 Example to Create a Backup Policy
 	policy:=policies.CreateOpts{
-			Policy : policies.PolicyCreate{
-			Name : "c2c-policy",
-			Description : "My plan",
-			ProviderId : "fc4d5750-22e7-4798-8a46-f48f62c4c1da",
-			Parameters : policies.PolicyParam{
-			Common:map[string]interface{}{},
-			},
-			ScheduledOperations : []policies.ScheduledOperations{ {
-				Name:  "my-backup",
-				Description: "My backup policy",
-				Enabled: true,
-				OperationDefinition: policies.OperationDefinition{
-					MaxBackups: "5",
+				Name : "c2c-policy",
+				Description : "My plan",
+				ProviderId : "fc4d5750-22e7-4798-8a46-f48f62c4c1da",
+				Parameters : policies.PolicyParam{
+				Common:map[string]interface{}{},
 				},
-				Trigger: policies.Trigger{
-					Properties : policies.TriggerProperties{
-						Pattern : "BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nRRULE:FREQ=WEEKLY;BYDAY=TH;BYHOUR=12;BYMINUTE=27\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+				ScheduledOperations : []policies.ScheduledOperation{ {
+					Name:  "my-backup",
+					Description: "My backup policy",
+					Enabled: true,
+					OperationDefinition: policies.OperationDefinition{
+						MaxBackups: "5",
 					},
-				},
-				OperationType: "backup",
-			}},
-			Resources : []policies.Resource{{
-				Id:  "9422f270-6fcf-4ba2-9319-a007f2f63a8e",
-				Type: "OS::Nova::Server",
-				Name: "resource4"}},
-		},
-	}
+					Trigger: policies.Trigger{
+						Properties : policies.TriggerProperties{
+							Pattern : "BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nRRULE:FREQ=WEEKLY;BYDAY=TH;BYHOUR=12;BYMINUTE=27\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+						},
+					},
+					OperationType: "backup",
+				}},
+				Resources : []policies.Resource{{
+					Id:  "9422f270-6fcf-4ba2-9319-a007f2f63a8e",
+					Type: "OS::Nova::Server",
+					Name: "resource4"
+				}},
+		}
 	out,err:=policies.Create(client,policy).Extract()
 	fmt.Println(out)
 	fmt.Println(err)
@@ -48,22 +47,26 @@ Example to Create a Backup Policy
 
 Example to Update a Backup Policy
 	updatepolicy:=policies.UpdateOpts{
-								Policy:policies.PolicyUpdate{
 								Name:"my-plan-c2c-update",
 								Parameters : policies.PolicyParamUpdate{
-								Common:map[string]interface{}{},
-										},
-								ScheduledOperations:[]policies.ScheduledOperationsUpdate{{
-								Id:"b70c712d-f48b-43f7-9a0f-3bab86d59149",
-								Name:"my-backup-policy",
-								Description:"My backup policy",
-								Enabled:true,
-								OperationDefinition:policies.OperationDefinitionUpdate{
-								RetentionDurationDays:-1,
-								MaxBackups:"20"},
-								Trigger:policies.TriggerUpdate{
-								Properties:policies.TriggerPropertiesUpdate{
-								Pattern:"BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nRRULE:FREQ=WEEKLY;BYDAY=TH;BYHOUR=12;BYMINUTE=27\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"}}}}}}
+									Common:map[string]interface{}{},
+								},
+								ScheduledOperations:[]policies.ScheduledOperationToUpdate{{
+									Id:"b70c712d-f48b-43f7-9a0f-3bab86d59149",
+									Name:"my-backup-policy",
+									Description:"My backup policy",
+									Enabled:true,
+									OperationDefinition:policies.OperationDefinitionToUpdate{
+										RetentionDurationDays:-1,
+										MaxBackups:"20",
+									},
+									Trigger:policies.Trigger{
+										Properties:policies.TriggerProperties{
+											Pattern:"BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nRRULE:FREQ=WEEKLY;BYDAY=TH;BYHOUR=12;BYMINUTE=27\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"}}
+										}
+									}
+								}
+							}
 		out,err:=policies.Update(client,"5af626d2-19b9-4dc4-8e95-ddba008318b3",updatepolicy).Extract()
 		fmt.Println(out)
 

@@ -159,7 +159,7 @@ func dataSourceCSBSBackupPolicyV1Read(d *schema.ResourceData, meta interface{}) 
 	policyClient, err := config.backupV1Client(GetRegion(d, config))
 
 	listOpts := policies.ListOpts{
-		Id:     d.Get("id").(string),
+		ID:     d.Get("id").(string),
 		Name:   d.Get("name").(string),
 		Status: d.Get("status").(string),
 	}
@@ -203,11 +203,11 @@ func dataSourceCSBSBackupPolicyV1Read(d *schema.ResourceData, meta interface{}) 
 			"permanent":                    scheduled_operation.OperationDefinition.Permanent,
 			"plan_id":                      scheduled_operation.OperationDefinition.PlanId,
 			"pattern":                      scheduled_operation.Trigger.Properties.Pattern,
-			"scheduler_id":                 scheduled_operation.Trigger.Id,
+			"scheduler_id":                 scheduled_operation.Trigger.ID,
 			"scheduler_name":               scheduled_operation.Trigger.Name,
 			"scheduler_type":               scheduled_operation.Trigger.Type,
-			"scheduled_period_id":          scheduled_operation.Id,
-			"trigger_id":                   scheduled_operation.TriggerId,
+			"scheduled_period_id":          scheduled_operation.ID,
+			"trigger_id":                   scheduled_operation.TriggerID,
 		}
 		s = append(s, mapping)
 	}
@@ -221,11 +221,11 @@ func dataSourceCSBSBackupPolicyV1Read(d *schema.ResourceData, meta interface{}) 
 		t = append(t, mapping)
 	}
 
-	log.Printf("[INFO] Retrieved Shares using given filter %s: %+v", policy.Id, policy)
-	d.SetId(policy.Id)
+	log.Printf("[INFO] Retrieved Shares using given filter %s: %+v", policy.ID, policy)
+	d.SetId(policy.ID)
 
 	d.Set("description", policy.Description)
-	d.Set("id", policy.Id)
+	d.Set("id", policy.ID)
 	d.Set("name", policy.Name)
 	d.Set("common", policy.Parameters.Common)
 	d.Set("project_id", policy.ProjectId)

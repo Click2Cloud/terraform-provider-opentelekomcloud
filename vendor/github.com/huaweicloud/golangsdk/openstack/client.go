@@ -565,8 +565,8 @@ func NewDeHServiceV1(client *golangsdk.ProviderClient, eo golangsdk.EndpointOpts
 	return sc, err
 }
 
-// NewCSBSServiceV1 creates a ServiceClient that may be used to access the v1 Backup service.
-func NewCSBSServiceV1(client *golangsdk.ProviderClient, eo golangsdk.EndpointOpts) (*golangsdk.ServiceClient, error) {
+// NewCSBSService creates a ServiceClient that can be used to access the Cloud Server Backup service.
+func NewCSBSService(client *golangsdk.ProviderClient, eo golangsdk.EndpointOpts) (*golangsdk.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "data-protect")
 	return sc, err
 }

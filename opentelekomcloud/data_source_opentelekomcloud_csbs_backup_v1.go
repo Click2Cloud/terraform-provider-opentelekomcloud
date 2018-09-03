@@ -228,13 +228,13 @@ func dataSourceCSBSBackupV1Read(d *schema.ResourceData, meta interface{}) error 
 	d.Set("space_saving_ratio", backups.ExtendInfo.SpaceSavingRatio)
 	d.Set("supported_restore_mode", backups.ExtendInfo.SupportedRestoreMode)
 	d.Set("support_lld", backups.ExtendInfo.Supportlld)
-	d.Set("cloudservicetype", backups.BackupData.CloudServiceType)
-	d.Set("disk", backups.BackupData.Disk)
-	d.Set("imagetype", backups.BackupData.ImageType)
-	d.Set("ram", backups.BackupData.Ram)
-	d.Set("vcpus", backups.BackupData.Vcpus)
-	d.Set("eip", backups.BackupData.Eip)
-	d.Set("private_ip", backups.BackupData.PrivateIp)
+	d.Set("cloudservicetype", backups.VMMetadata.CloudServiceType)
+	d.Set("disk", backups.VMMetadata.Disk)
+	d.Set("imagetype", backups.VMMetadata.ImageType)
+	d.Set("ram", backups.VMMetadata.Ram)
+	d.Set("vcpus", backups.VMMetadata.Vcpus)
+	d.Set("eip", backups.VMMetadata.Eip)
+	d.Set("private_ip", backups.VMMetadata.PrivateIp)
 	if err := d.Set("tags", t); err != nil {
 		return err
 	}

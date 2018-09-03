@@ -5,44 +5,29 @@ import (
 	"github.com/huaweicloud/golangsdk/pagination"
 )
 
-type Backup struct {
-	Checkpoint     ProtectResp    `json:"checkpoint"`
-	CheckpointItem CheckpointItem `json:"checkpoint_item"`
+type Checkpoint struct {
+	Status         string         `json:"status"`
+	CreatedAt      string         `json:"created_at"`
+	Id             string         `json:"id"`
+	ResourceGraph  string         `json:"resource_graph"`
+	ProjectId      string         `json:"project_id"`
+	ProtectionPlan ProtectionPlan `json:"protection_plan"`
 }
 
-type ProtectResp struct {
-	Status         string   `json:"status"`
-	CreatedAt      string   `json:"created_at"`
-	Id             string   `json:"id"`
-	ResourceGraph  string   `json:"resource_graph"`
-	ProjectId      string   `json:"project_id"`
-	ProtectionPlan PlanResp `json:"protection_plan"`
+type ProtectionPlan struct {
+	Id              string           `json:"id"`
+	Name            string           `json:"name"`
+	BackupResources []BackupResource `json:"resources"`
 }
 
-type PlanResp struct {
-	Id        string     `json:"id"`
-	Name      string     `json:"name"`
-	Resources []Resource `json:"resources"`
-}
-
-type Resource struct {
-	Id        string `json:"id"`
+type BackupResource struct {
+	ID        string `json:"id"`
 	Type      string `json:"type"`
 	Name      string `json:"name"`
 	ExtraInfo string `json:"extra_info"`
 }
 
-func (r commonResult) Extract() (*Backup, error) {
-	var response Backup
-	err := r.ExtractInto(&response)
-	return &response, err
-}
-
-type QueryResponse struct {
-	Protectable []CheckResp `json:"protectable"`
-}
-
-type CheckResp struct {
+type ResourceCapability struct {
 	Result       bool   `json:"result"`
 	ResourceType string `json:"resource_type"`
 	ErrorCode    string `json:"error_code"`
@@ -50,13 +35,15 @@ type CheckResp struct {
 	ResourceId   string `json:"resource_id"`
 }
 
-func (r commonResult) ExtractQueryResponse() (*QueryResponse, error) {
-	var response QueryResponse
-	err := r.ExtractInto(&response)
-	return &response, err
+func (r commonResult) ExtractQueryResponse() ([]ResourceCapability, error) {
+	var s struct {
+		ResourcesCaps []ResourceCapability `json:"protectable"`
+	}
+	err := r.ExtractInto(&s)
+	return s.ResourcesCaps, err
 }
 
-type CheckpointItem struct {
+type Backup struct {
 	CheckpointId string        `json:"checkpoint_id"`
 	CreatedAt    string        `json:"created_at"`
 	ExtendInfo   ExtendInfo    `json:"extend_info"`
@@ -65,37 +52,37 @@ type CheckpointItem struct {
 	ResourceId   string        `json:"resource_id"`
 	Status       string        `json:"status"`
 	UpdatedAt    string        `json:"updated_at"`
-	BackupData   BackupData    `json:"backup_data"`
+	VMMetadata   VMMetadata    `json:"backup_data"`
 	Description  string        `json:"description"`
 	Tags         []ResourceTag `json:"tags"`
 	ResourceType string        `json:"resource_type"`
 }
 
 type ExtendInfo struct {
-	AutoTrigger          bool            `json:"auto_trigger"`
-	AverageSpeed         int             `json:"average_speed"`
-	CopyFrom             string          `json:"copy_from"`
-	CopyStatus           string          `json:"copy_status"`
-	FailCode             FailCode        `json:"fail_code"`
-	FailOp               string          `json:"fail_op"`
-	FailReason           string          `json:"fail_reason"`
-	ImageType            string          `json:"image_type"`
-	Incremental          bool            `json:"incremental"`
-	Progress             int             `json:"progress"`
-	ResourceAz           string          `json:"resource_az"`
-	ResourceName         string          `json:"resource_name"`
-	ResourceType         string          `json:"resource_type"`
-	Size                 int             `json:"size"`
-	SpaceSavingRatio     int             `json:"space_saving_ratio"`
-	VolumeBackups        []VolumeBackups `json:"volume_backups"`
-	FinishedAt           string          `json:"finished_at"`
-	TaskId               string          `json:"taskid"`
-	HypervisorType       string          `json:"hypervisor_type"`
-	SupportedRestoreMode string          `json:"supported_restore_mode"`
-	Supportlld           bool            `json:"support_lld"`
+	AutoTrigger          bool           `json:"auto_trigger"`
+	AverageSpeed         int            `json:"average_speed"`
+	CopyFrom             string         `json:"copy_from"`
+	CopyStatus           string         `json:"copy_status"`
+	FailCode             FailCode       `json:"fail_code"`
+	FailOp               string         `json:"fail_op"`
+	FailReason           string         `json:"fail_reason"`
+	ImageType            string         `json:"image_type"`
+	Incremental          bool           `json:"incremental"`
+	Progress             int            `json:"progress"`
+	ResourceAz           string         `json:"resource_az"`
+	ResourceName         string         `json:"resource_name"`
+	ResourceType         string         `json:"resource_type"`
+	Size                 int            `json:"size"`
+	SpaceSavingRatio     int            `json:"space_saving_ratio"`
+	VolumeBackups        []VolumeBackup `json:"volume_backups"`
+	FinishedAt           string         `json:"finished_at"`
+	TaskId               string         `json:"taskid"`
+	HypervisorType       string         `json:"hypervisor_type"`
+	SupportedRestoreMode string         `json:"supported_restore_mode"`
+	Supportlld           bool           `json:"support_lld"`
 }
 
-type BackupData struct {
+type VMMetadata struct {
 	RegionName       string `json:"__openstack_region_name"`
 	CloudServiceType string `json:"cloudservicetype"`
 	Disk             int    `json:"disk"`
@@ -111,7 +98,7 @@ type FailCode struct {
 	Description string `json:"Description"`
 }
 
-type VolumeBackups struct {
+type VolumeBackup struct {
 	AverageSpeed     int    `json:"average_speed"`
 	Bootable         bool   `json:"bootable"`
 	Id               string `json:"id"`
@@ -126,15 +113,20 @@ type VolumeBackups struct {
 	SourceVolumeName string `json:"source_volume_name"`
 }
 
-type ResourceTag struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
+// Extract will get the checkpoint object from the commonResult
+func (r commonResult) Extract() (*Checkpoint, error) {
+	var s struct {
+		Checkpoint *Checkpoint `json:"checkpoint"`
+	}
+
+	err := r.ExtractInto(&s)
+	return s.Checkpoint, err
 }
 
 // ExtractBackup will get the backup object from the commonResult
-func (r commonResult) ExtractBackup() (*CheckpointItem, error) {
+func (r commonResult) ExtractBackup() (*Backup, error) {
 	var s struct {
-		Backup *CheckpointItem `json:"checkpoint_item"`
+		Backup *Backup `json:"checkpoint_item"`
 	}
 
 	err := r.ExtractInto(&s)
@@ -170,12 +162,12 @@ func (r BackupPage) IsEmpty() (bool, error) {
 // ExtractBackups accepts a Page struct, specifically a BackupPage struct,
 // and extracts the elements into a slice of Backup structs. In other words,
 // a generic collection is mapped into a relevant slice.
-func ExtractBackups(r pagination.Page) ([]CheckpointItem, error) {
+func ExtractBackups(r pagination.Page) ([]Backup, error) {
 	var s struct {
-		Vpcs []CheckpointItem `json:"checkpoint_items"`
+		Backups []Backup `json:"checkpoint_items"`
 	}
 	err := (r.(BackupPage)).ExtractInto(&s)
-	return s.Vpcs, err
+	return s.Backups, err
 }
 
 type commonResult struct {
