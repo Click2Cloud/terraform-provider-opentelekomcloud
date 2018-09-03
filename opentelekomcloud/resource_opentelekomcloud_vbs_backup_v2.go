@@ -25,7 +25,7 @@ func resourceVBSBackupV2() *schema.Resource {
 			Delete: schema.DefaultTimeout(3 * time.Minute),
 		},
 
-		Schema: map[string]*schema.Schema{ //request and response parameters
+		Schema: map[string]*schema.Schema{
 			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -37,7 +37,7 @@ func resourceVBSBackupV2() *schema.Resource {
 				Optional:     true,
 				ForceNew:     true,
 				Computed:     true,
-				ValidateFunc: validateName,
+				ValidateFunc: validateVBSBackupName,
 			},
 			"volume_id": &schema.Schema{
 				Type:     schema.TypeString,
@@ -51,10 +51,11 @@ func resourceVBSBackupV2() *schema.Resource {
 				Computed: true,
 			},
 			"description": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Computed: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ForceNew:     true,
+				Computed:     true,
+				ValidateFunc: validateVBSBackupDescription,
 			},
 			"container": &schema.Schema{
 				Type:     schema.TypeString,
@@ -99,14 +100,16 @@ func resourceVBSBackupV2() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"key": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
+							Type:         schema.TypeString,
+							Required:     true,
+							ForceNew:     true,
+							ValidateFunc: validateVBSTagKey,
 						},
 						"value": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
-							ForceNew: true,
+							Type:         schema.TypeString,
+							Required:     true,
+							ForceNew:     true,
+							ValidateFunc: validateVBSTagValue,
 						},
 					},
 				},
@@ -147,7 +150,7 @@ func resourceVBSBackupV2Create(d *schema.ResourceData, meta interface{}) error {
 	n, err := backups.Create(vbsClient, createOpts).ExtractJobResponse()
 
 	if err != nil {
-		return fmt.Errorf("Error creating OpenTelekomCloud Backup: %s", err)
+		return fmt.Errorf("Error creating OpenTelekomCloud VBS Backup: %s", err)
 	}
 
 	if err := backups.WaitForJobSuccess(vbsClient, int(d.Timeout(schema.TimeoutCreate)/time.Second), n.JobID); err != nil {
@@ -161,7 +164,7 @@ func resourceVBSBackupV2Create(d *schema.ResourceData, meta interface{}) error {
 		return resourceVBSBackupV2Read(d, meta)
 	}
 
-	return fmt.Errorf("Unexpected conversion error in resourceELoadBalancerCreate.")
+	return fmt.Errorf("Unexpected conversion error in resourceVBSBackupV2Create.")
 }
 
 func resourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
@@ -178,7 +181,7 @@ func resourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
 			return nil
 		}
 
-		return fmt.Errorf("Error retrieving OpenTelekomCloud Backup: %s", err)
+		return fmt.Errorf("Error retrieving OpenTelekomCloud VBS Backup: %s", err)
 	}
 
 	d.Set("id", n.Id)
@@ -219,7 +222,7 @@ func resourceVBSBackupV2Delete(d *schema.ResourceData, meta interface{}) error {
 
 	_, err = stateConf.WaitForState()
 	if err != nil {
-		return fmt.Errorf("Error deleting OpenTelekomCloud Backup: %s", err)
+		return fmt.Errorf("Error deleting OpenTelekomCloud VBS Backup: %s", err)
 	}
 
 	d.SetId("")
@@ -228,24 +231,24 @@ func resourceVBSBackupV2Delete(d *schema.ResourceData, meta interface{}) error {
 
 func waitForBackupDelete(client *golangsdk.ServiceClient, backupID string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
-		v, err := backups.Get(client, backupID).Extract()
+		r, err := backups.Get(client, backupID).Extract()
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				return v, "deleted", nil
+				return r, "deleted", nil
 			}
 			return nil, "available", err
 		}
 
-		if v.Status != "deleting" {
+		if r.Status != "deleting" {
 			err := backups.Delete(client, backupID).ExtractErr()
 			if err != nil {
 				if _, ok := err.(golangsdk.ErrDefault404); ok {
-					log.Printf("[INFO] Successfully deleted OpenTelekomCloud backup %s", backupID)
-					return v, "deleted", nil
+					log.Printf("[INFO] Successfully deleted OpenTelekomCloud VBS backup %s", backupID)
+					return r, "deleted", nil
 				}
-				return v, v.Status, err
+				return r, r.Status, err
 			}
 		}
-		return v, v.Status, nil
+		return r, r.Status, nil
 	}
 }

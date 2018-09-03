@@ -206,7 +206,7 @@ func validateVBSPolicyRetainBackup(v interface{}, k string) (ws []string, errors
 	return
 }
 
-func validateVBSPolicyTagKey(v interface{}, k string) (ws []string, errors []error) {
+func validateVBSTagKey(v interface{}, k string) (ws []string, errors []error) {
 	value := v.(string)
 
 	if len(value) > 36 {
@@ -222,7 +222,7 @@ func validateVBSPolicyTagKey(v interface{}, k string) (ws []string, errors []err
 	return
 }
 
-func validateVBSPolicyTagValue(v interface{}, k string) (ws []string, errors []error) {
+func validateVBSTagValue(v interface{}, k string) (ws []string, errors []error) {
 	value := v.(string)
 
 	if len(value) > 43 {
@@ -230,6 +230,41 @@ func validateVBSPolicyTagValue(v interface{}, k string) (ws []string, errors []e
 			"%q cannot be longer than 64 characters: %q", k, value))
 	}
 	pattern := `^[\.\-_A-Za-z0-9]+$`
+	if !regexp.MustCompile(pattern).MatchString(value) {
+		errors = append(errors, fmt.Errorf(
+			"%q doesn't comply with restrictions (%q): %q",
+			k, pattern, value))
+	}
+	return
+}
+
+func validateVBSBackupName(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+	if strings.HasPrefix(strings.ToLower(value), "autobk") {
+		errors = append(errors, fmt.Errorf(
+			"%q cannot start with autobk: %q", k, value))
+	}
+
+	if len(value) > 64 {
+		errors = append(errors, fmt.Errorf(
+			"%q cannot be longer than 64 characters: %q", k, value))
+	}
+	pattern := `^[\.\-_A-Za-z0-9]+$`
+	if !regexp.MustCompile(pattern).MatchString(value) {
+		errors = append(errors, fmt.Errorf(
+			"%q doesn't comply with restrictions (%q): %q",
+			k, pattern, value))
+	}
+	return
+}
+
+func validateVBSBackupDescription(v interface{}, k string) (ws []string, errors []error) {
+	value := v.(string)
+	if len(value) > 64 {
+		errors = append(errors, fmt.Errorf(
+			"%q cannot be longer than 64 characters: %q", k, value))
+	}
+	pattern := `^[^<>]*$`
 	if !regexp.MustCompile(pattern).MatchString(value) {
 		errors = append(errors, fmt.Errorf(
 			"%q doesn't comply with restrictions (%q): %q",
