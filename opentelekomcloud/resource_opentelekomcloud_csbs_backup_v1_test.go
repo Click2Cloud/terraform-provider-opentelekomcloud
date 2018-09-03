@@ -13,7 +13,7 @@ import (
 )
 
 func TestAccCSBSBackupV1_basic(t *testing.T) {
-	var backups backup.CheckpointItem
+	var backups backup.Backup
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -35,7 +35,7 @@ func TestAccCSBSBackupV1_basic(t *testing.T) {
 }
 
 func TestAccCSBSBackupV1_timeout(t *testing.T) {
-	var backups backup.CheckpointItem
+	var backups backup.Backup
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -73,7 +73,7 @@ func testAccCSBSBackupV1Destroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCSBSBackupV1Exists(n string, backups *backup.CheckpointItem) resource.TestCheckFunc {
+func testAccCSBSBackupV1Exists(n string, backups *backup.Backup) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -107,19 +107,45 @@ func testAccCSBSBackupV1Exists(n string, backups *backup.CheckpointItem) resourc
 }
 
 var testAccCSBSBackupV1_basic = fmt.Sprintf(`
+resource "opentelekomcloud_compute_instance_v2" "instance_1" {
+  name = "instance_1"
+  image_id = "%s"
+  security_groups = ["default"]
+  availability_zone = "%s"
+  flavor_id = "s2.medium.1"
+  metadata {
+    foo = "bar"
+  }
+  network {
+    uuid = "%s"
+  }
+}
 resource "opentelekomcloud_csbs_backup_v1" "csbs" {
   backup_name      = "csbs-test1"
   description      = "test-code"
-  resource_id = "92cc41e5-a761-4828-9b19-247076aa4e55"
+  resource_id = "${opentelekomcloud_compute_instance_v2.instance_1.id}"
   resource_type = "OS::Nova::Server"
 }
-`)
+`, OS_IMAGE_ID, OS_AVAILABILITY_ZONE, OS_NETWORK_ID)
 
 var testAccCSBSBackupV1_timeout = fmt.Sprintf(`
+resource "opentelekomcloud_compute_instance_v2" "instance_1" {
+  name = "instance_1"
+  image_id = "%s"
+  security_groups = ["default"]
+  availability_zone = "%s"
+  flavor_id = "s2.medium.1"
+  metadata {
+    foo = "bar"
+  }
+  network {
+    uuid = "%s"
+  }
+}
 resource "opentelekomcloud_csbs_backup_v1" "csbs" {
   backup_name      = "csbs-test1"
   description      = "test-code"
-  resource_id = "92cc41e5-a761-4828-9b19-247076aa4e55"
+  resource_id = "${opentelekomcloud_compute_instance_v2.instance_1.id}"
   resource_type = "OS::Nova::Server"
 }
-`)
+`, OS_IMAGE_ID, OS_AVAILABILITY_ZONE, OS_NETWORK_ID)

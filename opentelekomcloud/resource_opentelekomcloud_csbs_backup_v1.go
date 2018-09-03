@@ -152,11 +152,12 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 	config := meta.(*Config)
 	backupClient, err := config.backupV1Client(GetRegion(d, config))
 
+	log.Printf("[DEBUG] queryOpts: %s", backupClient)
 	if err != nil {
 		return fmt.Errorf("Error creating OpenTelekomCloud backup Client: %s", err)
 	}
-	queryOpts := backup.QueryResourceOpts{
-		CheckProtectable: []backup.ProtectableParam{
+	queryOpts := backup.ResourceBackupCapOpts{
+		CheckProtectable: []backup.ResourceCapQueryParams{
 			{
 				ResourceId:   d.Get("resource_id").(string),
 				ResourceType: d.Get("resource_type").(string),
@@ -166,26 +167,25 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 
 	log.Printf("[DEBUG] queryOpts: %s", queryOpts)
 
-	query, err := backup.QueryResourceCreate(backupClient, queryOpts).ExtractQueryResponse()
-	log.Printf("[DEBUG] query backup: %s", query.Protectable[0].ResourceId)
-	if query.Protectable[0].Result == true {
+	query, err := backup.QueryResourceBackupCapability(backupClient, queryOpts).ExtractQueryResponse()
+	log.Printf("[DEBUG] query backup: %s", query[0].ResourceId)
+	if query[0].Result == true {
 
 		createOpts := backup.CreateOpts{
-			Protect: backup.ProtectParam{
 				BackupName:   d.Get("backup_name").(string),
 				Description:  d.Get("description").(string),
 				ResourceType: d.Get("resource_type").(string),
-				ExtraInfo:    d.Get("extra_info").(string),
+				//ExtraInfo:    d.Get("extra_info").(string),
 				Tags:         resourceCSBSTagsV1(d),
-			},
-		}
 
-		create, err := backup.Create(backupClient, query.Protectable[0].ResourceId, createOpts).Extract()
+		}
+		log.Printf("[DEBUG] createOpts: %s", createOpts)
+		create, err := backup.Create(backupClient, query[0].ResourceId, createOpts).Extract()
 		if err != nil {
 			return fmt.Errorf("Error creating OpenTelekomCloud backup: %s", err)
 		}
-
-		backupOpts := backup.ListOpts{CheckpointId: create.Checkpoint.Id}
+		log.Printf("[DEBUG] create: %#v", create)
+		backupOpts := backup.ListOpts{CheckpointId: create.Id}
 		backupItems, err := backup.List(backupClient, backupOpts)
 
 		if err != nil {
@@ -200,7 +200,7 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 		n := backupItems[0]
 
 		d.SetId(n.Id)
-		d.Set("backup_record_id", create.Checkpoint.Id)
+		d.Set("backup_record_id", create.Id)
 
 		stateConf := &resource.StateChangeConf{
 			Pending:    []string{"protecting"},
@@ -214,13 +214,13 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 		if stateErr != nil {
 			return fmt.Errorf(
 				"Error waiting for Backup (%s) to become Available: %s",
-				create.Checkpoint.Id, stateErr)
+				create.Id, stateErr)
 		}
 
-		log.Printf("[DEBUG] Waiting for OpenTelekomCloud Backup (%s) to become available", create.Checkpoint.Id)
+		log.Printf("[DEBUG] Waiting for OpenTelekomCloud Backup (%s) to become available", create.Id)
 	} else {
 		return fmt.Errorf("Server (%s) is already in service : %s",
-			query.Protectable[0].ResourceId, query.Protectable[0].ErrorMsg)
+			query[0].ResourceId, query[0].ErrorMsg)
 	}
 
 	return resourceCSBSBackupV1Read(d, meta)

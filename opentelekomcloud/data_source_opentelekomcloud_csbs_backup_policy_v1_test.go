@@ -41,27 +41,40 @@ func testAccCheckCSBSBackupPolicyV1DataSourceID(n string) resource.TestCheckFunc
 	}
 }
 
-var testAccCSBSBackupPolicyV1DataSource_basic = `
-resource "opentelekomcloud_csbs_backup_policy_v1" "csbs_policy" {
-  name            = "csbs-policy"
-  description      = "test-code"
-  provider_id = "fc4d5750-22e7-4798-8a46-f48f62c4c1da"
-  common= {  }
-  resources = [{
-    id = "9422f270-6fcf-4ba2-9319-a007f2f63a8e"
-    type = "OS::Nova::Server"
-    r_name = "resource4"
-  }]
-  scheduled_operations = [{
-    so_name ="mybackupp"
+var testAccCSBSBackupPolicyV1DataSource_basic = fmt.Sprintf(`
+resource "opentelekomcloud_compute_instance_v2" "instance_1" {
+  name = "instance_1"
+  image_id = "%s"
+  security_groups = ["default"]
+  availability_zone = "%s"
+  flavor_id = "s2.medium.1"
+  metadata {
+    foo = "bar"
+  }
+  network {
+    uuid = "%s"
+  }
+}
+resource "opentelekomcloud_csbs_backup_policy_v1" "backup_policy_v1" {
+	name            = "csbs-policy"
+  	description      = "test-code"
+  	provider_id = "fc4d5750-22e7-4798-8a46-f48f62c4c1da"
+  	common= {  }
+  	resources = [{
+    resource_id = "${opentelekomcloud_compute_instance_v2.instance_1.id}"
+    resource_type = "OS::Nova::Server"
+    resource_name = "resource4"
+  	}]
+  	scheduled_operations = [{
+    scheduled_period_name ="mybackup"
     enabled = true
-    so_description = "My backup policyy"
+    scheduled_period_description = "My backup policy"
     operation_type ="backup"
-    max_backups = "3"
+    max_backups = "20"
     pattern = "BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nRRULE:FREQ=WEEKLY;BYDAY=TH;BYHOUR=12;BYMINUTE=27\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
-  }]
+  	}]
 }
 data "opentelekomcloud_csbs_backup_policy_v1" "csbs_policy" {  
-  id = "${opentelekomcloud_csbs_backup_policy_v1.csbs_policy.id}"
+  id = "${opentelekomcloud_csbs_backup_policy_v1.backup_policy_v1.id}"
 }
-`
+`, OS_IMAGE_ID, OS_AVAILABILITY_ZONE, OS_NETWORK_ID)

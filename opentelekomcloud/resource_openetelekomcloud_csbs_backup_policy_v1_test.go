@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccCSBSBackupPolicyV1_basic(t *testing.T) {
-	var policy policies.PolicyResp
+	var policy policies.BackupPolicy
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -46,7 +46,7 @@ func TestAccCSBSBackupPolicyV1_basic(t *testing.T) {
 }
 
 func TestAccCSBSBackupPolicyV1_timeout(t *testing.T) {
-	var policy policies.PolicyResp
+	var policy policies.BackupPolicy
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -84,7 +84,7 @@ func testAccCheckCSBSBackupPolicyV1Destroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckCSBSBackupPolicyV1Exists(n string, policy *policies.PolicyResp) resource.TestCheckFunc {
+func testAccCheckCSBSBackupPolicyV1Exists(n string, policy *policies.BackupPolicy) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -106,7 +106,7 @@ func testAccCheckCSBSBackupPolicyV1Exists(n string, policy *policies.PolicyResp)
 			return err
 		}
 
-		if found.Id != rs.Primary.ID {
+		if found.ID != rs.Primary.ID {
 			return fmt.Errorf("share file not found")
 		}
 
@@ -122,7 +122,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance_1" {
   image_id = "%s"
   security_groups = ["default"]
   availability_zone = "%s"
-  flavor_id = "physical.o2.medium"
+  flavor_id = "s2.medium.1"
   metadata {
     foo = "bar"
   }
@@ -157,7 +157,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance_1" {
   image_id = "%s"
   security_groups = ["default"]
   availability_zone = "%s"
-  flavor_id = "physical.o2.medium"
+  flavor_id = "s2.medium.1"
   metadata {
     foo = "bar"
   }
@@ -167,7 +167,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance_1" {
 }
 resource "opentelekomcloud_csbs_backup_policy_v1" "backup_policy_v1" {
 	name            = "backup-policy-update"
-  	description      = "test-code"
+  	description      = "test-code-update"
   	provider_id = "fc4d5750-22e7-4798-8a46-f48f62c4c1da"
   	common= {  }
   	resources = [{
@@ -192,7 +192,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance_1" {
   image_id = "%s"
   security_groups = ["default"]
   availability_zone = "%s"
-  flavor_id = "physical.o2.medium"
+  flavor_id = "s2.medium.1"
   metadata {
     foo = "bar"
   }
