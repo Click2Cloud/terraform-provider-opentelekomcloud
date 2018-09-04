@@ -211,7 +211,7 @@ func validateVBSTagKey(v interface{}, k string) (ws []string, errors []error) {
 
 	if len(value) > 36 {
 		errors = append(errors, fmt.Errorf(
-			"%q cannot be longer than 64 characters: %q", k, value))
+			"%q cannot be longer than 36 characters: %q", k, value))
 	}
 	pattern := `^[\.\-_A-Za-z0-9]+$`
 	if !regexp.MustCompile(pattern).MatchString(value) {
@@ -227,7 +227,7 @@ func validateVBSTagValue(v interface{}, k string) (ws []string, errors []error) 
 
 	if len(value) > 43 {
 		errors = append(errors, fmt.Errorf(
-			"%q cannot be longer than 64 characters: %q", k, value))
+			"%q cannot be longer than 43 characters: %q", k, value))
 	}
 	pattern := `^[\.\-_A-Za-z0-9]+$`
 	if !regexp.MustCompile(pattern).MatchString(value) {
