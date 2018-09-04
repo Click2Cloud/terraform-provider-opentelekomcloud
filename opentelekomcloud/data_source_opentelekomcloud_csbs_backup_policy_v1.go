@@ -96,7 +96,7 @@ func dataSourceCSBSBackupPolicyV1() *schema.Resource {
 							Optional: true,
 						},
 						"permanent": &schema.Schema{
-							Type:     schema.TypeString,
+							Type:     schema.TypeBool,
 							Optional: true,
 						},
 						"plan_id": &schema.Schema{

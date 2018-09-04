@@ -17,7 +17,7 @@ func TestAccCSBSBackupPolicyV1DataSource_basic(t *testing.T) {
 				Config: testAccCSBSBackupPolicyV1DataSource_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCSBSBackupPolicyV1DataSourceID("data.opentelekomcloud_csbs_backup_policy_v1.csbs_policy"),
-					resource.TestCheckResourceAttr("data.opentelekomcloud_csbs_backup_policy_v1.csbs_policy", "name", "csbs-policy"),
+					resource.TestCheckResourceAttr("data.opentelekomcloud_csbs_backup_policy_v1.csbs_policy", "name", "backup-policy"),
 					resource.TestCheckResourceAttr("data.opentelekomcloud_csbs_backup_policy_v1.csbs_policy", "description", "test-code"),
 					resource.TestCheckResourceAttr("data.opentelekomcloud_csbs_backup_policy_v1.csbs_policy", "provider_id", "fc4d5750-22e7-4798-8a46-f48f62c4c1da"),
 				),
@@ -56,7 +56,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance_1" {
   }
 }
 resource "opentelekomcloud_csbs_backup_policy_v1" "backup_policy_v1" {
-	name            = "csbs-policy"
+	name            = "backup-policy"
   	description      = "test-code"
   	provider_id = "fc4d5750-22e7-4798-8a46-f48f62c4c1da"
   	common= {  }
