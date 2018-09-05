@@ -96,7 +96,7 @@ func dataSourceCSBSBackupPolicyV1() *schema.Resource {
 							Optional: true,
 						},
 						"permanent": &schema.Schema{
-							Type:     schema.TypeBool,
+							Type:     schema.TypeString,
 							Optional: true,
 						},
 						"plan_id": &schema.Schema{
@@ -163,8 +163,9 @@ func dataSourceCSBSBackupPolicyV1Read(d *schema.ResourceData, meta interface{}) 
 		Name:   d.Get("name").(string),
 		Status: d.Get("status").(string),
 	}
-
+	log.Printf("[DEBUG] listOpts %#v:", listOpts)
 	refinedpolicies, err := policies.List(policyClient, listOpts)
+	log.Printf("[DEBUG] refinedpolicies %#v:", refinedpolicies)
 	if err != nil {
 		return fmt.Errorf("Unable to retrieve backup policies: %s", err)
 	}

@@ -28,24 +28,21 @@ Provides an OpenTelekomCloud Backup of Resources.
 ## Argument Reference
 The following arguments are supported:
 
+* `backup_name` - (Optional) Name for the backup. The value consists of 1 to 255 characters and can contain only letters, digits, underscores (_), and hyphens (-). Changing backup_name creates a new backup.
 
-* `backup_name` - (Optional) Name for the backup. The value consists of 1 to 255 characters and can contain only letters, digits, underscores (_), and hyphens (-).
+* `description` - (Optional) Backup description. The value consists of 0 to 255 characters and must not contain a greater-than sign (>) or less-than sign (<). Changing description creates a new backup.
 
-* `description` - (Optional) Backup description. The value consists of 0 to 255 characters and must not contain a greater-than sign (>) or less-than sign (<).
+* `resource_id` - (Required) ID of the target to which the backup is restored. Changing this creates a new backup.
 
-* `resource_id` - (Required) ID of the target to which the backup is restored.
+* `resource_type` - (Required) Type of the target to which the backup is restored. The default value is **OS::Nova::Server** for an ECS. Changing this creates a new backup.
 
-* `resource_type` - (Required) Type of the target to which the backup is restored. The default value is **OS::Nova::Server** for an ECS.
-
-**tags** **- (Optional)** List of tags. Keys in this list must be unique.
+**tags** **- (Optional)** List of tags. Keys in this list must be unique. Changing this creates a new backup.
 
 * `key` - (Required) Tag key. It cannot be an empty string.
     
 * `value` - (Required) Tag value. It can be an empty string.
 ## Attributes Reference
 In addition to all arguments above, the following attributes are exported:
-
-
 
 * `status` - Status of Backup.
 
@@ -72,20 +69,11 @@ In addition to all arguments above, the following attributes are exported:
 
 ## Import
 
-RTS Stacks can be imported using the `name`, e.g.
+Backup can be imported using  `id`, e.g.
 
 ```
-$ terraform import opentelekomcloud_rts_stack_v1.mystack rts-stack
+$ terraform import opentelekomcloud_csbs_backup_v1.backup_v1 7056d636-ac60-4663-8a6c-82d3c32c1c64
 ```
 
 
-<a id="timeouts"></a>
-## Timeouts
-
-`opentelekomcloud_rts_stack_v1` provides the following
-[Timeouts](/docs/configuration/resources.html#timeouts) configuration options:
-
-- `create` - (Default `30 minutes`) Used for Creating Stacks
-- `update` - (Default `30 minutes`) Used for Stack modifications
-- `delete` - (Default `30 minutes`) Used for destroying stacks.
 

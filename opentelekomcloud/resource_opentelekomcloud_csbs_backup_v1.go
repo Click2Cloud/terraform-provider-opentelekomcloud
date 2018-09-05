@@ -35,6 +35,7 @@ func resourceCSBSBackupV1() *schema.Resource {
 			"backup_record_id": {
 				Type:     schema.TypeString,
 				Computed: true,
+				ForceNew: true,
 			},
 			"resource_id": &schema.Schema{
 				Type:     schema.TypeString,
@@ -43,7 +44,7 @@ func resourceCSBSBackupV1() *schema.Resource {
 			},
 			"backup_name": &schema.Schema{
 				Type:     schema.TypeString,
-				Optional: true,
+				Required: true,
 				ForceNew: true,
 			},
 			"description": &schema.Schema{
@@ -75,11 +76,6 @@ func resourceCSBSBackupV1() *schema.Resource {
 						},
 					},
 				},
-			},
-			"extra_info": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
 			},
 			"status": &schema.Schema{
 				Type:     schema.TypeString,
@@ -130,16 +126,8 @@ func resourceCSBSBackupV1() *schema.Resource {
 										Type:     schema.TypeString,
 										Computed: true,
 									},
-									"extra_info": &schema.Schema{
-										Type:     schema.TypeString,
-										Computed: true,
-									},
 								},
 							},
-						},
-						"resource_type": &schema.Schema{
-							Type:     schema.TypeString,
-							Required: true,
 						},
 					},
 				},
@@ -172,12 +160,10 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 	if query[0].Result == true {
 
 		createOpts := backup.CreateOpts{
-				BackupName:   d.Get("backup_name").(string),
-				Description:  d.Get("description").(string),
-				ResourceType: d.Get("resource_type").(string),
-				//ExtraInfo:    d.Get("extra_info").(string),
-				Tags:         resourceCSBSTagsV1(d),
-
+			BackupName:   d.Get("backup_name").(string),
+			Description:  d.Get("description").(string),
+			ResourceType: d.Get("resource_type").(string),
+			Tags:         resourceCSBSTagsV1(d),
 		}
 		log.Printf("[DEBUG] createOpts: %s", createOpts)
 		create, err := backup.Create(backupClient, query[0].ResourceId, createOpts).Extract()

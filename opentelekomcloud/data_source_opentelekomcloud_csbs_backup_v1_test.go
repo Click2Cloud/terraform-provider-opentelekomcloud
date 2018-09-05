@@ -41,7 +41,7 @@ func testAccCheckCSBSBackupV1DataSourceID(n string) resource.TestCheckFunc {
 	}
 }
 
-var testAccCSBSBackupV1DataSource_basic =fmt.Sprintf( `
+var testAccCSBSBackupV1DataSource_basic = fmt.Sprintf(`
 resource "opentelekomcloud_compute_instance_v2" "instance_1" {
   name = "instance_1"
   image_id = "%s"

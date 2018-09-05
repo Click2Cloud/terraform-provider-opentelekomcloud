@@ -846,14 +846,14 @@
 		{
 			"checksumSHA1": "dixnJZ1J8hROdd/mUNgzrwPU3Ls=",
 			"path": "github.com/huaweicloud/golangsdk/openstack/csbs/v1/backup",
-			"revision": "10d8e9f7517bc4c5339252f85312a8fbc3e29195",
-			"revisionTime": "2018-08-31T14:16:50Z"
+			"revision": "5c3196aed52595dc7e624278e8a0e4e8aee3cc0b",
+			"revisionTime": "2018-09-03T07:18:55Z"
 		},
 		{
-			"checksumSHA1": "j4Ip91swuybLOVBCIJyzATozSws=",
+			"checksumSHA1": "01evDa/prNrOzRn859JEA6GTbbQ=",
 			"path": "github.com/huaweicloud/golangsdk/openstack/csbs/v1/policies",
-			"revision": "10d8e9f7517bc4c5339252f85312a8fbc3e29195",
-			"revisionTime": "2018-08-31T14:16:50Z"
+			"revision": "5c3196aed52595dc7e624278e8a0e4e8aee3cc0b",
+			"revisionTime": "2018-09-03T07:18:55Z"
 		},
 		{
 			"checksumSHA1": "plsG8kyRJhFGnhGfO0scQk5kRLw=",
