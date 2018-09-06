@@ -34,9 +34,8 @@ func resourceVBSBackupV2() *schema.Resource {
 			},
 			"name": &schema.Schema{
 				Type:         schema.TypeString,
-				Optional:     true,
+				Required:     true,
 				ForceNew:     true,
-				Computed:     true,
 				ValidateFunc: validateVBSBackupName,
 			},
 			"volume_id": &schema.Schema{

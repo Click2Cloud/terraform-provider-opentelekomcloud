@@ -96,7 +96,7 @@ type CreateOpts struct {
 	//Snapshot ID of the disk to be backed up
 	SnapshotId string `json:"snapshot_id,omitempty" `
 	//Backup name, which cannot start with autobk
-	Name string `json:"name,omitempty"`
+	Name string `json:"name" required:"true"`
 	//Backup description
 	Description string `json:"description,omitempty"`
 	//List of tags to be configured for the backup resources

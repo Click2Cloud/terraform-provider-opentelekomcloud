@@ -1102,6 +1102,13 @@
 			"revisionTime": "2018-02-26T07:57:01Z"
 		},
 		{
+			"checksumSHA1": "xKM8Q5jKaDxDIlA8+AISa+5lNB0=",
+			"origin": "github.com/Click2Cloud/terraform-provider-opentelekomcloud/vendor/github.com/huaweicloud/golangsdk/openstack/vbs/v2/backups",
+			"path": "github.com/huaweicloud/golangsdk/openstack/vbs/v2/backups",
+			"revision": "160857782933e39f40dfe627757df7e69861e727",
+			"revisionTime": "2018-09-06T06:07:39Z"
+		},
+		{
 			"checksumSHA1": "UyWV8camIWUFnbKI+7VCByD9FMg=",
 			"path": "github.com/huaweicloud/golangsdk/openstack/vbs/v2/policies",
 			"revision": "e8888f4a32b91610c3cd9bedcf81a3815e13b4cb",
@@ -1284,5 +1291,5 @@
 			"versionExact": "v1.6.1"
 		}
 	],
-	"rootPath": "github.com/huaweicloud/terraform-provider-opentelekomcloud"
+	"rootPath": "github.com/Click2Cloud/terraform-provider-opentelekomcloud"
 }
