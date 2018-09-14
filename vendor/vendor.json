@@ -868,6 +868,12 @@
 			"revisionTime": "2018-09-11T07:04:38Z"
 		},
 		{
+			"checksumSHA1": "Xucq+Ue/IefP4qrReitCN5F3rRg=",
+			"path": "github.com/huaweicloud/golangsdk/openstack/blockstorage/v2/volumes",
+			"revision": "95e54166c7135959f7c56ae87632e34b88b19b37",
+			"revisionTime": "2018-09-10T09:15:04Z"
+		},
+		{
 			"checksumSHA1": "WN/dwJ8WzlLFnp31TdnmVDgpjAY=",
 			"path": "github.com/huaweicloud/golangsdk/openstack/bms/v2/flavors",
 			"revision": "6aa721c497760e91ad31b27f843c2a4451e9de51",
@@ -896,6 +902,12 @@
 			"path": "github.com/huaweicloud/golangsdk/openstack/cloudeyeservice/alarmrule",
 			"revision": "b30e33595f46378156035bfec5b52b350c4b2b72",
 			"revisionTime": "2018-03-15T11:09:47Z"
+		},
+		{
+			"checksumSHA1": "Y20gNFAdSahcMx1fuzZHc6jXG7U=",
+			"path": "github.com/huaweicloud/golangsdk/openstack/compute/v2/extensions/volumeattach",
+			"revision": "95e54166c7135959f7c56ae87632e34b88b19b37",
+			"revisionTime": "2018-09-10T09:15:04Z"
 		},
 		{
 			"checksumSHA1": "plsG8kyRJhFGnhGfO0scQk5kRLw=",
@@ -1357,5 +1369,5 @@
 			"versionExact": "v1.6.1"
 		}
 	],
-	"rootPath": "github.com/Click2Cloud/terraform-provider-opentelekomcloud"
+	"rootPath": "github.com/terraform-providers/terraform-provider-opentelekomcloud"
 }
