@@ -5,8 +5,6 @@ import (
 	"log"
 	"time"
 
-	"strconv"
-
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/huaweicloud/golangsdk"
@@ -259,18 +257,6 @@ func resourceCSBSBackupPolicyRead(d *schema.ResourceData, meta interface{}) erro
 
 	var scheduledlist []map[string]interface{}
 	for _, schedule := range n.ScheduledOperations {
-		maxbackup := schedule.OperationDefinition.MaxBackups
-		MaxBackups, err := strconv.Atoi(maxbackup)
-		if err != nil {
-			MaxBackups = 0
-		}
-		retention_duration_days := schedule.OperationDefinition.RetentionDurationDays
-		RetentionDurationDays, err := strconv.Atoi(retention_duration_days)
-		if err != nil {
-			RetentionDurationDays = 0
-		}
-		permanent := schedule.OperationDefinition.Permanent
-		Permanent, err := strconv.ParseBool(permanent)
 
 		mapping := map[string]interface{}{
 			"scheduled_period_description": schedule.Description,
@@ -278,9 +264,9 @@ func resourceCSBSBackupPolicyRead(d *schema.ResourceData, meta interface{}) erro
 			"trigger_id":                   schedule.TriggerID,
 			"scheduled_period_name":        schedule.Name,
 			"operation_type":               schedule.OperationType,
-			"max_backups":                  MaxBackups,
-			"retention_duration_days":      RetentionDurationDays,
-			"permanent":                    Permanent,
+			"max_backups":                  schedule.OperationDefinition.MaxBackups,
+			"retention_duration_days":      schedule.OperationDefinition.RetentionDurationDays,
+			"permanent":                    schedule.OperationDefinition.Permanent,
 			"plan_id":                      schedule.OperationDefinition.PlanId,
 			"scheduler_id":                 schedule.Trigger.ID,
 			"scheduler_name":               schedule.Trigger.Name,

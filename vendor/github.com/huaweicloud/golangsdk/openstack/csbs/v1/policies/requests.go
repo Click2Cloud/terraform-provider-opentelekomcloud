@@ -111,7 +111,7 @@ type Resource struct {
 
 type ScheduledOperation struct {
 	Description         string              `json:"description,omitempty"`
-	Enabled             bool                `json:"enabled,omitempty"`
+	Enabled             bool                `json:"enabled"`
 	Name                string              `json:"name,omitempty"`
 	OperationType       string              `json:"operation_type" required:"true"`
 	OperationDefinition OperationDefinition `json:"operation_definition" required:"true"`
@@ -188,7 +188,7 @@ type UpdateOpts struct {
 
 type ScheduledOperationToUpdate struct {
 	Description         string              `json:"description,omitempty"`
-	Enabled             bool                `json:"enabled,omitempty"`
+	Enabled             bool                `json:"enabled"`
 	TriggerId           string              `json:"trigger_id,omitempty"`
 	Name                string              `json:"name,omitempty"`
 	OperationDefinition OperationDefinition `json:"operation_definition,omitempty"`

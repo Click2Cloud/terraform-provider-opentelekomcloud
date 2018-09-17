@@ -67,7 +67,7 @@ func testAccCheckCSBSBackupPolicyV1Destroy(s *terraform.State) error {
 	config := testAccProvider.Meta().(*Config)
 	policyClient, err := config.backupV1Client(OS_REGION_NAME)
 	if err != nil {
-		return fmt.Errorf("Error creating opentelekomcloud sfs client: %s", err)
+		return fmt.Errorf("Error creating opentelekomcloud backup policy client: %s", err)
 	}
 
 	for _, rs := range s.RootModule().Resources {
@@ -77,7 +77,7 @@ func testAccCheckCSBSBackupPolicyV1Destroy(s *terraform.State) error {
 
 		_, err := policies.Get(policyClient, rs.Primary.ID).Extract()
 		if err == nil {
-			return fmt.Errorf("Share File still exists")
+			return fmt.Errorf("backup policy still exists")
 		}
 	}
 
@@ -98,7 +98,7 @@ func testAccCheckCSBSBackupPolicyV1Exists(n string, policy *policies.BackupPolic
 		config := testAccProvider.Meta().(*Config)
 		policyClient, err := config.backupV1Client(OS_REGION_NAME)
 		if err != nil {
-			return fmt.Errorf("Error creating opentelekomcloud sfs client: %s", err)
+			return fmt.Errorf("Error creating opentelekomcloud backup policy client: %s", err)
 		}
 
 		found, err := policies.Get(policyClient, rs.Primary.ID).Extract()
@@ -107,7 +107,7 @@ func testAccCheckCSBSBackupPolicyV1Exists(n string, policy *policies.BackupPolic
 		}
 
 		if found.ID != rs.Primary.ID {
-			return fmt.Errorf("share file not found")
+			return fmt.Errorf("backup policy not found")
 		}
 
 		*policy = *found

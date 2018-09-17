@@ -1,6 +1,9 @@
 package policies
 
 import (
+	"encoding/json"
+	"strconv"
+
 	"github.com/huaweicloud/golangsdk"
 	"github.com/huaweicloud/golangsdk/pagination"
 )
@@ -31,11 +34,11 @@ type ScheduledOperationResp struct {
 }
 
 type OperationDefinitionResp struct {
-	MaxBackups            string `json:"max_backups,omitempty"`
-	RetentionDurationDays string `json:"retention_duration_days,omitempty"`
-	Permanent             string   `json:"permanent,omitempty"`
-	PlanId                string `json:"plan_id,omitempty"`
-	ProviderId            string `json:"provider_id,omitempty"`
+	MaxBackups            int    `json:"-"`
+	RetentionDurationDays int    `json:"-"`
+	Permanent             bool   `json:"-"`
+	PlanId                string `json:"plan_id"`
+	ProviderId            string `json:"provider_id"`
 }
 
 type TriggerResp struct {
@@ -48,6 +51,27 @@ type TriggerResp struct {
 type TriggerPropertiesResp struct {
 	Pattern   string `json:"pattern"`
 	StartTime string `json:"start_time"`
+}
+
+func (r *OperationDefinitionResp) UnmarshalJSON(b []byte) error {
+	type tmp OperationDefinitionResp
+	var s struct {
+		tmp
+		MaxBackups            string `json:"max_backups"`
+		RetentionDurationDays string `json:"retention_duration_days"`
+		Permanent             string `json:"permanent"`
+	}
+	err := json.Unmarshal(b, &s)
+	if err != nil {
+		return err
+	}
+
+	*r = OperationDefinitionResp(s.tmp)
+	r.MaxBackups, err = strconv.Atoi(s.MaxBackups)
+	r.RetentionDurationDays, err = strconv.Atoi(s.RetentionDurationDays)
+	r.Permanent, err = strconv.ParseBool(s.Permanent)
+
+	return err
 }
 
 // Extract will get the backup policies object from the commonResult

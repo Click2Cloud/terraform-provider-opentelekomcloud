@@ -28,10 +28,6 @@ func dataSourceCSBSBackupV1() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"az": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"resource_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -112,7 +108,7 @@ func dataSourceCSBSBackupV1() *schema.Resource {
 				Computed: true,
 			},
 			"supported_restore_mode": &schema.Schema{
-				Type:     schema.TypeBool,
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"support_lld": &schema.Schema{
@@ -124,7 +120,7 @@ func dataSourceCSBSBackupV1() *schema.Resource {
 				Computed: true,
 			},
 			"disk": &schema.Schema{
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"imagetype": &schema.Schema{
@@ -132,11 +128,11 @@ func dataSourceCSBSBackupV1() *schema.Resource {
 				Computed: true,
 			},
 			"ram": &schema.Schema{
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"vcpus": &schema.Schema{
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"eip": &schema.Schema{

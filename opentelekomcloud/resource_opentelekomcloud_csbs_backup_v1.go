@@ -35,7 +35,6 @@ func resourceCSBSBackupV1() *schema.Resource {
 			"backup_record_id": {
 				Type:     schema.TypeString,
 				Computed: true,
-				ForceNew: true,
 			},
 			"resource_id": &schema.Schema{
 				Type:     schema.TypeString,
@@ -44,7 +43,7 @@ func resourceCSBSBackupV1() *schema.Resource {
 			},
 			"backup_name": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 				ForceNew: true,
 			},
 			"description": &schema.Schema{
