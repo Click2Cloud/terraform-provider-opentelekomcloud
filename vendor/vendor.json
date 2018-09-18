@@ -850,10 +850,10 @@
 			"revisionTime": "2018-09-03T07:18:55Z"
 		},
 		{
-			"checksumSHA1": "WdutpTVKUUn7h2h/7UB5/tuywMY=",
+			"checksumSHA1": "miyAJNmZNQsFRk/2fzyttTyWrxI=",
 			"path": "github.com/huaweicloud/golangsdk/openstack/csbs/v1/policies",
-			"revision": "1ef4c250ce2ea6c28095385c1800ac8a74492ca9",
-			"revisionTime": "2018-09-05T09:58:59Z"
+			"revision": "435398e47c60557da79b6754731fe8aa5cbe81be",
+			"revisionTime": "2018-09-12T07:47:56Z"
 		},
 		{
 			"checksumSHA1": "plsG8kyRJhFGnhGfO0scQk5kRLw=",

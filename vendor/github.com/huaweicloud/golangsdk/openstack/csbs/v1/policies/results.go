@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"strconv"
 
+	"time"
+
 	"github.com/huaweicloud/golangsdk"
 	"github.com/huaweicloud/golangsdk/pagination"
 )
 
 type BackupPolicy struct {
-	CreatedAt           string                   `json:"created_at"`
+	CreatedAt           time.Time                `json:"-"`
 	Description         string                   `json:"description"`
 	ID                  string                   `json:"id"`
 	Name                string                   `json:"name"`
@@ -49,10 +51,47 @@ type TriggerResp struct {
 }
 
 type TriggerPropertiesResp struct {
-	Pattern   string `json:"pattern"`
-	StartTime string `json:"start_time"`
+	Pattern   string    `json:"pattern"`
+	StartTime time.Time `json:"-"`
 }
 
+// UnmarshalJSON helps to unmarshal BackupPolicy fields into needed values.
+func (r *BackupPolicy) UnmarshalJSON(b []byte) error {
+	type tmp BackupPolicy
+	var s struct {
+		tmp
+		CreatedAt golangsdk.JSONRFC3339MilliNoZ `json:"created_at"`
+	}
+	err := json.Unmarshal(b, &s)
+	if err != nil {
+		return err
+	}
+	*r = BackupPolicy(s.tmp)
+
+	r.CreatedAt = time.Time(s.CreatedAt)
+
+	return err
+}
+
+/*// UnmarshalJSON helps to unmarshal TriggerPropertiesResp fields into needed values.
+func (r *TriggerPropertiesResp) UnmarshalJSON(b []byte) error {
+	type tmp TriggerPropertiesResp
+	var s struct {
+		tmp
+		StartTime golangsdk.JSONRFC3339ZNoTNoZ `json:"start_time"`
+	}
+	err := json.Unmarshal(b, &s)
+	if err != nil {
+		return err
+	}
+	*r = TriggerPropertiesResp(s.tmp)
+
+	r.StartTime = time.Time(s.StartTime)
+
+	return err
+}*/
+
+// UnmarshalJSON helps to unmarshal OperationDefinitionResp fields into needed values.
 func (r *OperationDefinitionResp) UnmarshalJSON(b []byte) error {
 	type tmp OperationDefinitionResp
 	var s struct {
@@ -67,9 +106,36 @@ func (r *OperationDefinitionResp) UnmarshalJSON(b []byte) error {
 	}
 
 	*r = OperationDefinitionResp(s.tmp)
-	r.MaxBackups, err = strconv.Atoi(s.MaxBackups)
-	r.RetentionDurationDays, err = strconv.Atoi(s.RetentionDurationDays)
-	r.Permanent, err = strconv.ParseBool(s.Permanent)
+
+	switch s.MaxBackups {
+	case "":
+		r.MaxBackups = 0
+	default:
+		r.MaxBackups, err = strconv.Atoi(s.MaxBackups)
+		if err != nil {
+			return err
+		}
+	}
+
+	switch s.RetentionDurationDays {
+	case "":
+		r.RetentionDurationDays = 0
+	default:
+		r.RetentionDurationDays, err = strconv.Atoi(s.RetentionDurationDays)
+		if err != nil {
+			return err
+		}
+	}
+
+	switch s.Permanent {
+	case "":
+		r.Permanent = false
+	default:
+		r.Permanent, err = strconv.ParseBool(s.Permanent)
+		if err != nil {
+			return err
+		}
+	}
 
 	return err
 }

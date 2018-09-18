@@ -41,10 +41,6 @@ func dataSourceCSBSBackupV1() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"policy_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"backup_record_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,

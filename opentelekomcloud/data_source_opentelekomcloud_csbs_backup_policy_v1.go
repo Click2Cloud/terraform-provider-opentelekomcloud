@@ -88,15 +88,15 @@ func dataSourceCSBSBackupPolicyV1() *schema.Resource {
 							Optional: true,
 						},
 						"max_backups": &schema.Schema{
-							Type:     schema.TypeString,
+							Type:     schema.TypeInt,
 							Optional: true,
 						},
 						"retention_duration_days": &schema.Schema{
-							Type:     schema.TypeString,
+							Type:     schema.TypeInt,
 							Optional: true,
 						},
 						"permanent": &schema.Schema{
-							Type:     schema.TypeString,
+							Type:     schema.TypeBool,
 							Optional: true,
 						},
 						"plan_id": &schema.Schema{
@@ -226,9 +226,10 @@ func dataSourceCSBSBackupPolicyV1Read(d *schema.ResourceData, meta interface{}) 
 	d.SetId(policy.ID)
 
 	d.Set("description", policy.Description)
+	d.Set("status", policy.Status)
 	d.Set("id", policy.ID)
 	d.Set("name", policy.Name)
-	d.Set("common", policy.Parameters.Common)
+	d.Set("parameters", policy.Parameters.Common)
 	d.Set("project_id", policy.ProjectId)
 	d.Set("provider_id", policy.ProviderId)
 	d.Set("region", GetRegion(d, config))
