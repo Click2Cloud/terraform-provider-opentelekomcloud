@@ -63,7 +63,7 @@ func resourceCSBSBackupPolicyV1() *schema.Resource {
 			},
 			"scheduled_operations": &schema.Schema{
 				Type:     schema.TypeList,
-				Optional: true,
+				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"scheduled_period_name": &schema.Schema{
@@ -79,7 +79,6 @@ func resourceCSBSBackupPolicyV1() *schema.Resource {
 						"enabled": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
-							//ForceNew: false,
 						},
 						"max_backups": &schema.Schema{
 							Type:     schema.TypeInt,
@@ -139,7 +138,7 @@ func resourceCSBSBackupPolicyV1() *schema.Resource {
 			},
 			"resources": &schema.Schema{
 				Type:     schema.TypeList,
-				Optional: true,
+				Required: true,
 				ForceNew: false,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
