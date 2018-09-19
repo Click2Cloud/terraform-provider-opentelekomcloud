@@ -92,7 +92,7 @@ func testAccVBSBackupShareV2Exists(n string, share *shares.Share) resource.TestC
 			return err
 		}
 		found := shareList[0]
-		if found.ID != rs.Primary.ID {
+		if found.ID == rs.Primary.ID {
 			return fmt.Errorf("backup share not found")
 		}
 
@@ -120,8 +120,7 @@ resource "opentelekomcloud_vbs_backup_share_v2" "share" {
   backup_id ="${opentelekomcloud_vbs_backup_v2.backup_1.id}"
   to_project_ids = ["%s"]
 }
-`,OS_TO_TENANT_ID)
-
+`, OS_TO_TENANT_ID)
 
 var testAccVBSBackupShareV2_timeout = fmt.Sprintf(`
 resource "opentelekomcloud_blockstorage_volume_v2" "volume_1" {
@@ -147,4 +146,4 @@ timeouts {
   }
 
 }
-`,OS_TO_TENANT_ID)
+`, OS_TO_TENANT_ID)
