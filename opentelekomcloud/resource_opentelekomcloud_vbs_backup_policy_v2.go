@@ -102,7 +102,7 @@ func resourceVBSBackupPolicyV2Create(d *schema.ResourceData, meta interface{}) e
 
 	createOpts := policies.CreateOpts{
 		Name: d.Get("name").(string),
-		ScheduledPolicy: policies.CreateSchedule{
+		ScheduledPolicy: policies.ScheduledPolicy{
 			StartTime:         d.Get("start_time").(string),
 			Frequency:         d.Get("frequency").(int),
 			RententionNum:     d.Get("rentention_num").(int),
@@ -175,7 +175,7 @@ func resourceVBSBackupPolicyV2Read(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error retrieving OpenTelekomCloud Backup Policy Tags: %s", err)
 	}
 	var tagList []map[string]interface{}
-	for _, v := range tags.Tag {
+	for _, v := range tags.Tags {
 		tag := make(map[string]interface{})
 		tag["key"] = v.Key
 		tag["value"] = v.Value
@@ -223,7 +223,7 @@ func resourceVBSBackupPolicyV2Update(d *schema.ResourceData, meta interface{}) e
 	}
 	if d.HasChange("tags") {
 		oldTags, _ := tags.Get(vbsClient, d.Id()).Extract()
-		deleteopts := tags.BatchOpts{Action: tags.ActionDelete, Tags: oldTags.Tag}
+		deleteopts := tags.BatchOpts{Action: tags.ActionDelete, Tags: oldTags.Tags}
 		deleteTags := tags.BatchAction(vbsClient, d.Id(), deleteopts)
 		if deleteTags.Err != nil {
 			return fmt.Errorf("Error updating OpenTelekomCloud backup policy tags: %s", deleteTags.Err)
@@ -306,12 +306,12 @@ func waitForVBSPolicyActive(vbsClient *golangsdk.ServiceClient, policyID string)
 	}
 }
 
-func resourceVBSTagsV2(d *schema.ResourceData) []policies.Tags {
+func resourceVBSTagsV2(d *schema.ResourceData) []policies.Tag {
 	rawTags := d.Get("tags").([]interface{})
-	tags := make([]policies.Tags, len(rawTags))
+	tags := make([]policies.Tag, len(rawTags))
 	for i, raw := range rawTags {
 		rawMap := raw.(map[string]interface{})
-		tags[i] = policies.Tags{
+		tags[i] = policies.Tag{
 			Key:   rawMap["key"].(string),
 			Value: rawMap["value"].(string),
 		}
@@ -319,12 +319,12 @@ func resourceVBSTagsV2(d *schema.ResourceData) []policies.Tags {
 	return tags
 }
 
-func resourceVBSUpdateTagsV2(d *schema.ResourceData) []tags.ActionTags {
+func resourceVBSUpdateTagsV2(d *schema.ResourceData) []tags.Tag {
 	rawTags := d.Get("tags").([]interface{})
-	tagList := make([]tags.ActionTags, len(rawTags))
+	tagList := make([]tags.Tag, len(rawTags))
 	for i, raw := range rawTags {
 		rawMap := raw.(map[string]interface{})
-		tagList[i] = tags.ActionTags{
+		tagList[i] = tags.Tag{
 			Key:   rawMap["key"].(string),
 			Value: rawMap["value"].(string),
 		}

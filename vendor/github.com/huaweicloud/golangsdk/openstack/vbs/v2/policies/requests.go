@@ -21,13 +21,13 @@ type CreateOpts struct {
 	//Backup policy name.It cannot start with default.
 	Name string `json:"backup_policy_name" required:"true"`
 	//Details about the scheduling policy
-	ScheduledPolicy CreateSchedule `json:"scheduled_policy" required:"true"`
+	ScheduledPolicy ScheduledPolicy `json:"scheduled_policy" required:"true"`
 	// Tags to be configured for the backup policy
-	Tags []Tags `json:"tags,omitempty"`
+	Tags []Tag `json:"tags,omitempty"`
 }
 
 //Details about the scheduling policy for create
-type CreateSchedule struct {
+type ScheduledPolicy struct {
 	//Start time of the backup job.
 	StartTime string `json:"start_time" required:"true"`
 	//Backup interval (1 to 14 days)
@@ -40,7 +40,7 @@ type CreateSchedule struct {
 	Status string `json:"status" required:"true"`
 }
 
-type Tags struct {
+type Tag struct {
 	//Tag key. A tag key consists of up to 36 characters
 	Key string `json:"key" required:"true"`
 	//Tag value. A tag value consists of 0 to 43 characters
@@ -118,31 +118,18 @@ func Update(c *golangsdk.ServiceClient, policyID string, opts UpdateOptsBuilder)
 
 //Delete will delete the specified backup policy.
 func Delete(c *golangsdk.ServiceClient, policyID string) (r DeleteResult) {
-	_, r.Err = c.Delete(resourceURL(c, policyID), &golangsdk.RequestOpts{
-		OkCodes: []int{204},
-	})
+	_, r.Err = c.Delete(resourceURL(c, policyID), nil)
 	return
 }
 
 //ListOpts allows filtering policies
 type ListOpts struct {
 	//Backup policy ID
-	ID string `json:"backup_policy_id"`
+	ID string
 	//Backup policy name
-	Name string `json:"backup_policy_name"`
+	Name string
 	//Backup policy status
-	Status string `json:"status"`
-}
-
-// ListOptsBuilder allows extensions to add parameters to the List request.
-type ListOptsBuilder interface {
-	ToPolicyListQuery() (string, error)
-}
-
-// ToPolicyListQuery formats a ListOpts into a query string.
-func (opts ListOpts) ToPolicyListQuery() (string, error) {
-	q, err := golangsdk.BuildQueryString(opts)
-	return q.String(), err
+	Status string
 }
 
 // List returns a Pager which allows you to iterate over a collection of
@@ -225,10 +212,10 @@ type AssociateOpts struct {
 	//Backup policy ID, to which the resource is to be associated.
 	PolicyID string `json:"backup_policy_id" required:"true"`
 	//Details about the resources to associate with the policy.
-	Resources []AssociateResources `json:"resources" required:"true"`
+	Resources []AssociateResource `json:"resources" required:"true"`
 }
 
-type AssociateResources struct {
+type AssociateResource struct {
 	//The ID of the resource to associate with policy.
 	ResourceID string `json:"resource_id" required:"true"`
 	//Type of the resource , e.g. volume.
@@ -265,10 +252,10 @@ type DisassociateOptsBuilder interface {
 // DisassociateOpts contains the options disassociate a resource from a Policy.
 type DisassociateOpts struct {
 	//Disassociate Resources
-	Resources []DisassociateResources `json:"resources" required:"true"`
+	Resources []DisassociateResource `json:"resources" required:"true"`
 }
 
-type DisassociateResources struct {
+type DisassociateResource struct {
 	//ResourceID
 	ResourceID string `json:"resource_id" required:"true"`
 }
