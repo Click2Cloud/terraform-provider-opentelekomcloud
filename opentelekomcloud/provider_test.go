@@ -352,8 +352,7 @@ func testAccAsConfigPreCheck(t *testing.T) {
 
 func testAccVBSBackupShareCheck(t *testing.T) {
 	testAccPreCheckRequiredEnvVars(t)
-
-	if OS_TO_TENANT_ID != "" {
+	if OS_TO_TENANT_ID == "" {
 		t.Skip("OS_TO_TENANT_ID must be set for acceptance tests")
 	}
 
