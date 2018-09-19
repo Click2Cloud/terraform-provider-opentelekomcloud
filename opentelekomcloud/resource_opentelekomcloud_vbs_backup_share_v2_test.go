@@ -116,7 +116,7 @@ resource "opentelekomcloud_vbs_backup_v2" "backup_1" {
   description = "Backup_Demo"
 }
 
-resource "opentelekomcloud_vbs_backup_share_v2" "vbs" {
+resource "opentelekomcloud_vbs_backup_share_v2" "share" {
   backup_id ="${opentelekomcloud_vbs_backup_v2.backup_1.id}"
   to_project_ids = ["%s"]
 }
