@@ -31,7 +31,6 @@ var (
 	OS_SUBNET_ID              = os.Getenv("OS_SUBNET_ID")
 	OS_TENANT_ID              = os.Getenv("OS_TENANT_ID")
 	OS_SERVER_ID              = os.Getenv("OS_SERVER_ID")
-	OS_DEH_HOST_ID            = os.Getenv("OS_DEH_HOST_ID")
 	OS_KEYPAIR_NAME           = os.Getenv("OS_KEYPAIR_NAME")
 	OS_BMS_FLAVOR_NAME        = os.Getenv("OS_BMS_FLAVOR_NAME")
 	OS_NIC_ID                 = os.Getenv("OS_NIC_ID")
@@ -349,17 +348,4 @@ func testAccAsConfigPreCheck(t *testing.T) {
 	if OS_FLAVOR_ID == "" {
 		t.Skip("OS_FLAVOR_ID must be set for acceptance tests")
 	}
-}
-
-func testAccDehServerPreCheck(t *testing.T) {
-	testAccPreCheckRequiredEnvVars(t)
-
-	if OS_DEH_HOST_ID == "" {
-		t.Fatalf("OS_DEH_HOST_ID must be set for acceptance tests")
-	}
-
-	if OS_SERVER_ID == "" {
-		t.Fatalf("OS_SERVER_ID must be set for acceptance tests ,Provide Server Id binded with DeH Id")
-	}
-
 }
