@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/huaweicloud/golangsdk/openstack/vbs/v2/backups"
+	"github.com/huaweicloud/golangsdk/openstack/vbs/v2/shares"
 )
 
 func dataSourceVBSBackupV2() *schema.Resource {
@@ -71,6 +72,18 @@ func dataSourceVBSBackupV2() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"to_project_ids": &schema.Schema{
+				Type:     schema.TypeSet,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+			},
+			"share_ids": &schema.Schema{
+				Type:     schema.TypeSet,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+			},
 		},
 	}
 }
@@ -79,7 +92,7 @@ func dataSourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 	vbsClient, err := config.vbsV2Client(GetRegion(d, config))
 
-	listOpts := backups.ListOpts{
+	listBackupOpts := backups.ListOpts{
 		Id:         d.Get("id").(string),
 		Name:       d.Get("name").(string),
 		Status:     d.Get("status").(string),
@@ -87,7 +100,7 @@ func dataSourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
 		SnapshotId: d.Get("snapshot_id").(string),
 	}
 
-	refinedBackups, err := backups.List(vbsClient, listOpts)
+	refinedBackups, err := backups.List(vbsClient, listBackupOpts)
 	if err != nil {
 		return fmt.Errorf("Unable to retrieve backups: %s", err)
 	}
@@ -120,6 +133,22 @@ func dataSourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
 	d.Set("object_count", Backup.ObjectCount)
 	d.Set("volume_id", Backup.VolumeId)
 	d.Set("region", GetRegion(d, config))
+
+	listShareOpts := shares.ListOpts{
+		BackupID:   d.Get("id").(string),
+		Name:       d.Get("name").(string),
+		Status:     d.Get("status").(string),
+		VolumeID:   d.Get("volume_id").(string),
+		SnapshotID: d.Get("snapshot_id").(string),
+	}
+
+	shares, err := shares.List(vbsClient, listShareOpts)
+	if err != nil {
+		return fmt.Errorf("Unable to retrieve shares: %s", err)
+	}
+
+	d.Set("to_project_ids", resourceToProjectIdsV2(shares))
+	d.Set("share_ids", resourceShareIDsV2(shares))
 
 	return nil
 }

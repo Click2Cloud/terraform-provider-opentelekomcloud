@@ -17,7 +17,7 @@ func TestAccOTCVBSBackupV2DataSource_basic(t *testing.T) {
 				Config: testAccVBSBackupV2DataSource_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVBSBackupV2DataSourceID("data.opentelekomcloud_vbs_backup_v2.backups"),
-					resource.TestCheckResourceAttr("data.opentelekomcloud_vbs_backup_v2.backups", "name", "opentelekomcloud-backup"),
+					resource.TestCheckResourceAttr("data.opentelekomcloud_vbs_backup_v2.backups", "name", "vbs-backup"),
 					resource.TestCheckResourceAttr("data.opentelekomcloud_vbs_backup_v2.backups", "description", "Backup_Demo"),
 				),
 			},
@@ -41,13 +41,20 @@ func testAccCheckVBSBackupV2DataSourceID(n string) resource.TestCheckFunc {
 }
 
 var testAccVBSBackupV2DataSource_basic = `
-resource "opentelekomcloud_vbs_backup_v2" "backups_1" {
-  volume_id = "b02b11ea-4eab-4bcb-96b7-9c872adfdafc"
-  name = "opentelekomcloud-backup"
+resource "opentelekomcloud_blockstorage_volume_v2" "volume_1" {
+  name = "volume_123"
+  description = "first test volume"
+  size = 40
+  cascade = true
+}
+
+resource "opentelekomcloud_vbs_backup_v2" "backup_1" {
+  volume_id = "${opentelekomcloud_blockstorage_volume_v2.volume_1.id}"
+  name = "vbs-backup"
   description = "Backup_Demo"
 }
 
 data "opentelekomcloud_vbs_backup_v2" "backups" {
-  id = "${opentelekomcloud_vbs_backup_v2.backups_1.id}"
+  id = "${opentelekomcloud_vbs_backup_v2.backup_1.id}"
 }
 `

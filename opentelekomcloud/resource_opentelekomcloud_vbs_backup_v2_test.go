@@ -23,7 +23,7 @@ func TestAccOTCVBSBackupV2_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVBSBackupV2Exists("opentelekomcloud_vbs_backup_v2.backup_1", &config),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_vbs_backup_v2.backup_1", "name", "opentelekomcloud-backup"),
+						"opentelekomcloud_vbs_backup_v2.backup_1", "name", "vbs-backup"),
 					resource.TestCheckResourceAttr(
 						"opentelekomcloud_vbs_backup_v2.backup_1", "description", "Backup_Demo"),
 					resource.TestCheckResourceAttr(
@@ -106,17 +106,31 @@ func testAccCheckVBSBackupV2Exists(n string, configs *backups.Backup) resource.T
 }
 
 const testAccVBSBackupV2_basic = `
+resource "opentelekomcloud_blockstorage_volume_v2" "volume_1" {
+  name = "volume_123"
+  description = "first test volume"
+  size = 40
+  cascade = true
+}
+
 resource "opentelekomcloud_vbs_backup_v2" "backup_1" {
-  volume_id = "b02b11ea-4eab-4bcb-96b7-9c872adfdafc"
-  name = "opentelekomcloud-backup"
+  volume_id = "${opentelekomcloud_blockstorage_volume_v2.volume_1.id}"
+  name = "vbs-backup"
   description = "Backup_Demo"
 }
 `
 
 const testAccVBSBackupV2_timeout = `
+resource "opentelekomcloud_blockstorage_volume_v2" "volume_1" {
+  name = "volume_123"
+  description = "first test volume"
+  size = 40
+  cascade = true
+}
+
 resource "opentelekomcloud_vbs_backup_v2" "backup_1" {
-  volume_id = "b02b11ea-4eab-4bcb-96b7-9c872adfdafc"
-  name = "opentelekomcloud-backup"
+  volume_id = "${opentelekomcloud_blockstorage_volume_v2.volume_1.id}"
+  name = "vbs-backup"
   description = "Backup_Demo"
 
   timeouts {
