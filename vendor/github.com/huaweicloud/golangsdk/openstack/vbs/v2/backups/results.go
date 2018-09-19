@@ -1,6 +1,9 @@
 package backups
 
 import (
+	"encoding/json"
+	"time"
+
 	"github.com/huaweicloud/golangsdk"
 	"github.com/huaweicloud/golangsdk/pagination"
 )
@@ -16,8 +19,8 @@ type Backup struct {
 	Status string `json:"status"`
 	//Backup description
 	Description string `json:"description"`
-	//AZ where the backup resides
-	AZ string `json:"availability_zone"`
+	//AvailabilityZone where the backup resides
+	AvailabilityZone string `json:"availability_zone"`
 	//Source volume ID of the backup
 	VolumeId string `json:"volume_id"`
 	//Cause of the backup failure
@@ -29,15 +32,15 @@ type Backup struct {
 	//Container of the backup
 	Container string `json:"container"`
 	//Backup creation time
-	CreatedAt string `json:"created_at"`
+	CreatedAt time.Time `json:"-"`
 	//ID of the tenant to which the backup belongs
 	TenantId string `json:"os-bak-tenant-attr:tenant_id"`
 	//Backup metadata
 	ServiceMetadata string `json:"service_metadata"`
 	//Time when the backup was updated
-	UpdatedAt string `json:"updated_at"`
+	UpdatedAt time.Time `json:"-"`
 	//Current time
-	DataTimeStamp string `json:"data_timestamp"`
+	DataTimeStamp time.Time `json:"-"`
 	//Whether a dependent backup exists
 	DependentBackups bool `json:"has_dependent_backups"`
 	//ID of the snapshot associated with the backup
@@ -46,7 +49,7 @@ type Backup struct {
 	Incremental bool `json:"is_incremental"`
 }
 
-type Restore struct {
+type BackupRestoreInfo struct {
 	//Backup ID
 	BackupId string `json:"backup_id"`
 	//Volume ID
@@ -105,10 +108,10 @@ func (r commonResult) Extract() (*Backup, error) {
 	return s.Backup, err
 }
 
-// ExtractRestore is a function that accepts a result and extracts a backup
-func (r commonResult) ExtractRestore() (*Restore, error) {
+// ExtractBackupRestore is a function that accepts a result and extracts a backup
+func (r commonResult) ExtractBackupRestore() (*BackupRestoreInfo, error) {
 	var s struct {
-		Restore *Restore `json:"restore"`
+		Restore *BackupRestoreInfo `json:"restore"`
 	}
 	err := r.ExtractInto(&s)
 	return s.Restore, err
@@ -130,4 +133,27 @@ type GetResult struct {
 // method to determine if the request succeeded or failed.
 type DeleteResult struct {
 	golangsdk.ErrResult
+}
+
+// UnmarshalJSON overrides the default, to convert the JSON API response into our Backup struct
+func (r *Backup) UnmarshalJSON(b []byte) error {
+	type tmp Backup
+	var s struct {
+		tmp
+		CreatedAt     golangsdk.JSONRFC3339MilliNoZ `json:"created_at"`
+		UpdatedAt     golangsdk.JSONRFC3339MilliNoZ `json:"updated_at"`
+		DataTimeStamp golangsdk.JSONRFC3339MilliNoZ `json:"data_timestamp"`
+	}
+	err := json.Unmarshal(b, &s)
+	if err != nil {
+		return err
+	}
+
+	*r = Backup(s.tmp)
+
+	r.CreatedAt = time.Time(s.CreatedAt)
+	r.UpdatedAt = time.Time(s.UpdatedAt)
+	r.DataTimeStamp = time.Time(s.DataTimeStamp)
+
+	return nil
 }

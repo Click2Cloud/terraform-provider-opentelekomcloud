@@ -2,16 +2,16 @@ package shares
 
 import "github.com/huaweicloud/golangsdk"
 
-const resourcePath = "os-vendor-backup-sharing"
+const rootPath = "os-vendor-backup-sharing"
 
 func rootURL(c *golangsdk.ServiceClient) string {
-	return c.ServiceURL(c.ProjectID, resourcePath)
+	return c.ServiceURL(rootPath)
 }
 
 func resourceURL(c *golangsdk.ServiceClient, id string) string {
-	return c.ServiceURL(c.ProjectID, resourcePath, id)
+	return c.ServiceURL(rootPath, id)
 }
 
 func listURL(c *golangsdk.ServiceClient) string {
-	return c.ServiceURL(c.ProjectID, resourcePath, "detail")
+	return c.ServiceURL(rootPath, "detail")
 }

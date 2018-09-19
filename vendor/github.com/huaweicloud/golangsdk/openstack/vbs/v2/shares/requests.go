@@ -10,56 +10,35 @@ import (
 // SortDir is a type for specifying in which direction to sort a list of Shares.
 type SortDir string
 
-// SortKey is a type for specifying by which key to sort a list of Shares.
-type SortKey string
-
 var (
 	// SortAsc is used to sort a list of Shares in ascending order.
 	SortAsc SortDir = "asc"
 	// SortDesc is used to sort a list of Shares in descending order.
 	SortDesc SortDir = "desc"
-	// SortId is used to sort a list of Shares by id.
-	SortId SortKey = "id"
-	// SortName is used to sort a list of Shares by name.
-	SortName SortKey = "name"
-	// SortSize is used to sort a list of Shares by size.
-	SortSize SortKey = "size"
-	// SortContainerFormat is used to sort a list of Shares by container_format.
-	SortContainerFormat SortKey = "container_format"
-	// SortDiskFormat is used to sort a list of Shares by disk_format.
-	SortDiskFormat SortKey = "disk_format"
-	// SortStatus is used to sort a list of Shares by status.
-	SortStatus SortKey = "status"
-	// SortCreatedAt is used to sort a list of Shares by date created.
-	SortCreatedAt SortKey = "created_at"
-	// SortUpdatedAt is used to sort a list of Shares by date updated.
-	SortUpdatedAt SortKey = "updated_at"
 )
 
 // ListOpts allows the filtering and sorting of paginated collections through
 // the API. Filtering is achieved by passing in struct field values that map to
 // the share attributes you want to see returned.
 type ListOpts struct {
-	Id            string
-	SnapshotId    string
-	ShareToMe     bool    `q:"share_to_me"`
-	Name          string  `q:"name"`
-	Status        string  `q:"status"`
-	BackupId      string  `q:"backup_id"`
-	FromProjectId string  `q:"from_project_id"`
-	ToProjectId   string  `q:"to_project_id"`
-	AZ            string  `q:"availability_zone"`
-	SortDir       SortDir `q:"sort_dir"`
-	SortKey       SortKey `q:"sort_key"`
-	Limit         int     `q:"limit"`
-	Offset        int     `q:"offset"`
-	VolumeId      string  `q:"volume_id"`
+	ID               string
+	SnapshotID       string
+	ShareToMe        bool    `q:"share_to_me"`
+	Name             string  `q:"name"`
+	Status           string  `q:"status"`
+	BackupID         string  `q:"backup_id"`
+	FromProjectID    string  `q:"from_project_id"`
+	ToProjectID      string  `q:"to_project_id"`
+	AvailabilityZone string  `q:"availability_zone"`
+	SortDir          SortDir `q:"sort_dir"`
+	Limit            int     `q:"limit"`
+	Offset           int     `q:"offset"`
+	VolumeID         string  `q:"volume_id"`
 }
 
 // List returns collection of
 // share. It accepts a ListOpts struct, which allows you to filter and sort
 // the returned collection for greater efficiency.
-//
 // Default policy settings return only those share that are owned by the
 // tenant who submits the request, unless an admin user submits the request.
 func List(c *golangsdk.ServiceClient, opts ListOpts) ([]Share, error) {
@@ -72,7 +51,7 @@ func List(c *golangsdk.ServiceClient, opts ListOpts) ([]Share, error) {
 		return SharePage{pagination.LinkedPageBase{PageResult: r}}
 	}).AllPages()
 
-	allShares, err := ExtractShares(pages)
+	allShares, err := ExtractShareList(pages)
 	if err != nil {
 		return nil, err
 	}
@@ -86,11 +65,11 @@ func FilterShares(shares []Share, opts ListOpts) ([]Share, error) {
 	var matched bool
 	m := map[string]FilterStruct{}
 
-	if opts.Id != "" {
-		m["Id"] = FilterStruct{Value: opts.Id}
+	if opts.ID != "" {
+		m["ID"] = FilterStruct{Value: opts.ID}
 	}
-	if opts.SnapshotId != "" {
-		m["SnapshotId"] = FilterStruct{Value: opts.SnapshotId, Driller: []string{"Backup"}}
+	if opts.SnapshotID != "" {
+		m["SnapshotID"] = FilterStruct{Value: opts.SnapshotID, Driller: []string{"Backup"}}
 	}
 
 	if len(m) > 0 && len(shares) > 0 {
@@ -138,9 +117,9 @@ type CreateOptsBuilder interface {
 // CreateOpts contains all the values needed to create a new share.
 type CreateOpts struct {
 	//ID of the backup to be shared
-	BackupId string `json:"backup_id" required:"true"`
+	BackupID string `json:"backup_id" required:"true"`
 	//IDs of projects with which the backup is shared
-	ToProjectIds []string `json:"to_project_ids" required:"true"`
+	ToProjectIDs []string `json:"to_project_ids" required:"true"`
 }
 
 // ToShareCreateMap builds a create request body from CreateOpts.
@@ -168,7 +147,7 @@ func Get(c *golangsdk.ServiceClient, id string) (r GetResult) {
 	return
 }
 
-//DeleteOptsBuilder is an interface by which can be able to build the query string
+//DeleteOptsBuilder is an interface which can be able to build the query string
 //of share deletion.
 type DeleteOptsBuilder interface {
 	ToShareDeleteQuery() (string, error)
@@ -176,7 +155,7 @@ type DeleteOptsBuilder interface {
 
 type DeleteOpts struct {
 	//Whether the ID in the URL is a backup share ID or a backup ID
-	IsBackupId bool `q:"is_backup_id"`
+	IsBackupID bool `q:"is_backup_id"`
 }
 
 func (opts DeleteOpts) ToShareDeleteQuery() (string, error) {
