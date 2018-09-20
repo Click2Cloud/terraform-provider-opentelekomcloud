@@ -27,6 +27,7 @@ func dataSourceCSBSBackupV1() *schema.Resource {
 			"backup_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
 			"resource_id": &schema.Schema{
 				Type:     schema.TypeString,
@@ -35,10 +36,7 @@ func dataSourceCSBSBackupV1() *schema.Resource {
 			},
 			"resource_name": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"image_type": &schema.Schema{
-				Type:     schema.TypeString,
+				Optional: true,
 				Computed: true,
 			},
 			"backup_record_id": &schema.Schema{
@@ -48,12 +46,12 @@ func dataSourceCSBSBackupV1() *schema.Resource {
 			},
 			"resource_type": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"backup_id": &schema.Schema{
-				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
+			},
+			"id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
@@ -67,80 +65,120 @@ func dataSourceCSBSBackupV1() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"copy_from": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"copy_status": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"fail_op": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"fail_reason": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"incremental": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-			},
-			"progress": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"resource_az": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"space_saving_ratio": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"supported_restore_mode": &schema.Schema{
+			"vm_ip": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
+				Optional: true,
 			},
-			"support_lld": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-			},
-			"cloudservicetype": &schema.Schema{
+			"policy_id": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
+				Optional: true,
 			},
-			"disk": &schema.Schema{
-				Type:     schema.TypeInt,
+			"volume_backups": &schema.Schema{
+				Type:     schema.TypeSet,
 				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"status": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"space_saving_ratio": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"bootable": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"average_speed": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"source_volume_size": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"source_volume_id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"incremental": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"snapshot_id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"source_volume_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"image_type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"size": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+					},
+				},
 			},
-			"imagetype": &schema.Schema{
-				Type:     schema.TypeString,
+			"vm_metadata": &schema.Schema{
+				Type:     schema.TypeSet,
 				Computed: true,
-			},
-			"ram": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"vcpus": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"eip": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"private_ip": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"eip": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"cloud_service_type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"ram": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"vcpus": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"private_ip": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"disk": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"image_type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
 			},
 			"tags": &schema.Schema{
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -161,12 +199,18 @@ func dataSourceCSBSBackupV1() *schema.Resource {
 
 func dataSourceCSBSBackupV1Read(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	backupClient, err := config.backupV1Client(GetRegion(d, config))
+	backupClient, err := config.csbsV1Client(GetRegion(d, config))
 
 	listOpts := backup.ListOpts{
-		ID:     d.Get("backup_id").(string),
-		Name:   d.Get("backup_name").(string),
-		Status: d.Get("status").(string),
+		ID:           d.Get("id").(string),
+		Name:         d.Get("backup_name").(string),
+		Status:       d.Get("status").(string),
+		ResourceName: d.Get("resource_name").(string),
+		CheckpointId: d.Get("backup_record_id").(string),
+		ResourceType: d.Get("resource_type").(string),
+		ResourceId:   d.Get("resource_id").(string),
+		PolicyId:     d.Get("policy_id").(string),
+		VmIp:         d.Get("vm_ip").(string),
 	}
 
 	refinedbackups, err := backup.List(backupClient, listOpts)
@@ -184,52 +228,28 @@ func dataSourceCSBSBackupV1Read(d *schema.ResourceData, meta interface{}) error 
 			" Please try a more specific search criteria")
 	}
 
-	backups := refinedbackups[0]
+	backupObject := refinedbackups[0]
+	log.Printf("[INFO] Retrieved backup %s using given filter", backupObject.Id)
 
-	var t []map[string]interface{}
-	for _, tags := range backups.Tags {
-		mapping := map[string]interface{}{
-			"key":   tags.Key,
-			"value": tags.Value,
-		}
-		t = append(t, mapping)
-	}
+	d.SetId(backupObject.Id)
 
-	log.Printf("[INFO] Retrieved Shares using given filter %s: %+v", backups.Id, backups)
-	d.SetId(backups.Id)
+	d.Set("backup_record_id", backupObject.CheckpointId)
+	d.Set("backup_name", backupObject.Name)
+	d.Set("resource_id", backupObject.ResourceId)
+	d.Set("status", backupObject.Status)
+	d.Set("description", backupObject.Description)
+	d.Set("resource_type", backupObject.ResourceType)
+	d.Set("auto_trigger", backupObject.ExtendInfo.AutoTrigger)
+	d.Set("average_speed", backupObject.ExtendInfo.AverageSpeed)
+	d.Set("resource_name", backupObject.ExtendInfo.ResourceName)
+	d.Set("size", backupObject.ExtendInfo.Size)
+	d.Set("volume_backups", flattenCSBSVolumeBackups(&backupObject))
+	d.Set("vm_metadata", flattenCSBSVMMetadata(&backupObject))
 
-	d.Set("backup_record_id", backups.CheckpointId)
-	d.Set("backup_id", backups.Id)
-	d.Set("backup_name", backups.Name)
-	d.Set("resource_id", backups.ResourceId)
-	d.Set("status", backups.Status)
-	d.Set("description", backups.Description)
-	d.Set("resource_type", backups.ResourceType)
-	d.Set("auto_trigger", backups.ExtendInfo.AutoTrigger)
-	d.Set("average_speed", backups.ExtendInfo.AverageSpeed)
-	d.Set("copy_from", backups.ExtendInfo.CopyFrom)
-	d.Set("copy_status", backups.ExtendInfo.CopyStatus)
-	d.Set("fail_op", backups.ExtendInfo.FailOp)
-	d.Set("fail_reason", backups.ExtendInfo.FailReason)
-	d.Set("image_type", backups.ExtendInfo.ImageType)
-	d.Set("incremental", backups.ExtendInfo.Incremental)
-	d.Set("progress", backups.ExtendInfo.Progress)
-	d.Set("resource_az", backups.ExtendInfo.ResourceAz)
-	d.Set("resource_name", backups.ExtendInfo.ResourceName)
-	d.Set("size", backups.ExtendInfo.Size)
-	d.Set("space_saving_ratio", backups.ExtendInfo.SpaceSavingRatio)
-	d.Set("supported_restore_mode", backups.ExtendInfo.SupportedRestoreMode)
-	d.Set("support_lld", backups.ExtendInfo.Supportlld)
-	d.Set("cloudservicetype", backups.VMMetadata.CloudServiceType)
-	d.Set("disk", backups.VMMetadata.Disk)
-	d.Set("imagetype", backups.VMMetadata.ImageType)
-	d.Set("ram", backups.VMMetadata.Ram)
-	d.Set("vcpus", backups.VMMetadata.Vcpus)
-	d.Set("eip", backups.VMMetadata.Eip)
-	d.Set("private_ip", backups.VMMetadata.PrivateIp)
-	if err := d.Set("tags", t); err != nil {
+	if err := d.Set("tags", flattenCSBSTags(&backupObject)); err != nil {
 		return err
 	}
+
 	d.Set("region", GetRegion(d, config))
 
 	return nil

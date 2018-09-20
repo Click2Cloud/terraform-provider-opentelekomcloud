@@ -156,7 +156,7 @@ func dataSourceCSBSBackupPolicyV1() *schema.Resource {
 
 func dataSourceCSBSBackupPolicyV1Read(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	policyClient, err := config.backupV1Client(GetRegion(d, config))
+	policyClient, err := config.csbsV1Client(GetRegion(d, config))
 
 	listOpts := policies.ListOpts{
 		ID:     d.Get("id").(string),

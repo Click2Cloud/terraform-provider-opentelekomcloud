@@ -18,8 +18,7 @@ func TestAccCSBSBackupV1DataSource_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCSBSBackupV1DataSourceID("data.opentelekomcloud_csbs_backup_v1.csbs"),
 					resource.TestCheckResourceAttr("data.opentelekomcloud_csbs_backup_v1.csbs", "backup_name", "csbs-test"),
-					resource.TestCheckResourceAttr("data.opentelekomcloud_csbs_backup_v1.csbs", "description", "test-code"),
-					resource.TestCheckResourceAttr("data.opentelekomcloud_csbs_backup_v1.csbs", "resource_type", "OS::Nova::Server"),
+					resource.TestCheckResourceAttr("data.opentelekomcloud_csbs_backup_v1.csbs", "resource_name", "instance_1"),
 				),
 			},
 		},
@@ -62,6 +61,6 @@ resource "opentelekomcloud_csbs_backup_v1" "csbs" {
   resource_type = "OS::Nova::Server"
 }
 data "opentelekomcloud_csbs_backup_v1" "csbs" {
-  backup_id = "${opentelekomcloud_csbs_backup_v1.csbs.id}"
+  id = "${opentelekomcloud_csbs_backup_v1.csbs.id}"
 }
 `, OS_IMAGE_ID, OS_AVAILABILITY_ZONE, OS_NETWORK_ID)

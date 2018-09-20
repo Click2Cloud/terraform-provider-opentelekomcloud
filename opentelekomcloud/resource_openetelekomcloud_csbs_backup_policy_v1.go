@@ -183,7 +183,7 @@ func resourceCSBSBackupPolicyV1() *schema.Resource {
 
 func resourceCSBSBackupPolicyCreate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	policyClient, err := config.backupV1Client(GetRegion(d, config))
+	policyClient, err := config.csbsV1Client(GetRegion(d, config))
 
 	if err != nil {
 		return fmt.Errorf("Error creating OpenTelekomCloud backup policy Client: %s", err)
@@ -230,7 +230,7 @@ func resourceCSBSBackupPolicyCreate(d *schema.ResourceData, meta interface{}) er
 func resourceCSBSBackupPolicyRead(d *schema.ResourceData, meta interface{}) error {
 
 	config := meta.(*Config)
-	policyClient, err := config.backupV1Client(GetRegion(d, config))
+	policyClient, err := config.csbsV1Client(GetRegion(d, config))
 	if err != nil {
 		return fmt.Errorf("Error creating OpenTelekomCloud backup policy: %s", err)
 	}
@@ -308,7 +308,7 @@ func resourceCSBSBackupPolicyRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceCSBSBackupPolicyUpdate(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	policyClient, err := config.backupV1Client(GetRegion(d, config))
+	policyClient, err := config.csbsV1Client(GetRegion(d, config))
 	if err != nil {
 		return fmt.Errorf("Error updating OpenTelekomCloud Backup Policy: %s", err)
 	}
@@ -338,7 +338,7 @@ func resourceCSBSBackupPolicyUpdate(d *schema.ResourceData, meta interface{}) er
 
 func resourceCSBSBackupPolicyDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	policyClient, err := config.backupV1Client(GetRegion(d, config))
+	policyClient, err := config.csbsV1Client(GetRegion(d, config))
 	if err != nil {
 		return fmt.Errorf("Error creating OpenTelekomCloud Backup Policy: %s", err)
 	}

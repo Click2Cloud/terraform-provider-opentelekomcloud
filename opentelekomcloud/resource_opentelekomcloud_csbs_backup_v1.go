@@ -21,8 +21,8 @@ func resourceCSBSBackupV1() *schema.Resource {
 		},
 
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(10 * time.Minute),
-			Delete: schema.DefaultTimeout(10 * time.Minute),
+			Create: schema.DefaultTimeout(30 * time.Minute),
+			Delete: schema.DefaultTimeout(30 * time.Minute),
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -45,11 +45,13 @@ func resourceCSBSBackupV1() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
+				Computed: true,
 			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
+				Computed: true,
 			},
 			"resource_type": &schema.Schema{
 				Type:     schema.TypeString,
@@ -58,8 +60,9 @@ func resourceCSBSBackupV1() *schema.Resource {
 				ForceNew: true,
 			},
 			"tags": &schema.Schema{
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
+				Computed: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -80,53 +83,102 @@ func resourceCSBSBackupV1() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"id": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"resource_graph": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"project_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"protection_plan": &schema.Schema{
+			"volume_backups": &schema.Schema{
 				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
+						"status": {
 							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"space_saving_ratio": {
+							Type:     schema.TypeInt,
 							Computed: true,
 						},
 						"name": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"resources": {
-							Type:     schema.TypeList,
-							Optional: true,
-							ForceNew: true,
+						"bootable": {
+							Type:     schema.TypeBool,
 							Computed: true,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"id": &schema.Schema{
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"type": &schema.Schema{
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-									"name": &schema.Schema{
-										Type:     schema.TypeString,
-										Computed: true,
-									},
-								},
-							},
+						},
+						"average_speed": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"source_volume_size": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"source_volume_id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"incremental": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"snapshot_id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"source_volume_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"image_type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"size": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+					},
+				},
+			},
+			"vm_metadata": &schema.Schema{
+				Type:     schema.TypeSet,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"eip": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"cloud_service_type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"ram": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"vcpus": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"private_ip": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"disk": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"image_type": {
+							Type:     schema.TypeString,
+							Computed: true,
 						},
 					},
 				},
@@ -137,55 +189,59 @@ func resourceCSBSBackupV1() *schema.Resource {
 
 func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	backupClient, err := config.backupV1Client(GetRegion(d, config))
+	backupClient, err := config.csbsV1Client(GetRegion(d, config))
 
-	log.Printf("[DEBUG] queryOpts: %s", backupClient)
 	if err != nil {
-		return fmt.Errorf("Error creating OpenTelekomCloud backup Client: %s", err)
+		return fmt.Errorf("Error creating csbs client: %s", err)
 	}
+
+	resourceID := d.Get("resource_id").(string)
+	resourceType := d.Get("resource_type").(string)
+
 	queryOpts := backup.ResourceBackupCapOpts{
 		CheckProtectable: []backup.ResourceCapQueryParams{
 			{
-				ResourceId:   d.Get("resource_id").(string),
-				ResourceType: d.Get("resource_type").(string),
+				ResourceId:   resourceID,
+				ResourceType: resourceType,
 			},
 		},
 	}
 
-	log.Printf("[DEBUG] queryOpts: %s", queryOpts)
-
 	query, err := backup.QueryResourceBackupCapability(backupClient, queryOpts).ExtractQueryResponse()
-	log.Printf("[DEBUG] query backup: %s", query[0].ResourceId)
-	if query[0].Result == true {
+	if err != nil {
+		return fmt.Errorf("Error querying resource backup capability: %s", err)
+	}
+
+	if query[0].Result {
 
 		createOpts := backup.CreateOpts{
 			BackupName:   d.Get("backup_name").(string),
 			Description:  d.Get("description").(string),
-			ResourceType: d.Get("resource_type").(string),
+			ResourceType: resourceType,
 			Tags:         resourceCSBSTagsV1(d),
 		}
-		log.Printf("[DEBUG] createOpts: %s", createOpts)
-		create, err := backup.Create(backupClient, query[0].ResourceId, createOpts).Extract()
+
+		checkpoint, err := backup.Create(backupClient, resourceID, createOpts).Extract()
 		if err != nil {
-			return fmt.Errorf("Error creating OpenTelekomCloud backup: %s", err)
+			return fmt.Errorf("Error creating backup: %s", err)
 		}
-		log.Printf("[DEBUG] create: %#v", create)
-		backupOpts := backup.ListOpts{CheckpointId: create.Id}
+
+		backupOpts := backup.ListOpts{CheckpointId: checkpoint.Id}
 		backupItems, err := backup.List(backupClient, backupOpts)
 
 		if err != nil {
-			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				d.SetId("")
-				return nil
-			}
-
-			return fmt.Errorf("Error retrieving OpenTelekomCloud Backup : %s", err)
+			return fmt.Errorf("Error listing Backup: %s", err)
 		}
 
-		n := backupItems[0]
+		if len(backupItems) == 0 {
+			return fmt.Errorf("Not able to find created Backup: %s", err)
+		}
 
-		d.SetId(n.Id)
-		d.Set("backup_record_id", create.Id)
+		backupObject := backupItems[0]
+
+		d.SetId(backupObject.Id)
+
+		log.Printf("[INFO] Resource Backup %s created successfully", backupObject.Id)
 
 		stateConf := &resource.StateChangeConf{
 			Pending:    []string{"protecting"},
@@ -198,14 +254,12 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 		_, stateErr := stateConf.WaitForState()
 		if stateErr != nil {
 			return fmt.Errorf(
-				"Error waiting for Backup (%s) to become Available: %s",
-				create.Id, stateErr)
+				"Error waiting for Backup (%s) to become available: %s",
+				backupObject.Id, stateErr)
 		}
 
-		log.Printf("[DEBUG] Waiting for OpenTelekomCloud Backup (%s) to become available", create.Id)
 	} else {
-		return fmt.Errorf("Server (%s) is already in service : %s",
-			query[0].ResourceId, query[0].ErrorMsg)
+		return fmt.Errorf("Error code: %s\n Error msg: %s", query[0].ErrorCode, query[0].ErrorMsg)
 	}
 
 	return resourceCSBSBackupV1Read(d, meta)
@@ -215,22 +269,38 @@ func resourceCSBSBackupV1Create(d *schema.ResourceData, meta interface{}) error 
 func resourceCSBSBackupV1Read(d *schema.ResourceData, meta interface{}) error {
 
 	config := meta.(*Config)
-	backupClient, err := config.backupV1Client(GetRegion(d, config))
+	backupClient, err := config.csbsV1Client(GetRegion(d, config))
 	if err != nil {
-		return fmt.Errorf("Error creating OpenTelekomCloud backup: %s", err)
+		return fmt.Errorf("Error creating csbs client: %s", err)
 	}
 
-	n, err := backup.Get(backupClient, d.Id()).ExtractBackup()
+	backupObject, err := backup.Get(backupClient, d.Id()).ExtractBackup()
+
 	if err != nil {
+
 		if _, ok := err.(golangsdk.ErrDefault404); ok {
+			log.Printf("[WARN] Removing backup %s as it's already gone", d.Id())
 			d.SetId("")
 			return nil
 		}
 
-		return fmt.Errorf("Error retrieving OpenTelekomCloud backup: %s", err)
+		return fmt.Errorf("Error retrieving backup: %s", err)
+
 	}
 
-	d.Set("id", n.CheckpointId)
+	d.Set("resource_id", backupObject.ResourceId)
+	d.Set("backup_name", backupObject.Name)
+	d.Set("description", backupObject.Description)
+	d.Set("resource_type", backupObject.ResourceType)
+	d.Set("status", backupObject.Status)
+	d.Set("volume_backups", flattenCSBSVolumeBackups(backupObject))
+	d.Set("vm_metadata", flattenCSBSVMMetadata(backupObject))
+	d.Set("backup_record_id", backupObject.CheckpointId)
+
+	if err := d.Set("tags", flattenCSBSTags(backupObject)); err != nil {
+		return err
+	}
+
 	d.Set("region", GetRegion(d, config))
 
 	return nil
@@ -238,9 +308,9 @@ func resourceCSBSBackupV1Read(d *schema.ResourceData, meta interface{}) error {
 
 func resourceCSBSBackupV1Delete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
-	backupClient, err := config.backupV1Client(GetRegion(d, config))
+	backupClient, err := config.csbsV1Client(GetRegion(d, config))
 	if err != nil {
-		return fmt.Errorf("Error creating OpenTelekomCloud Backup: %s", err)
+		return fmt.Errorf("Error creating csbs client: %s", err)
 	}
 
 	stateConf := &resource.StateChangeConf{
@@ -254,23 +324,24 @@ func resourceCSBSBackupV1Delete(d *schema.ResourceData, meta interface{}) error 
 
 	_, err = stateConf.WaitForState()
 	if err != nil {
-		return fmt.Errorf("Error deleting OpenTelekomCloud backup: %s", err)
+		return fmt.Errorf("Error deleting csbs backup: %s", err)
 	}
 
 	d.SetId("")
 	return nil
 }
 
-func waitForCSBSBackupActive(backupClient *golangsdk.ServiceClient, checkpointItemID string) resource.StateRefreshFunc {
+func waitForCSBSBackupActive(backupClient *golangsdk.ServiceClient, backupId string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
-		n, err := backup.Get(backupClient, checkpointItemID).ExtractBackup()
+		n, err := backup.Get(backupClient, backupId).ExtractBackup()
 		if err != nil {
 			return nil, "", err
 		}
 
 		if n.Id == "error" {
-			return n, n.Status, nil
+			return nil, "", fmt.Errorf("Backup status: %s", n.Status)
 		}
+
 		return n, n.Status, nil
 	}
 }
@@ -279,18 +350,18 @@ func waitForCSBSBackupDelete(backupClient *golangsdk.ServiceClient, backupId str
 	return func() (interface{}, string, error) {
 
 		r, err := backup.Get(backupClient, backupId).ExtractBackup()
-
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				log.Printf("[INFO] Successfully deleted OpenTelekomCloud Backup %s", backupId)
+				log.Printf("[INFO] Successfully deleted csbs backup %s", backupId)
 				return r, "deleted", nil
 			}
 			return r, "deleting", err
 		}
 
-		backups := backup.Delete(backupClient, backupRecordID)
+		err = backup.Delete(backupClient, backupRecordID).Err
 
-		if backups.Err != nil {
+		if err != nil {
+
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
 				log.Printf("[INFO] Successfully deleted OpenTelekomCloud Backup %s", backupId)
 				return r, "deleted", nil
@@ -300,6 +371,10 @@ func waitForCSBSBackupDelete(backupClient *golangsdk.ServiceClient, backupId str
 					return r, "deleting", nil
 				}
 			}
+			if _, ok := err.(golangsdk.ErrDefault400); ok {
+				return r, "deleting", nil
+			}
+
 			return r, "deleting", err
 		}
 
@@ -308,7 +383,7 @@ func waitForCSBSBackupDelete(backupClient *golangsdk.ServiceClient, backupId str
 }
 
 func resourceCSBSTagsV1(d *schema.ResourceData) []backup.ResourceTag {
-	rawTags := d.Get("tags").([]interface{})
+	rawTags := d.Get("tags").(*schema.Set).List()
 	tags := make([]backup.ResourceTag, len(rawTags))
 	for i, raw := range rawTags {
 		rawMap := raw.(map[string]interface{})
@@ -318,4 +393,62 @@ func resourceCSBSTagsV1(d *schema.ResourceData) []backup.ResourceTag {
 		}
 	}
 	return tags
+}
+
+func flattenCSBSVolumeBackups(backupObject *backup.Backup) []map[string]interface{} {
+	var volumeBackups []map[string]interface{}
+
+	for _, volume := range backupObject.ExtendInfo.VolumeBackups {
+		mapping := map[string]interface{}{
+			"status":             volume.Status,
+			"space_saving_ratio": volume.SpaceSavingRatio,
+			"name":               volume.Name,
+			"bootable":           volume.Bootable,
+			"average_speed":      volume.AverageSpeed,
+			"source_volume_size": volume.SourceVolumeSize,
+			"source_volume_id":   volume.SourceVolumeId,
+			"snapshot_id":        volume.SnapshotID,
+			"incremental":        volume.Incremental,
+			"source_volume_name": volume.SourceVolumeName,
+			"image_type":         volume.ImageType,
+			"id":                 volume.Id,
+			"size":               volume.Size,
+		}
+		volumeBackups = append(volumeBackups, mapping)
+	}
+
+	return volumeBackups
+}
+
+func flattenCSBSVMMetadata(backupObject *backup.Backup) []map[string]interface{} {
+	var vmMetadata []map[string]interface{}
+
+	mapping := map[string]interface{}{
+		"name":               backupObject.ExtendInfo.ResourceName,
+		"eip":                backupObject.VMMetadata.Eip,
+		"cloud_service_type": backupObject.VMMetadata.CloudServiceType,
+		"ram":                backupObject.VMMetadata.Ram,
+		"vcpus":              backupObject.VMMetadata.Vcpus,
+		"private_ip":         backupObject.VMMetadata.PrivateIp,
+		"disk":               backupObject.VMMetadata.Disk,
+		"image_type":         backupObject.VMMetadata.ImageType,
+	}
+
+	vmMetadata = append(vmMetadata, mapping)
+
+	return vmMetadata
+
+}
+
+func flattenCSBSTags(backupObject *backup.Backup) []map[string]interface{} {
+	var t []map[string]interface{}
+	for _, tag := range backupObject.Tags {
+		mapping := map[string]interface{}{
+			"key":   tag.Key,
+			"value": tag.Value,
+		}
+		t = append(t, mapping)
+	}
+
+	return t
 }
