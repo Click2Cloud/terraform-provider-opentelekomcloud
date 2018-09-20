@@ -156,7 +156,6 @@ func resourceVBSBackupShareV2Read(d *schema.ResourceData, meta interface{}) erro
 
 	n := backups[0]
 
-	d.Set("id", n.ID)
 	d.Set("backup_id", n.BackupID)
 	d.Set("from_project_id", n.FromProjectID)
 	d.Set("backup_name", n.Backup.Name)
@@ -175,22 +174,6 @@ func resourceVBSBackupShareV2Read(d *schema.ResourceData, meta interface{}) erro
 	d.Set("share_ids", resourceShareIDsV2(backups))
 
 	return nil
-}
-
-func resourceToProjectIdsV2(s []shares.Share) []string {
-	projectids := make([]string, len(s))
-	for i, raw := range s {
-		projectids[i] = raw.ToProjectID
-	}
-	return projectids
-}
-
-func resourceShareIDsV2(s []shares.Share) []string {
-	shareids := make([]string, len(s))
-	for i, raw := range s {
-		shareids[i] = raw.ID
-	}
-	return shareids
 }
 
 func resourceVBSBackupShareV2Delete(d *schema.ResourceData, meta interface{}) error {
@@ -218,4 +201,20 @@ func resourceVBSBackupShareV2Delete(d *schema.ResourceData, meta interface{}) er
 
 	d.SetId("")
 	return nil
+}
+
+func resourceToProjectIdsV2(s []shares.Share) []string {
+	projectids := make([]string, len(s))
+	for i, raw := range s {
+		projectids[i] = raw.ToProjectID
+	}
+	return projectids
+}
+
+func resourceShareIDsV2(s []shares.Share) []string {
+	shareids := make([]string, len(s))
+	for i, raw := range s {
+		shareids[i] = raw.ID
+	}
+	return shareids
 }

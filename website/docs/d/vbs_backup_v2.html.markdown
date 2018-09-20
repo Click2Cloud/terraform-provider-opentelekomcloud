@@ -54,5 +54,5 @@ In addition to all arguments above, the following attributes are exported:
 
 * `to_project_ids` - IDs of projects with which the backup is shared.
 
-* `share_ids` - IDs of the backup to be shared.
+* `share_ids` - The backup share IDs.
 

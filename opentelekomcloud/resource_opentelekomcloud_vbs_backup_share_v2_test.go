@@ -92,9 +92,6 @@ func testAccVBSBackupShareV2Exists(n string, share *shares.Share) resource.TestC
 			return err
 		}
 		found := shareList[0]
-		if found.ID == rs.Primary.ID {
-			return fmt.Errorf("backup share not found")
-		}
 
 		*share = found
 
