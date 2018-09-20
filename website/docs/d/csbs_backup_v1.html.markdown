@@ -24,63 +24,85 @@ data "opentelekomcloud_csbs_backup_v1" "csbs" {
 ## Argument Reference
 The following arguments are supported:
 
-* `backup_id` - (Optional) Specifies the ID of backup.
+* `id` - (Optional) Specifies the ID of backup.
 
 * `backup_name` - (Optional) Specifies the backup name.
 
 * `status` - (Optional) Specifies the backup status.
 
+* `resource_name` - (Optional) Specifies the backup object name.
+
+* `backup_record_id` - (Optional) Specifies the backup record ID.
+
+* `resource_type` - (Optional) Specifies the type of backup objects.
+
+* `resource_id` - (Optional) Specifies the backup object ID.
+
+* `policy_id` - (Optional) Specifies the Policy Id.
+
+* `vm_ip` - (Optional) Specifies the ip of VM.
+
 ## Attributes Reference
 In addition to all arguments above, the following attributes are exported:
 
-* `backup_record_id` - Specifies the backup record ID.
-
-* `resource_id` - Specifies the backup object ID.
-
 * `description` - Provides the backup description.
-
-* `resource_type` - Specifies the type of backup objects.
 
 * `auto_trigger` - Specifies whether automatic trigger is enabled.
 
 * `average_speed` - Specifies average speed.
 
-* `copy_from` - This parameter is left blank by default.
-
-* `copy_status` - The default value is **na**.
-
-* `fail_op` - Specifies the type of the failed operation i.e. **backup, restore, delete**.
-
-* `fail_reason` - Specifies the description of the failure cause,
-
-* `image_type` - Specifies the backup type. Default value is **backup**
-
-* `incremental` - Specifies whether incremental backup is used.
-
-* `progress` - Specifies the progress.
-
-* `resource_az` - Specifies the AZ to which the backup resource belongs.
-
-* `resource_name` - Specifies the backup object name.
-
 * `size` - Specifies the backup capacity.
 
 * `space_saving_ratio` - Specifies the space saving rate.
 
-* `supported_restore_mode` - Specifies the restoration mode.
+A `volume_backups` block supports the following arguments:
 
-* `support_lld` - Specifies whether to allow lazyloading for fast restoration.
+* `status` -  Status of backup Volume.
+    
+* `space_saving_ratio` -  Specifies space saving rate.
 
-* `cloudservicetype` - Specifies the ECS type.
+* `name` -  It gives EVS disk backup name.
 
-* `disk` - Specifies the system disk size corresponding to the ECS specifications.
+* `bootable` -  Specifies whether the disk is bootable.
 
-* `imagetype` - Specifies the image type. The value can be: gold: public image, private: private image,  market: market image.
+* `average_speed` -  Specifies the average speed.
 
-* `ram` - Specifies the memory size of the ECS, in MB.
+* `source_volume_size` -  Shows source volume size in GB.
 
-* `vcpus` - Specifies the cpu cores corresponding to the ECS.
+* `source_volume_id` -  It specifies source volume ID.
 
-* `eip` - Specifies the Elastic IP address of the ECS.
+* `incremental` -  Shows whether incremental backup is used.
 
-* `private_ip` - Specifies the internal IP address of the ECS.
+* `snapshot_id` -  ID of snapshot.
+
+* `source_volume_name` -  Specifies source volume name.
+
+* `image_type` -  It specifies backup. The default value is backup.
+
+* `id` -  Specifies Cinder backup ID.
+
+* `size` -  Specifies accumulated size (MB) of backups.
+
+A `vm_metadata` block supports the following arguments:
+
+* `name` - Name of backup data.
+
+* `eip` - Specifies elastic IP address of the ECS.
+
+* `cloud_service_type` - Specifies ECS type.
+
+* `ram` - Specifies memory size of the ECS, in MB.
+
+* `vcpus` - Specifies CPU cores corresponding to the ECS.
+
+* `private_ip` - It specifies internal IP address of the ECS.
+
+* `disk` - Shows system disk size corresponding to the ECS specifications.
+
+* `image_type` - Specifies image type.
+
+A `tags` block supports the following arguments:
+
+* `key` - Specifies tag key. 
+    
+* `value` - Specifies tag value. 
