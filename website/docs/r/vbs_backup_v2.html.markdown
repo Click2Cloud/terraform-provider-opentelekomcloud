@@ -27,7 +27,7 @@ resource "opentelekomcloud_vbs_backup_v2" "mybackup" {
 
 The following arguments are supported:
 
-* `name` - (Optional) The name of the vbs backup. Changing the parameter will create new resource.
+* `name` - (Required) The name of the vbs backup. Changing the parameter will create new resource.
 
 * `volume_id` - (Required) The id of the disk to be backed up. Changing the parameter will create new resource.
 
