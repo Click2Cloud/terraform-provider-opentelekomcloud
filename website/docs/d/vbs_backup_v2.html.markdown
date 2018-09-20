@@ -51,3 +51,8 @@ In addition to all arguments above, the following attributes are exported:
 * `tenant_id` - The ID of the tenant to which the backup belongs.
 
 * `service_metadata` - The metadata of the vbs backup.
+
+* `to_project_ids` - IDs of projects with which the backup is shared.
+
+* `share_ids` - IDs of the backup to be shared.
+

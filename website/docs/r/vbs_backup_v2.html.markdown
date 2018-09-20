@@ -49,8 +49,6 @@ In addition to all arguments above, the following attributes are exported:
 
 * `container` - The container of the backup.
 
-* `incremental` - Whether the backup is an incremental backup.
-
 * `status` - The status of the VBS backup.
 
 * `availability_zone` - The AZ where the backup resides.
@@ -65,7 +63,6 @@ In addition to all arguments above, the following attributes are exported:
 
 * `service_metadata` - The metadata of the vbs backup.
 
- 
 # Import
 
 VBS Backup can be imported using the `backup id`, e.g.
