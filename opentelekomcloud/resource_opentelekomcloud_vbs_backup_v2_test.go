@@ -10,7 +10,7 @@ import (
 	"github.com/huaweicloud/golangsdk/openstack/vbs/v2/backups"
 )
 
-func TestAccOTCVBSBackupV2_basic(t *testing.T) {
+func TestAccVBSBackupV2_basic(t *testing.T) {
 	var config backups.Backup
 
 	resource.Test(t, resource.TestCase{
@@ -34,7 +34,7 @@ func TestAccOTCVBSBackupV2_basic(t *testing.T) {
 	})
 }
 
-func TestAccOTCVBSBackupV2_timeout(t *testing.T) {
+func TestAccVBSBackupV2_timeout(t *testing.T) {
 	var config backups.Backup
 
 	resource.Test(t, resource.TestCase{
