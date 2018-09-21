@@ -135,11 +135,7 @@ func dataSourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
 	d.Set("region", GetRegion(d, config))
 
 	listShareOpts := shares.ListOpts{
-		BackupID:   d.Get("id").(string),
-		Name:       d.Get("name").(string),
-		Status:     d.Get("status").(string),
-		VolumeID:   d.Get("volume_id").(string),
-		SnapshotID: d.Get("snapshot_id").(string),
+		BackupID:   d.Id(),
 	}
 
 	shares, err := shares.List(vbsClient, listShareOpts)
