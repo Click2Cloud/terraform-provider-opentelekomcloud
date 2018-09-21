@@ -3,7 +3,7 @@ layout: "opentelekomcloud"
 page_title: "OpenTelekomCloud: resource_opentelekomcloud_csbs_backup_policy_v1"
 sidebar_current: "docs-opentelekomcloud-resource-csbs-backup-policy-v1"
 description: |-
-  Provides an OpenTelekomCloud Backup Policy of Resources.
+  Provides an OpenTelekomCloud Backup Policy of Resource.
 ---
 
 # opentelekomcloud_csbs_backup_policy_v1
@@ -15,25 +15,25 @@ Provides an OpenTelekomCloud Backup Policy of Resources.
  ```hcl
  variable "name" { }
  variable "description" { }
- variable "resource_id" { }
- variable "resource_name" { }
- variable "scheduled_period_name" { }
+ variable "id" { }
+ variable "name" { }
+ variable "name" { }
  
  resource "opentelekomcloud_csbs_backup_policy_v1" "backup_policy_v1" {
    name            = "${var.name}"
    description      = "${var.description}"
    provider_id = "fc4d5750-22e7-4798-8a46-f48f62c4c1da"
    common= {  }
-   resources = [{
-     resource_id = "${var.resource_id}"
-     resource_type = "OS::Nova::Server"
-     resource_name = "${var.resource_name}"
+   resource = [{
+     id = "${var.id}"
+     type = "OS::Nova::Server"
+     name = "${var.name}"
    }]
-   scheduled_operations = [{
-     scheduled_period_name ="${var.scheduled_period_name}"
+   scheduled_operation = [{
+     name ="${var.name}"
      enabled = true
      operation_type ="backup"
-     pattern = "BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nRRULE:FREQ=WEEKLY;BYDAY=TH;BYHOUR=12;BYMINUTE=27\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+     trigger_pattern = "BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nRRULE:FREQ=WEEKLY;BYDAY=TH;BYHOUR=12;BYMINUTE=27\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
    }]
  }
 
@@ -45,17 +45,17 @@ The following arguments are supported:
 
 * `description` - (Optional) Backup policy description. The value consists of 0 to 255 characters and must not contain a greater-than sign (>) or less-than sign (<).
 
-* `provider_id` - (Required) Specifies backup provider ID.
+* `provider_id` - (Required) Specifies backup provider ID. Default value is **fc4d5750-22e7-4798-8a46-f48f62c4c1da**
 
 * `common` - (Optional) General backup policy parameters, which are blank by default.
 
-**scheduled_operations** **- (Optional)** Specifies Scheduling period. A backup policy has only one backup period.
+A `scheduled_operation` block supports the following arguments:
 
-* `scheduled_period_name` - (Optional) Specifies Scheduling period name.The value consists of 1 to 255 characters and can contain only letters, digits, underscores (_), and hyphens (-).
+* `name` - (Optional) Specifies Scheduling period name.The value consists of 1 to 255 characters and can contain only letters, digits, underscores (_), and hyphens (-).
     
-* `scheduled_period_description` - (Optional) Specifies Scheduling period description.The value consists of 0 to 255 characters and must not contain a greater-than sign (>) or less-than sign (<).
+* `description` - (Optional) Specifies Scheduling period description.The value consists of 0 to 255 characters and must not contain a greater-than sign (>) or less-than sign (<).
 
-* `enabled` - (Optional) Specifies whether the scheduling period is enabled.
+* `enabled` - (Optional) Specifies whether the scheduling period is enabled. Default value is **true**
 
 * `max_backups` - (Optional) Specifies maximum number of backups that can be automatically created for a backup object.
 
@@ -63,19 +63,19 @@ The following arguments are supported:
 
 * `permanent` - (Optional) Specifies whether backups are permanently retained.
 
-* `plan_id` - (Optional) Specifies backup policy ID.
-
-* `pattern` - (Required) Specifies Scheduling policy of the scheduler.
+* `trigger_pattern` - (Required) Specifies Scheduling policy of the scheduler.
 
 * `operation_type` - (Required) Specifies Operation type, which can be backup.
-**resources** **- (Optional)** Backup object List. The list can be blank.
 
-* `resource_id` - (Required) Specifies the ID of the object to be backed up.
+A `resource` block supports the following arguments:
+
+* `id` - (Required) Specifies the ID of the object to be backed up.
     
-* `resource_type` - (Required) Entity object type of the backup object. If the type is VMs, the value is **OS::Nova::Server**.
+* `type` - (Required) Entity object type of the backup object. If the type is VMs, the value is **OS::Nova::Server**.
 
-* `resource_name` - (Required) Specifies backup object name.
-**tags** **- (Optional)** List of tags. Keys in this list must be unique.
+* `name` - (Required) Specifies backup object name.
+
+A `tags` block supports the following arguments:
 
 * `key` - (Required) Tag key. It cannot be an empty string.
     
@@ -88,15 +88,15 @@ In addition to all arguments above, the following attributes are exported:
 
 * `id` - Backup Policy ID.
 
-**scheduled_operations** - Backup plan information
+**scheduled_operation** - Backup plan information
 
-* `scheduled_period_id` -  Specifies Scheduling period ID.
+* `id` -  Specifies Scheduling period ID.
 
-* `scheduler_id` -  Specifies Scheduler ID.
+* `trigger_id` -  Specifies Scheduler ID.
 
-* `scheduler_name` -  Specifies Scheduler name.
+* `trigger_name` -  Specifies Scheduler name.
 
-* `scheduler_type` -  Specifies Scheduler type.
+* `trigger_type` -  Specifies Scheduler type.
 
 
 ## Import
