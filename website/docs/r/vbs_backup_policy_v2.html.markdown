@@ -40,9 +40,9 @@ The following arguments are supported:
 
 * `retain_first_backup` (Required) - Specifies whether to retain the first backup in the current month. Possible values are Y or N. 
 
-* `rentention_num` (Optional) - Specifies number of retained backups. Minimum value is 2.
+* `rentention_num` (Required) - Specifies number of retained backups. Minimum value is 2.
 
-* `frequency` (Optional) - Specifies the backup interval. The value is in the range of 1 to 14 days.
+* `frequency` (Required) - Specifies the backup interval. The value is in the range of 1 to 14 days.
 
 **tags** **- (Optional)** Represents the list of tags to be configured for the backup policy.
 * `key` - (Required) Specifies the tag key. A tag key consists of up to 36 characters, chosen from letters, digits, hyphens (-), and underscores (_).
@@ -63,5 +63,5 @@ result attributes:
 Backup Policy can be imported using the `id`, e.g.
 
 ```
-$ terraform import opentelekomcloud_vbs_backup_policy_v2 4779ab1c-7c1a-44b1-a02e-93dfc361b32d
+$ terraform import opentelekomcloud_vbs_backup_policy_v2.vbs 4779ab1c-7c1a-44b1-a02e-93dfc361b32d
 ```
