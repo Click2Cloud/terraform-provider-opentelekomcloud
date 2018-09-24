@@ -916,10 +916,10 @@
 			"revisionTime": "2018-09-18T11:34:14Z"
 		},
 		{
-			"checksumSHA1": "Bl0zO6Oj5TWjWyvoZErL7mqYAY0=",
+			"checksumSHA1": "gt78a9bKwcLhVV1LKD4HnpYbW8c=",
 			"path": "github.com/huaweicloud/golangsdk/openstack/compute/v2/extensions/schedulerhints",
-			"revision": "8e6170bae7e23912de313f00c0bba9294f9a7e9f",
-			"revisionTime": "2018-09-18T11:34:14Z"
+			"revision": "1d8a2d2776a596972047b59404b2e898847fbaea",
+			"revisionTime": "2018-09-21T09:37:12Z"
 		},
 		{
 			"checksumSHA1": "1RGyLlYlf1Edzqbzyrun8GLyMcA=",
