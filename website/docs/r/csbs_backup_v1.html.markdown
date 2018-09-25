@@ -34,45 +34,74 @@ The following arguments are supported:
 
 * `resource_id` - (Required) ID of the target to which the backup is restored. Changing this creates a new backup.
 
-* `resource_type` - (Required) Type of the target to which the backup is restored. The default value is **OS::Nova::Server** for an ECS. Changing this creates a new backup.
+* `resource_type` - (Optional) Type of the target to which the backup is restored. The default value is **OS::Nova::Server** for an ECS. Changing this creates a new backup.
 
-**tags** **- (Optional)** List of tags. Keys in this list must be unique. Changing this creates a new backup.
+* `tags` - (Optional) block supports the following arguments:
 
-* `key` - (Required) Tag key. It cannot be an empty string.
+  * `key` - (Required) Tag key. It cannot be an empty string.Changing key creates a new backup.
     
-* `value` - (Required) Tag value. It can be an empty string.
+  * `value` - (Required) Tag value. It can be an empty string.Changing value creates a new backup.
+
 ## Attributes Reference
 In addition to all arguments above, the following attributes are exported:
 
-* `status` - Status of Backup.
+* `status` - It specifies the status of backup.
 
-* `backup_record_id` - Backup record ID.
+* `backup_record_id` - Specifies backup record ID.
 
-* `resource_graph` - Resource graph.
+* `volume_backups` block supports the following arguments:
 
-* `project_id` - Tenant Id of the Resource.
-
-**protection_plan** - Backup plan information
-
-* `id` -  Backup plan ID
+  * `status` -  Status of backup Volume.
     
-* `name` -  Backup plan name
+  * `space_saving_ratio` -  Specifies space saving rate.
+
+  * `name` -  It gives EVS disk backup name.
+
+  * `bootable` -  Specifies whether the disk is bootable.
+
+  * `average_speed` -  Specifies the average speed.
+
+  * `source_volume_size` -  Shows source volume size in GB.
+
+  * `source_volume_id` -  It specifies source volume ID.
+
+  * `incremental` -  Shows whether incremental backup is used.
+
+  * `snapshot_id` -  ID of snapshot.
+
+  * `source_volume_name` -  Specifies source volume name.
+
+  * `image_type` -  It specifies backup. The default value is backup.
+
+  * `id` -  Specifies Cinder backup ID.
+
+  * `size` -  Specifies accumulated size (MB) of backups.
     
-**resources** - List of Backup object.
+* `vm_metadata` block supports the following arguments:
 
-* `id` - ID of the object to be backed up
+  * `name` - Name of backup data.
 
-* `type` - Backup object type. If the type is VMs, the value is **OS::Nova::Server**.
+  * `eip` - Specifies elastic IP address of the ECS.
 
-* `name` - Name of the backup object.
+  * `cloud_service_type` - Specifies ECS type.
+
+  * `ram` - Specifies memory size of the ECS, in MB.
+
+  * `vcpus` - Specifies CPU cores corresponding to the ECS.
+
+  * `private_ip` - It specifies internal IP address of the ECS.
+
+  * `disk` - Shows system disk size corresponding to the ECS specifications.
+
+  * `image_type` - Specifies image type.
 
 
 ## Import
 
-Backup can be imported using  `id`, e.g.
+Backup can be imported using  `backup_record_id`, e.g.
 
 ```
-$ terraform import opentelekomcloud_csbs_backup_v1.backup_v1 7056d636-ac60-4663-8a6c-82d3c32c1c64
+$ terraform import opentelekomcloud_csbs_backup_v1.backup_v1.backup_v1 7056d636-ac60-4663-8a6c-82d3c32c1c64
 ```
 
 
