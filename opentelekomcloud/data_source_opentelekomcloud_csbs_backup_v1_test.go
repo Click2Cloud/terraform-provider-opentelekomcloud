@@ -46,7 +46,7 @@ resource "opentelekomcloud_compute_instance_v2" "instance_1" {
   image_id = "%s"
   security_groups = ["default"]
   availability_zone = "%s"
-  flavor_id = "s2.medium.1"
+  flavor_id = "%s"
   metadata {
     foo = "bar"
   }
@@ -63,4 +63,4 @@ resource "opentelekomcloud_csbs_backup_v1" "csbs" {
 data "opentelekomcloud_csbs_backup_v1" "csbs" {
   id = "${opentelekomcloud_csbs_backup_v1.csbs.id}"
 }
-`, OS_IMAGE_ID, OS_AVAILABILITY_ZONE, OS_NETWORK_ID)
+`, OS_IMAGE_ID, OS_AVAILABILITY_ZONE, OS_FLAVOR_ID, OS_NETWORK_ID)
