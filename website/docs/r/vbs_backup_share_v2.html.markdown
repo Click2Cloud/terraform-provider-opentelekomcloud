@@ -6,7 +6,7 @@ description: |-
   Provides an VBS Backup Share resource.
 ---
 
-# opentelekomcloud_vbs_backup_v2
+# opentelekomcloud_vbs_backup_share_v2
 
 Provides an VBS Backup Share resource.
  
@@ -64,6 +64,7 @@ In addition to all arguments above, the following attributes are exported:
 # Import
 
 VBS Backup Share can be imported using the `backup id`, e.g.
+
 ```
  $ terraform import opentelekomcloud_vbs_backup_share_v2.backupshare 4779ab1c-7c1a-44b1-a02e-93dfc361b32d
 ```
