@@ -1,12 +1,9 @@
 package opentelekomcloud
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"time"
-
-	"github.com/hashicorp/terraform/helper/hashcode"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -493,12 +490,4 @@ func flattenCSBSPolicyResources(backupPolicy policies.BackupPolicy) []map[string
 	}
 
 	return resourceList
-}
-
-func resourceCSBSPolicySOHash(v interface{}) int {
-	var buf bytes.Buffer
-	m := v.(map[string]interface{})
-	buf.WriteString(fmt.Sprintf("%s", m["id"].(string)))
-
-	return hashcode.String(buf.String())
 }
