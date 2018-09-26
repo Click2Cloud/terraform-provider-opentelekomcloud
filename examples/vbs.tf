@@ -1,7 +1,7 @@
 resource "opentelekomcloud_vbs_backup_policy_v2" "vbs" {
-  name = "policy_002"
-  start_time  = "12:00"
-  status  = "ON"
+  name = "${var.project}-backup-policy${format("%02d", count.index+1)}"
+  start_time = "12:00"
+  status = "ON"
   retain_first_backup = "N"
   rentention_num = 2
   frequency = 1
@@ -33,4 +33,9 @@ resource "opentelekomcloud_vbs_backup_v2" "backups_1" {
 
 data "opentelekomcloud_vbs_backup_v2" "backups" {
   id = "${opentelekomcloud_vbs_backup_v2.backups_1.id}"
+}
+
+resource "opentelekomcloud_vbs_backup_share_v2" "share" {
+  backup_id ="${opentelekomcloud_vbs_backup_v2.backups_1.id}"
+  to_project_ids = "${var.to_project_id}"
 }
