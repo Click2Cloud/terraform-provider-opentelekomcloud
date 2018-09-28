@@ -53,7 +53,6 @@ func resourceVBSBackupV2() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
-				Computed:     true,
 				ValidateFunc: validateVBSBackupDescription,
 			},
 			"container": &schema.Schema{
@@ -68,20 +67,8 @@ func resourceVBSBackupV2() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"fail_reason": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"size": &schema.Schema{
 				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"object_count": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"tenant_id": &schema.Schema{
-				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"service_metadata": &schema.Schema{
@@ -89,7 +76,7 @@ func resourceVBSBackupV2() *schema.Resource {
 				Computed: true,
 			},
 			"tags": &schema.Schema{
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem: &schema.Resource{
@@ -114,7 +101,7 @@ func resourceVBSBackupV2() *schema.Resource {
 }
 
 func resourceVBSBackupTagsV2(d *schema.ResourceData) []backups.Tag {
-	rawTags := d.Get("tags").([]interface{})
+	rawTags := d.Get("tags").(*schema.Set).List()
 	tags := make([]backups.Tag, len(rawTags))
 	for i, raw := range rawTags {
 		rawMap := raw.(map[string]interface{})
@@ -153,6 +140,9 @@ func resourceVBSBackupV2Create(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	entity, err := backups.GetJobEntity(vbsClient, n.JobID, "backup_id")
+	if err != nil {
+		return err
+	}
 
 	if id, ok := entity.(string); ok {
 		d.SetId(id)
@@ -166,7 +156,7 @@ func resourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 	vbsClient, err := config.vbsV2Client(GetRegion(d, config))
 	if err != nil {
-		return fmt.Errorf("Error creating OpenTelekomCloud Vbs client: %s", err)
+		return fmt.Errorf("Error creating Vbs client: %s", err)
 	}
 
 	n, err := backups.Get(vbsClient, d.Id()).Extract()
@@ -176,10 +166,9 @@ func resourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
 			return nil
 		}
 
-		return fmt.Errorf("Error retrieving OpenTelekomCloud VBS Backup: %s", err)
+		return fmt.Errorf("Error retrieving VBS Backup: %s", err)
 	}
 
-	d.Set("id", n.Id)
 	d.Set("name", n.Name)
 	d.Set("description", n.Description)
 	d.Set("status", n.Status)
@@ -187,10 +176,7 @@ func resourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
 	d.Set("snapshot_id", n.SnapshotId)
 	d.Set("service_metadata", n.ServiceMetadata)
 	d.Set("size", n.Size)
-	d.Set("fail_reason", n.FailReason)
 	d.Set("container", n.Container)
-	d.Set("tenant_id", n.TenantId)
-	d.Set("object_count", n.ObjectCount)
 	d.Set("volume_id", n.VolumeId)
 	d.Set("region", GetRegion(d, config))
 
@@ -202,7 +188,7 @@ func resourceVBSBackupV2Delete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 	vbsClient, err := config.vbsV2Client(GetRegion(d, config))
 	if err != nil {
-		return fmt.Errorf("Error creating OpenTelekomCloud vbs: %s", err)
+		return fmt.Errorf("Error creating  vbs: %s", err)
 	}
 
 	stateConf := &resource.StateChangeConf{
@@ -216,7 +202,7 @@ func resourceVBSBackupV2Delete(d *schema.ResourceData, meta interface{}) error {
 
 	_, err = stateConf.WaitForState()
 	if err != nil {
-		return fmt.Errorf("Error deleting OpenTelekomCloud VBS Backup: %s", err)
+		return fmt.Errorf("Error deleting VBS Backup: %s", err)
 	}
 
 	d.SetId("")
@@ -237,7 +223,7 @@ func waitForBackupDelete(client *golangsdk.ServiceClient, backupID string) resou
 			err := backups.Delete(client, backupID).ExtractErr()
 			if err != nil {
 				if _, ok := err.(golangsdk.ErrDefault404); ok {
-					log.Printf("[INFO] Successfully deleted OpenTelekomCloud VBS backup %s", backupID)
+					log.Printf("[INFO] Successfully deleted VBS backup %s", backupID)
 					return r, "deleted", nil
 				}
 				return r, r.Status, err

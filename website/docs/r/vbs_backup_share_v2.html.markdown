@@ -35,8 +35,6 @@ The following arguments are supported:
 
 In addition to all arguments above, the following attributes are exported:
 
-* `from_project_id` - ID of the project that shares the backup.
-
 * `container` - The container of the backup.
 
 * `backup_status` - The status of the VBS backup.
@@ -45,13 +43,9 @@ In addition to all arguments above, the following attributes are exported:
 
 * `availability_zone` - The AZ where the backup resides.
 
-* `fail_reason` - Cause of the backup failure.
-
 * `size` - The size of the vbs backup.
 
 * `backup_name` - The backup name.
-
-* `object_count` - Number of objects on Object Storage Service (OBS) for the disk data.
 
 * `snapshot_id` - The ID of the snapshot associated with the backup.
 

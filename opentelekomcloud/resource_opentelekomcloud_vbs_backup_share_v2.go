@@ -2,10 +2,11 @@ package opentelekomcloud
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/huaweicloud/golangsdk/openstack/vbs/v2/shares"
 	"log"
 	"time"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/huaweicloud/golangsdk/openstack/vbs/v2/shares"
 
 	"github.com/huaweicloud/golangsdk"
 )
@@ -32,9 +33,9 @@ func resourceVBSBackupShareV2() *schema.Resource {
 				Computed: true,
 			},
 			"backup_id": &schema.Schema{
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     true,
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
 			},
 			"to_project_ids": &schema.Schema{
 				Type:     schema.TypeSet,
@@ -42,10 +43,6 @@ func resourceVBSBackupShareV2() *schema.Resource {
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set:      schema.HashString,
-			},
-			"from_project_id": &schema.Schema{
-				Type:         schema.TypeString,
-				Computed: true,
 			},
 			"availability_zone": &schema.Schema{
 				Type:     schema.TypeString,
@@ -59,16 +56,8 @@ func resourceVBSBackupShareV2() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"fail_reason": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"backup_name": &schema.Schema{
 				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"object_count": &schema.Schema{
-				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"size": &schema.Schema{
@@ -120,7 +109,7 @@ func resourceVBSBackupShareV2Create(d *schema.ResourceData, meta interface{}) er
 
 	createOpts := shares.CreateOpts{
 		ToProjectIDs: resourceBackupShareToProjectIdsV2(d),
-		BackupID: d.Get("backup_id").(string),
+		BackupID:     d.Get("backup_id").(string),
 	}
 
 	n, err := shares.Create(vbsClient, createOpts).Extract()
@@ -144,7 +133,7 @@ func resourceVBSBackupShareV2Read(d *schema.ResourceData, meta interface{}) erro
 		return fmt.Errorf("Error creating OpenTelekomCloud Vbs client: %s", err)
 	}
 
-	backups, err := shares.List(vbsClient, shares.ListOpts{BackupID:d.Id()})
+	backups, err := shares.List(vbsClient, shares.ListOpts{BackupID: d.Id()})
 	if err != nil {
 		if _, ok := err.(golangsdk.ErrDefault404); ok {
 			d.SetId("")
@@ -157,16 +146,13 @@ func resourceVBSBackupShareV2Read(d *schema.ResourceData, meta interface{}) erro
 	n := backups[0]
 
 	d.Set("backup_id", n.BackupID)
-	d.Set("from_project_id", n.FromProjectID)
 	d.Set("backup_name", n.Backup.Name)
 	d.Set("backup_status", n.Backup.Status)
 	d.Set("description", n.Backup.Description)
 	d.Set("availability_zone", n.Backup.AvailabilityZone)
 	d.Set("volume_id", n.Backup.VolumeID)
-	d.Set("fail_reason", n.Backup.FailReason)
 	d.Set("size", n.Backup.Size)
 	d.Set("service_metadata", n.Backup.ServiceMetadata)
-	d.Set("object_count", n.Backup.ObjectCount)
 	d.Set("container", n.Backup.Container)
 	d.Set("snapshot_id", n.Backup.SnapshotID)
 	d.Set("region", GetRegion(d, config))
@@ -183,9 +169,9 @@ func resourceVBSBackupShareV2Delete(d *schema.ResourceData, meta interface{}) er
 		return fmt.Errorf("Error creating OpenTelekomCloud Vbs client: %s", err)
 	}
 
-	deleteopts:=shares.DeleteOpts{IsBackupID: true}
+	deleteopts := shares.DeleteOpts{IsBackupID: true}
 
-	err = shares.Delete(vbsClient, d.Id(),deleteopts).ExtractErr()
+	err = shares.Delete(vbsClient, d.Id(), deleteopts).ExtractErr()
 	if err != nil {
 		if _, ok := err.(golangsdk.ErrDefault404); ok {
 			log.Printf("[INFO] Successfully deleted OpenTelekomCloud Vbs Backup Share %s", d.Id())

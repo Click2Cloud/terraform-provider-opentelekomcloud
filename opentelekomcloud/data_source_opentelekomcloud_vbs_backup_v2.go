@@ -40,23 +40,11 @@ func dataSourceVBSBackupV2() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"fail_reason": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"size": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"object_count": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
 			"container": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"tenant_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -127,15 +115,12 @@ func dataSourceVBSBackupV2Read(d *schema.ResourceData, meta interface{}) error {
 	d.Set("snapshot_id", Backup.SnapshotId)
 	d.Set("service_metadata", Backup.ServiceMetadata)
 	d.Set("size", Backup.Size)
-	d.Set("fail_reason", Backup.FailReason)
 	d.Set("container", Backup.Container)
-	d.Set("tenant_id", Backup.TenantId)
-	d.Set("object_count", Backup.ObjectCount)
 	d.Set("volume_id", Backup.VolumeId)
 	d.Set("region", GetRegion(d, config))
 
 	listShareOpts := shares.ListOpts{
-		BackupID:   d.Id(),
+		BackupID: d.Id(),
 	}
 
 	shares, err := shares.List(vbsClient, listShareOpts)
