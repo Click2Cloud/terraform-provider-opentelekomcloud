@@ -838,7 +838,7 @@
 			"revisionTime": "2018-09-11T07:04:38Z"
 		},
 		{
-			"checksumSHA1": "/jBVXITeGDO3ZvgO0M6GGTsBbjc=",
+			"checksumSHA1": "1F2mCVPsqPCrWo8CnbrqJ3jeY9A=",
 			"path": "github.com/huaweicloud/golangsdk/openstack",
 			"revision": "02234c041f693ec39067f110661bb38680003a7c",
 			"revisionTime": "2018-09-28T08:16:35Z"
@@ -956,6 +956,12 @@
 			"path": "github.com/huaweicloud/golangsdk/openstack/compute/v2/extensions/volumeattach",
 			"revision": "1d8a2d2776a596972047b59404b2e898847fbaea",
 			"revisionTime": "2018-09-21T09:37:12Z"
+		},
+		{
+			"checksumSHA1": "Y20gNFAdSahcMx1fuzZHc6jXG7U=",
+			"path": "github.com/huaweicloud/golangsdk/openstack/compute/v2/extensions/volumeattach",
+			"revision": "f08a3288280dde5efc7e934854f4f920c99a8534",
+			"revisionTime": "2018-09-17T05:36:38Z"
 		},
 		{
 			"checksumSHA1": "w7H87mnx/gmHEMQo9PsXjSET6H8=",
@@ -1292,6 +1298,30 @@
 			"path": "github.com/huaweicloud/golangsdk/openstack/utils",
 			"revision": "98f31e4f21bec892b331ee55c5a5fff72d407abc",
 			"revisionTime": "2018-02-26T07:57:01Z"
+		},
+		{
+			"checksumSHA1": "7xZpRon0BdX3smmIQeTi2DUfeC0=",
+			"path": "github.com/huaweicloud/golangsdk/openstack/vbs/v2/backups",
+			"revision": "bc667b4964d9381ae75ac2c2c99e64b161cfb46b",
+			"revisionTime": "2018-09-18T15:16:54Z"
+		},
+		{
+			"checksumSHA1": "0ja94F7LBVXcdh0pKQm9lNr1E+w=",
+			"path": "github.com/huaweicloud/golangsdk/openstack/vbs/v2/policies",
+			"revision": "bc667b4964d9381ae75ac2c2c99e64b161cfb46b",
+			"revisionTime": "2018-09-18T15:16:54Z"
+		},
+		{
+			"checksumSHA1": "zpccc4OuoCm4ewnN0zrFTMAP8cE=",
+			"path": "github.com/huaweicloud/golangsdk/openstack/vbs/v2/shares",
+			"revision": "bc667b4964d9381ae75ac2c2c99e64b161cfb46b",
+			"revisionTime": "2018-09-18T15:16:54Z"
+		},
+		{
+			"checksumSHA1": "fc3FTnwCo8Yj9lj8b+3sTwHHKsY=",
+			"path": "github.com/huaweicloud/golangsdk/openstack/vbs/v2/tags",
+			"revision": "bc667b4964d9381ae75ac2c2c99e64b161cfb46b",
+			"revisionTime": "2018-09-18T15:16:54Z"
 		},
 		{
 			"checksumSHA1": "unuouwL0EzTLflKCDFkwzrJ81d4=",
