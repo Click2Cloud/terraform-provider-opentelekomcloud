@@ -182,6 +182,7 @@ func Provider() terraform.ResourceProvider {
 			"opentelekomcloud_compute_bms_server_v2":      dataSourceBMSServersV2(),
 			"opentelekomcloud_csbs_backup_v1":             dataSourceCSBSBackupV1(),
 			"opentelekomcloud_csbs_backup_policy_v1":      dataSourceCSBSBackupPolicyV1(),
+			"opentelekomcloud_cts_tracker_v1":             dataSourceCTSTrackerV1(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -248,6 +249,7 @@ func Provider() terraform.ResourceProvider {
 			"opentelekomcloud_networking_vip_associate_v2":        resourceNetworkingVIPAssociateV2(),
 			"opentelekomcloud_dms_queue_v1":                       resourceDmsQueuesV1(),
 			"opentelekomcloud_dms_group_v1":                       resourceDmsGroupsV1(),
+			"opentelekomcloud_cts_tracker_v1":                     resourceCTSTrackerV1(),
 		},
 
 		ConfigureFunc: configureProvider,
