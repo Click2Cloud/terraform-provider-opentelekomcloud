@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccCTSTrackerV1_basic(t *testing.T) {
-	var tracker []tracker.Tracker
+	var tracker tracker.Tracker
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -20,9 +20,9 @@ func TestAccCTSTrackerV1_basic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccCTSTrackerV1_basic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", tracker),
+					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", &tracker),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_cts_tracker_v1.tracker_v1", "bucket_name", "obs-e51d"),
+						"opentelekomcloud_cts_tracker_v1.tracker_v1", "bucket_name", "tf-test-bucket"),
 					resource.TestCheckResourceAttr(
 						"opentelekomcloud_cts_tracker_v1.tracker_v1", "file_prefix_name", "yO8Q"),
 				),
@@ -30,9 +30,9 @@ func TestAccCTSTrackerV1_basic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccCTSTrackerV1_update,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", tracker),
+					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", &tracker),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_cts_tracker_v1.tracker_v1", "bucket_name", "obs-e51d"),
+						"opentelekomcloud_cts_tracker_v1.tracker_v1", "bucket_name", "tf-test-bucket1"),
 					resource.TestCheckResourceAttr(
 						"opentelekomcloud_cts_tracker_v1.tracker_v1", "file_prefix_name", "yO8Q1"),
 				),
@@ -42,7 +42,7 @@ func TestAccCTSTrackerV1_basic(t *testing.T) {
 }
 
 func TestAccCTSTrackerV1_timeout(t *testing.T) {
-	var tracker []tracker.Tracker
+	var tracker tracker.Tracker
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -52,7 +52,7 @@ func TestAccCTSTrackerV1_timeout(t *testing.T) {
 			resource.TestStep{
 				Config: testAccCTSTrackerV1_timeout,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", tracker),
+					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", &tracker),
 				),
 			},
 		},
@@ -114,11 +114,22 @@ func testAccCheckCTSTrackerV1Exists(n string, trackers *tracker.Tracker) resourc
 }
 
 var testAccCTSTrackerV1_basic = `
+resource "opentelekomcloud_s3_bucket" "bucket" {
+  bucket = "tf-test-bucket"
+  acl = "public-read"
+  force_destroy = true
+}
+
+resource "opentelekomcloud_smn_topic_v2" "topic_1" {
+  name		  = "topic_check"
+  display_name    = "The display name of topic_check"
+}
+
 resource "opentelekomcloud_cts_tracker_v1" "tracker_v1" {
-  bucket_name      = "obs-e51d"
+  bucket_name      = "${opentelekomcloud_s3_bucket.bucket.bucket}"
   file_prefix_name      = "yO8Q"
   is_support_smn = true
-  topic_id = "urn:smn:eu-de:626ce20e52a346c090b09cffc3e038e5:c2c-topic"
+  topic_id = "${opentelekomcloud_smn_topic_v2.topic_1.id}"
   is_send_all_key_operation = false
   operations = ["login"]
   need_notify_user_list = ["user1"]
@@ -126,23 +137,43 @@ resource "opentelekomcloud_cts_tracker_v1" "tracker_v1" {
 `
 
 var testAccCTSTrackerV1_update = `
+resource "opentelekomcloud_s3_bucket" "bucket" {
+  bucket = "tf-test-bucket1"
+  acl = "public-read"
+  force_destroy = true
+}
+resource "opentelekomcloud_smn_topic_v2" "topic_1" {
+  name		  = "topic_check1"
+  display_name    = "The display name of topic_check"
+}
 resource "opentelekomcloud_cts_tracker_v1" "tracker_v1" {
-  bucket_name      = "obs-e51d"
+  bucket_name      = "${opentelekomcloud_s3_bucket.bucket.bucket}"
   file_prefix_name      = "yO8Q1"
   is_support_smn = true
-  topic_id = "urn:smn:eu-de:626ce20e52a346c090b09cffc3e038e5:c2c-topic"
+  topic_id = "${opentelekomcloud_smn_topic_v2.topic_1.id}"
   is_send_all_key_operation = false
-  operations = ["login"]
-  need_notify_user_list = ["user1"]
+  operations = ["login", "delete"]
+  need_notify_user_list = ["user2"]
 }
 `
 
 var testAccCTSTrackerV1_timeout = `
+resource "opentelekomcloud_s3_bucket" "bucket" {
+  bucket = "tf-test-bucket"
+  acl = "public-read"
+  force_destroy = true
+}
+
+resource "opentelekomcloud_smn_topic_v2" "topic_1" {
+  name		  = "topic_check"
+  display_name    = "The display name of topic_check"
+}
+
 resource "opentelekomcloud_cts_tracker_v1" "tracker_v1" {
-  bucket_name      = "obs-e51d"
+  bucket_name      = "${opentelekomcloud_s3_bucket.bucket.bucket}"
   file_prefix_name      = "yO8Q"
   is_support_smn = true
-  topic_id = "urn:smn:eu-de:626ce20e52a346c090b09cffc3e038e5:c2c-topic"
+  topic_id = "${opentelekomcloud_smn_topic_v2.topic_1.id}"
   is_send_all_key_operation = false
   operations = ["login"]
   need_notify_user_list = ["user1"]

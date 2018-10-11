@@ -111,7 +111,7 @@ func resourceCTSTrackerCreate(d *schema.ResourceData, meta interface{}) error {
 	stateConf := &resource.StateChangeConf{
 		Pending:    []string{"creating"},
 		Target:     []string{"enabled"},
-		Refresh:    waitForCTSTrackerActive(ctsClient),
+		Refresh:    waitForCTSTrackerActive(ctsClient, d.Id()),
 		Timeout:    d.Timeout(schema.TimeoutCreate),
 		Delay:      5 * time.Second,
 		MinTimeout: 3 * time.Second,
@@ -212,7 +212,7 @@ func resourceCTSTrackerDelete(d *schema.ResourceData, meta interface{}) error {
 	stateConf := &resource.StateChangeConf{
 		Pending:    []string{"enabled", "disabled"},
 		Target:     []string{"deleted"},
-		Refresh:    waitForCTSTrackerDelete(ctsClient),
+		Refresh:    waitForCTSTrackerDelete(ctsClient, d.Id()),
 		Timeout:    d.Timeout(schema.TimeoutDelete),
 		Delay:      5 * time.Second,
 		MinTimeout: 3 * time.Second,
@@ -227,24 +227,27 @@ func resourceCTSTrackerDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func waitForCTSTrackerActive(ctsClient *golangsdk.ServiceClient) resource.StateRefreshFunc {
+func waitForCTSTrackerActive(ctsClient *golangsdk.ServiceClient, trackerName string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
-		n, err := tracker.Get(ctsClient).ExtractTracker()
+
+		CtsOpts := tracker.ListOpts{TrackerName: trackerName}
+		trackers, err := tracker.List(ctsClient,CtsOpts)
 		if err != nil {
 			return nil, "", err
 		}
 
-		if n[0].Status == "error" {
-			return n, n[0].Status, nil
+		if trackers[0].Status == "error" {
+			return trackers, trackers[0].Status, nil
 		}
-		return n, n[0].Status, nil
+		return trackers, trackers[0].Status, nil
 	}
 }
 
-func waitForCTSTrackerDelete(ctsClient *golangsdk.ServiceClient) resource.StateRefreshFunc {
+func waitForCTSTrackerDelete(ctsClient *golangsdk.ServiceClient,trackerName string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 
-		r, err := tracker.Get(ctsClient).ExtractTracker()
+		CtsOpts := tracker.ListOpts{TrackerName: trackerName}
+		r, err := tracker.List(ctsClient, CtsOpts)
 
 		if err != nil {
 			if _, ok := err.(golangsdk.ErrDefault404); ok {
