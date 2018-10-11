@@ -80,7 +80,7 @@ func testAccCheckCTSTrackerV1Destroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckCTSTrackerV1Exists(n string, trackers []tracker.Tracker) resource.TestCheckFunc {
+func testAccCheckCTSTrackerV1Exists(n string, trackers *tracker.Tracker) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -97,16 +97,17 @@ func testAccCheckCTSTrackerV1Exists(n string, trackers []tracker.Tracker) resour
 			return fmt.Errorf("Error creating cts client: %s", err)
 		}
 
-		found, err := tracker.Get(ctsClient).ExtractTracker()
+		ctsList, err := tracker.List(ctsClient, tracker.ListOpts{TrackerName: rs.Primary.ID})
 		if err != nil {
 			return err
 		}
 
-		if found[0].TrackerName != rs.Primary.ID {
+		found := ctsList[0]
+		if found.TrackerName != rs.Primary.ID {
 			return fmt.Errorf("cts tracker not found")
 		}
 
-		trackers = found
+		*trackers = found
 
 		return nil
 	}
