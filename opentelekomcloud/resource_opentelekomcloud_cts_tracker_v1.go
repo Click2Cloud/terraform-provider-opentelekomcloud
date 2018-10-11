@@ -145,6 +145,7 @@ func resourceCTSTrackerRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error retrieving cts tracker: %s", err)
 	}
 
+
 	ctsTracker := trackers[0]
 
 	d.Set("tracker_name", ctsTracker.TrackerName)
@@ -177,6 +178,10 @@ func resourceCTSTrackerUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	updateOpts.SimpleMessageNotification.Operations = resourceCTSOperations(d)
 
+	updateOpts.SimpleMessageNotification.NeedNotifyUserList = resourceCTSNeedNotifyUserList(d)
+
+	updateOpts.SimpleMessageNotification.IsSupportSMN = d.Get("is_support_smn").(bool)
+
 	if d.HasChange("file_prefix_name") {
 		updateOpts.FilePrefixName = d.Get("file_prefix_name").(string)
 	}
@@ -186,12 +191,7 @@ func resourceCTSTrackerUpdate(d *schema.ResourceData, meta interface{}) error {
 	if d.HasChange("is_send_all_key_operation") {
 		updateOpts.SimpleMessageNotification.IsSendAllKeyOperation = d.Get("is_send_all_key_operation").(bool)
 	}
-	if d.HasChange("is_support_smn") {
-		updateOpts.SimpleMessageNotification.IsSupportSMN = d.Get("is_support_smn").(bool)
-	}
-	if d.HasChange("need_notify_user_list") {
-		updateOpts.SimpleMessageNotification.NeedNotifyUserList = resourceCTSNeedNotifyUserList(d)
-	}
+
 
 	_, err = tracker.Update(ctsClient, updateOpts).Extract()
 	if err != nil {

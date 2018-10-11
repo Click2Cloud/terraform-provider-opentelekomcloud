@@ -44,6 +44,7 @@ var testAccCTSTrackerV1DataSource_basic = `
 resource "opentelekomcloud_s3_bucket" "bucket" {
   bucket		= "tf-test-bucket"
   acl			= "public-read"
+  force_destroy = true
 }
 resource "opentelekomcloud_smn_topic_v2" "topic_1" {
   name			= "tf-test-topic"
@@ -61,6 +62,6 @@ resource "opentelekomcloud_cts_tracker_v1" "tracker_v1" {
 }
 
 data "opentelekomcloud_cts_tracker_v1" "tracker_v1" {  
-  id = "${opentelekomcloud_cts_tracker_v1.tracker_v1.tracker_name}"
+  tracker_name = "${opentelekomcloud_cts_tracker_v1.tracker_v1.id}"
 }
 `
