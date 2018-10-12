@@ -1,25 +1,29 @@
 ### OpenTelekomCloud Credentials
 variable "username" {
   # If you don't fill this in, you will be prompted for it
-  #default = "your_username"
+  default = "lizhonghua"
 }
 
 variable "password" {
   # If you don't fill this in, you will be prompted for it
-  #default = "your_password'
+  default = "Tools@1234"
 }
 
 variable "domain_name" {
   # If you don't fill this in, you will be prompted for it
-  #default = "your_domainname"
+  default = "OTC00000000001000010501"
 }
 
-variable "tenant_name" {
-  default = "eu-de"
+/*variable "tenant_name" {
+  default = "eu-de_terraform"
+}*/
+
+variable "tenant_id" {
+  default = "17fbda95add24720a4038ba4b1c705ed"
 }
 
 variable "endpoint" {
-  default = "https://iam.eu-de.otc.t-systems.com:443/v3"
+  default = "https://iam.eu-de.otc.t-systems.com/v3"
 }
 
 ### OTC Specific Settings
