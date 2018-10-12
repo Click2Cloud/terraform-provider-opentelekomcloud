@@ -1,0 +1,67 @@
+---
+layout: "opentelekomcloud"
+page_title: "OpenTelekomCloud: resource_opentelekomcloud_cts_tracker_v1"
+sidebar_current: "docs-opentelekomcloud-resource-cts-tracker-v1"
+description: |-
+    Allows you to collect, store, and query cloud resource operation records and use these records for security analysis, compliance auditing, resource tracking, and fault locating.
+---
+
+# opentelekomcloud_cts_tracker_v1
+
+Allows you to collect, store, and query cloud resource operation records.
+
+## Example Usage
+
+ ```hcl
+ variable "bucket_name" { }
+ variable "topic_id" { }
+ 
+ resource "opentelekomcloud_cts_tracker_v1" "tracker_v1" {
+   bucket_name      = "${var.bucket_name}"
+   file_prefix_name      = "yO8Q"
+   is_support_smn = true
+   topic_id = "${var.topic_id}"
+   is_send_all_key_operation = false
+   operations = ["login"]
+   need_notify_user_list = ["user1"]
+ }
+
+ ```
+## Argument Reference
+The following arguments are supported:
+
+* `bucket_name` - (Required) Specifies the OBS bucket name. The value is a string of 0 to 64 characters and can contain uppercase and lowercase letters (a to z and A to Z), digits (0 to 9), hyphens (-), underscores (_), and periods (.).
+
+* `file_prefix_name` - (Optional) Specifies the prefix of a log that needs to be stored in an OBS bucket. 
+
+* `is_support_smn` - (Required) Specifies whether SMN is supported. When the value is false, topic_id and operations can be left empty.
+
+* `topic_id` - (Required) Is obtained from SMN and in the format of **urn:smn:([a-z]|[A-Z]|[0-9]|\-){1,32}:([a-z]|[A-Z]|[0-9]){32}:([a-z]|[A-Z]|[0-9]|\-|\_){1,256}**.
+
+* `operations` - (Required) Specifies trigger conditions for sending a notification.
+
+* `is_send_all_key_operation` - (Required) When the value is **false**, operations cannot be left empty.
+
+* `need_notify_user_list` - (Optional) you can specify the users using the login function. When these users log in, notifications will be sent.
+
+
+
+## Attributes Reference
+In addition to all arguments above, the following attributes are exported:
+
+* `status` - Specifies the status of a tracker. The value is **enabled**.
+
+* `tracker_name` - Specifies the tracker name. Currently, only tracker **system** is available.
+
+
+## Import
+
+Backup Policy can be imported using  `tracker_name`, e.g.
+
+```
+$ terraform import opentelekomcloud_cts_tracker_v1.tracker_v1 system
+```
+
+
+
+

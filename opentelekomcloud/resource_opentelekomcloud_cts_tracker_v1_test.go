@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/huaweicloud/golangsdk"
 	"github.com/huaweicloud/golangsdk/openstack/cts/v1/tracker"
 )
 
@@ -22,7 +23,7 @@ func TestAccCTSTrackerV1_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", tracker),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_cts_tracker_v1.tracker_v1", "bucket_name", "obs-e51d"),
+						"opentelekomcloud_cts_tracker_v1.tracker_v1", "bucket_name", "tf-test-bucket"),
 					resource.TestCheckResourceAttr(
 						"opentelekomcloud_cts_tracker_v1.tracker_v1", "file_prefix_name", "yO8Q"),
 				),
@@ -32,7 +33,7 @@ func TestAccCTSTrackerV1_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", tracker),
 					resource.TestCheckResourceAttr(
-						"opentelekomcloud_cts_tracker_v1.tracker_v1", "bucket_name", "obs-e51d"),
+						"opentelekomcloud_cts_tracker_v1.tracker_v1", "bucket_name", "tf-test-bucket1"),
 					resource.TestCheckResourceAttr(
 						"opentelekomcloud_cts_tracker_v1.tracker_v1", "file_prefix_name", "yO8Q1"),
 				),
@@ -73,7 +74,10 @@ func testAccCheckCTSTrackerV1Destroy(s *terraform.State) error {
 
 		_, err := tracker.Get(ctsClient).ExtractTracker()
 		if err != nil {
-			return fmt.Errorf("cts tracker still exists")
+			return fmt.Errorf("cts tracker still exists.")
+		}
+		if _, ok := err.(golangsdk.ErrDefault404); !ok {
+			return err
 		}
 	}
 
@@ -112,38 +116,74 @@ func testAccCheckCTSTrackerV1Exists(n string, trackers []tracker.Tracker) resour
 	}
 }
 
-var testAccCTSTrackerV1_basic = `
+const testAccCTSTrackerV1_basic = `
+resource "opentelekomcloud_s3_bucket" "bucket" {
+  bucket = "tf-test-bucket"
+  acl = "public-read"
+  force_destroy = true
+}
+
+resource "opentelekomcloud_smn_topic_v2" "topic_1" {
+  name		  = "topic_check"
+  display_name    = "The display name of topic_check"
+}
+
 resource "opentelekomcloud_cts_tracker_v1" "tracker_v1" {
-  bucket_name      = "obs-e51d"
+  bucket_name      = "${opentelekomcloud_s3_bucket.bucket.bucket}"
   file_prefix_name      = "yO8Q"
   is_support_smn = true
-  topic_id = "urn:smn:eu-de:626ce20e52a346c090b09cffc3e038e5:c2c-topic"
+  topic_id = "${opentelekomcloud_smn_topic_v2.topic_1.id}"
   is_send_all_key_operation = false
   operations = ["login"]
   need_notify_user_list = ["user1"]
 }
 `
 
-var testAccCTSTrackerV1_update = `
+const testAccCTSTrackerV1_update = `
+resource "opentelekomcloud_s3_bucket" "bucket" {
+  bucket = "tf-test-bucket1"
+  acl = "public-read"
+  force_destroy = true
+}
+resource "opentelekomcloud_smn_topic_v2" "topic_1" {
+  name		  = "topic_check1"
+  display_name    = "The display name of topic_check"
+}
 resource "opentelekomcloud_cts_tracker_v1" "tracker_v1" {
-  bucket_name      = "obs-e51d"
+  bucket_name      = "${opentelekomcloud_s3_bucket.bucket.bucket}"
   file_prefix_name      = "yO8Q1"
   is_support_smn = true
-  topic_id = "urn:smn:eu-de:626ce20e52a346c090b09cffc3e038e5:c2c-topic"
+  topic_id = "${opentelekomcloud_smn_topic_v2.topic_1.id}"
   is_send_all_key_operation = false
   operations = ["login"]
   need_notify_user_list = ["user1"]
 }
 `
 
-var testAccCTSTrackerV1_timeout = `
+const testAccCTSTrackerV1_timeout = `
+resource "opentelekomcloud_s3_bucket" "bucket" {
+  bucket = "tf-test-bucket-1"
+  acl = "public-read"
+  force_destroy = true
+}
+
+resource "opentelekomcloud_smn_topic_v2" "topic_1" {
+  name		  = "topic_check-1"
+  display_name    = "The display name of topic_check"
+}
+
 resource "opentelekomcloud_cts_tracker_v1" "tracker_v1" {
-  bucket_name      = "obs-e51d"
+  bucket_name      = "${opentelekomcloud_s3_bucket.bucket.bucket}"
   file_prefix_name      = "yO8Q"
   is_support_smn = true
-  topic_id = "urn:smn:eu-de:626ce20e52a346c090b09cffc3e038e5:c2c-topic"
+  topic_id = "${opentelekomcloud_smn_topic_v2.topic_1.id}"
   is_send_all_key_operation = false
   operations = ["login"]
   need_notify_user_list = ["user1"]
+
+timeouts {
+    create = "5m"
+    delete = "5m"
+  }
 }
 `

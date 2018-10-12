@@ -40,7 +40,7 @@ func testAccCheckCTSTrackerV1DataSourceID(n string) resource.TestCheckFunc {
 	}
 }
 
-var testAccCTSTrackerV1DataSource_basic = `
+const testAccCTSTrackerV1DataSource_basic = `
 resource "opentelekomcloud_s3_bucket" "bucket" {
   bucket		= "tf-test-bucket"
   acl			= "public-read"

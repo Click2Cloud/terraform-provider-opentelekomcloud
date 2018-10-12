@@ -39,37 +39,29 @@ func dataSourceCTSTrackerV1() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-			"smn": &schema.Schema{
+			"is_support_smn": &schema.Schema{
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"topic_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"operations": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"is_support_smn": &schema.Schema{
-							Type:     schema.TypeBool,
-							Computed: true,
-						},
-						"topic_id": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"operations": &schema.Schema{
-							Type:     schema.TypeSet,
-							Computed: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-							Set:      schema.HashString,
-						},
-						"is_send_all_key_operation": &schema.Schema{
-							Type:     schema.TypeBool,
-							Computed: true,
-						},
-						"need_notify_user_list": &schema.Schema{
-							Type:     schema.TypeSet,
-							Computed: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-							Set:      schema.HashString,
-						},
-					},
-				},
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+			},
+			"is_send_all_key_operation": &schema.Schema{
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"need_notify_user_list": &schema.Schema{
+				Type:     schema.TypeSet,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
 			},
 		},
 	}
@@ -111,9 +103,11 @@ func dataSourceCTSTrackerV1Read(d *schema.ResourceData, meta interface{}) error 
 	d.Set("bucket_name", trackers.BucketName)
 	d.Set("file_prefix_name", trackers.FilePrefixName)
 	d.Set("status", trackers.Status)
-	if err := d.Set("smn", flattenCTSSimpleMessageNotification(trackers)); err != nil {
-		return err
-	}
+	d.Set("is_support_smn", trackers.SimpleMessageNotification.IsSupportSMN)
+	d.Set("topic_id", trackers.SimpleMessageNotification.TopicID)
+	d.Set("is_send_all_key_operation", trackers.SimpleMessageNotification.IsSendAllKeyOperation)
+	d.Set("operations", trackers.SimpleMessageNotification.Operations)
+	d.Set("need_notify_user_list", trackers.SimpleMessageNotification.NeedNotifyUserList)
 
 	d.Set("region", GetRegion(d, config))
 
