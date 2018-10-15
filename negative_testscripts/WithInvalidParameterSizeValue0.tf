@@ -1,7 +1,11 @@
+resource "opentelekomcloud_vpc_v1" "vpc_sfs001" {
+  name = "terraform_provider_test"
+  cidr="192.168.0.0/16"
+}
 resource "opentelekomcloud_sfs_file_system_v2" "Share_file_001" {
   size = 0
   name = "test-share-01"
-  access_to = "34af42db-654f-4128-9126-9ef312bdd2d4	",
+  access_to = "${opentelekomcloud_vpc_v1.vpc_sfs001.id}"
   access_type = "cert",
   access_level = "rw"
 }
