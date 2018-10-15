@@ -1,5 +1,5 @@
 resource "opentelekomcloud_vpc_v1" "vpc_sfs001" {
-  name = "terraform_provider_test"
+  name = "vpc_sf_test1"
   cidr="192.168.0.0/16"
 }
 resource "opentelekomcloud_sfs_file_system_v2" "Share_file_001" {
