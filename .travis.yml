@@ -30,7 +30,7 @@ jobs:
   #stage 1 to execute positive test case
     - stage: positive_testscripts
       script:
-        - bash scripts/positive_testcases.sh
+        - bash scripts/positive_testcase.sh
 
   # stage 2 to execute negative test case
 
