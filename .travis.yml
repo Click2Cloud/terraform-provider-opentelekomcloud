@@ -36,7 +36,7 @@ jobs:
 
     - stage: negative_testscripts
       script:
-        - bash scripts/negative_testcases.sh
+        - bash scripts/negative_testcase.sh
 
 notifications:
 
