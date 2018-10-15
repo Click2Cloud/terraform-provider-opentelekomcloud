@@ -52,7 +52,7 @@ notifications:
 
 branches:
   only:
-  - master
+  - travis_sfs
 
 #to cache terraform installation directories
 cache:
