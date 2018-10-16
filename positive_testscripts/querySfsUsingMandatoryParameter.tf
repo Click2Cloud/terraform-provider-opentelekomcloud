@@ -4,7 +4,7 @@ resource "opentelekomcloud_vpc_v1" "vpc_sfs003" {
 }
 resource "opentelekomcloud_sfs_file_system_v2" "Share_file_003" {
   size = 40
-  name = "test-share-101"
+  name = "test-share-03"
   access_to = "${opentelekomcloud_vpc_v1.vpc_sfs003.id}"
   access_level = "rw"
 }
