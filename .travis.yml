@@ -72,6 +72,6 @@ matrix:
     fast_finish: true
     allow_failures:
     - stage: negative_testscripts
-    - stage: modify-resource_testscripts
+    
 
 
