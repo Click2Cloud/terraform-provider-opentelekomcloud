@@ -38,6 +38,12 @@ jobs:
       script:
         - bash scripts/negative_testcase.sh
 
+  # stage 3 to execute update test case
+
+    - stage: modify-resource_testcrripts
+        script:
+        - bash scripts/modify_testcases.sh
+
 notifications:
 
   email:
@@ -66,5 +72,6 @@ matrix:
     fast_finish: true
     allow_failures:
     - stage: negative_testscripts
-    
+    - stage: modify-resource_testcrripts
+
 
