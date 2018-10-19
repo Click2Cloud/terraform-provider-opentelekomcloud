@@ -68,7 +68,7 @@ cache:
 
 
 matrix:
-# the build won’t be marked as finished until they have completed, use fast_finish to mark them as finish
+# the build won’t be marked as finished until they have completed, use fast_finish to mark them as finish test
     fast_finish: true
     allow_failures:
     - stage: negative_testscripts
