@@ -40,7 +40,7 @@ jobs:
 
   # stage 3 to execute update test case
 
-    - stage: modify-resource_testcrripts
+    - stage: modify-resource_testscripts
         script:
         - bash scripts/modify_testcases.sh
 
