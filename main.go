@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform/plugin"
 	"github.com/AashishsMohankar/terraform-provider-opentelekomcloud/opentelekomcloud"
+	"github.com/hashicorp/terraform/plugin"
 )
 
 func main() {
