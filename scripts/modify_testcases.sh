@@ -16,7 +16,7 @@ sudo rm -rf terraform.tfstate /modify-resource_testscripts
 
 echo "==> for import a resource"
 
-terraform import opentelekomcloud_sfs_file_system_v2.Share_file_011.id ./modify-resource_testscripts
+terraform import "${opentelekomcloud_sfs_file_system_v2.Share_file_011.id}" ./modify-resource_testscripts
 
 echo "==> Preparing for terraform apply..."
 
