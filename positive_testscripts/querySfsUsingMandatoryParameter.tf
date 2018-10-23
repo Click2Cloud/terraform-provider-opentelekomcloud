@@ -11,7 +11,6 @@ resource "opentelekomcloud_sfs_file_system_v2" "Share_file_004" {
   share_proto = "NFS"
   description = "Ceate Sfs with optional parameters"
   is_public = false
-  availability_zone = "eu-de_terraform"
   access_type = "cert"
 }
 data "opentelekomcloud_sfs_file_system_v2" "Share_file_005" {
