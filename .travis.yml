@@ -62,9 +62,9 @@ branches:
   - travis_sfs
 
 #to cache terraform installation directories
-cache:
-  directories:
-    - ./usr/local/bin/
+#cache:
+#  directories:
+#    - ./usr/local/bin/
 
 
 matrix:
