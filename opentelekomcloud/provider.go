@@ -184,6 +184,7 @@ func Provider() terraform.ResourceProvider {
 			"opentelekomcloud_compute_bms_server_v2":      dataSourceBMSServersV2(),
 			"opentelekomcloud_csbs_backup_v1":             dataSourceCSBSBackupV1(),
 			"opentelekomcloud_csbs_backup_policy_v1":      dataSourceCSBSBackupPolicyV1(),
+			"opentelekomcloud_antiddos_v1":                dataSourceAntiDdosV1(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
