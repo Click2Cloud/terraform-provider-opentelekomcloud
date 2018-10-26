@@ -42,7 +42,7 @@ jobs:
 
     - stage: query_negative_scenario
       script:
-        - bash scripts/query_negative_scenario.sh
+        - bash scripts/query_negative_testscripts.sh
 
   # stage 4 to execute update test case
 
@@ -78,6 +78,7 @@ matrix:
     fast_finish: true
     allow_failures:
     - stage: negative_testscripts
+    - stage: query_negative_scenario
 
 
 
