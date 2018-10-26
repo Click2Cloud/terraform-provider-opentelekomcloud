@@ -40,6 +40,12 @@ jobs:
 
   # stage 3 to execute update test case
 
+    - stage: query_negative_scenario
+      script:
+        - bash scripts/query_negative_scenario.sh
+
+  # stage 4 to execute update test case
+
     - stage: modify_resource_testscripts
       script:
         - bash scripts/modify_testcases.sh

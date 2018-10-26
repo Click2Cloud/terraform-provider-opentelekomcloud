@@ -34,9 +34,9 @@ output "availability_zone" {
 output "size" {
   value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.size}"
 }
-output "share_type" {
-  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.share_type}"
-}
+/*output "share_type" {
+  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_004.share_type}"
+}*/
 output "status" {
   value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.status}"
 }
@@ -55,24 +55,24 @@ output "name" {
 output "share_proto" {
   value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.share_proto}"
 }
-output "volume_type" {
-  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.volume_type}"
+/*output "volume_type" {
+  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_004.volume_type}"
 }
 output "export_location" {
-  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.export_location}"
+  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_004.export_location}"
 }
 output "metadata" {
-  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.metadata}"
-}
-output "export_locations" {
-  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.export_locations}"
-}
+  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_004.metadata}"
+}*/
+/*output "export_locations" {
+  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_004.export_locations}"
+}*/
 output "access_level" {
   value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.access_level}"
 }
-output "state" {
-  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.state}"
-}
+/*output "state" {
+  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_004.state}"
+}*/
 output "share_access_id" {
   value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.share_access_id}"
 }
@@ -82,12 +82,13 @@ output "access_type" {
 output "access_to" {
   value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.access_to}"
 }
-output "mount_id" {
-  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.mount_id}"
+/*output "mount_id" {
+  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_004.mount_id}"
 }
 output "share_instance_id" {
-  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.share_instance_id}"
+  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_004.share_instance_id}"
 }
+
 output "preferred" {
-  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_011.preferred}"
-}
+  value = "${opentelekomcloud_sfs_file_system_v2.Share_file_004.preferred}"
+}*/
