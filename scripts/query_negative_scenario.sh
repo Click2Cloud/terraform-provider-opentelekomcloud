@@ -4,7 +4,7 @@
 echo "==> Terraform initialization in process..."
 
 sudo cp terraform-provider-opentelekomcloud /query_negative_scenario
-terraform init ./negative_testscripts
+terraform init ./query_negative_scenario
 
 echo "==> Preparing for terraform apply..."
 
