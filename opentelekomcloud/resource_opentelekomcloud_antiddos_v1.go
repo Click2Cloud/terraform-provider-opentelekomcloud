@@ -121,7 +121,7 @@ func resourceAntiDdosV1Read(d *schema.ResourceData, meta interface{}) error {
 
 	n, err := antiddos.Get(antiddosClient, d.Id()).Extract()
 	if err != nil {
-		if _, ok := err.(golangsdk.ErrDefault404); ok {
+		if _, ok := err.(golangsdk.ErrDefault403); ok {
 			d.SetId("")
 			return nil
 		}
@@ -177,7 +177,7 @@ func resourceAntiDdosV1Update(d *schema.ResourceData, meta interface{}) error {
 	return resourceAntiDdosV1Read(d, meta)
 }
 
-/*func resourceAntiDdosV1Delete(d *schema.ResourceData, meta interface{}) error {
+func resourceAntiDdosV1Delete(d *schema.ResourceData, meta interface{}) error {
 
 	config := meta.(*Config)
 	antiddosClient, err := config.antiddosV1Client(GetRegion(d, config))
@@ -190,7 +190,8 @@ func resourceAntiDdosV1Update(d *schema.ResourceData, meta interface{}) error {
 		Target:     []string{"notConfig"},
 		Refresh:    waitForAntiDdosDelete(antiddosClient, d.Id()),
 		Timeout:    d.Timeout(schema.TimeoutDelete),
-		Delay:      15 * time.Second,
+		Delay:      5 * time.Second,
+		MinTimeout: 3 * time.Second,
 	}
 
 	_, err = stateConf.WaitForState()
@@ -198,24 +199,6 @@ func resourceAntiDdosV1Update(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error deleting AntiDdos: %s", err)
 	}
 
-	d.SetId("")
-	return nil
-}*/
-
-func resourceAntiDdosV1Delete(d *schema.ResourceData, meta interface{}) error {
-	config := meta.(*Config)
-	antiddosClient, err := config.antiddosV1Client(GetRegion(d, config))
-
-	if err != nil {
-		return fmt.Errorf("Error creating OpenTelekomCloud bms client: %s", err)
-	}
-
-	_, err = antiddos.Delete(antiddosClient, d.Id()).Extract()
-	if err != nil {
-		return fmt.Errorf("Error deleting OpenTelekomCloud tags: %s", err)
-	}
-
-	time.Sleep(60 * time.Second)
 	d.SetId("")
 	return nil
 }
@@ -234,45 +217,9 @@ func waitForAntiDdosActive(antiddosClient *golangsdk.ServiceClient, antiddosId s
 func waitForAntiDdosDelete(antiddosClient *golangsdk.ServiceClient, antiddosId string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 
-		r, err := antiddos.Get(antiddosClient, antiddosId).Extract()
-		log.Print("[DEBUG] Get antiddos %#v", r)
-		if err != nil {
-			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				log.Printf("[INFO] Successfully deleted AntiDdos %s", antiddosId)
-				return r, "notConfig", nil
-			}
-			return r, "normal", err
-		}
-
-		n, err := antiddos.Delete(antiddosClient, antiddosId).Extract()
-		log.Print("[DEBUG] Delete antiddos %#v", n)
-
-		if err != nil {
-			if _, ok := err.(golangsdk.ErrDefault404); ok {
-				log.Printf("[DEBUG] error 404")
-				log.Printf("[INFO] Successfully deleted AntiDdos %s", antiddosId)
-				return r, "notConfig", nil
-			}
-			if errCode, ok := err.(golangsdk.ErrUnexpectedResponseCode); ok {
-				if errCode.Actual == 409 {
-					log.Printf("[DEBUG] error 409")
-					return r, "normal", nil
-				}
-			}
-			return r, "normal", err
-		}
-
-		return r, "normal", nil
-	}
-}
-
-/*func waitForAntiDdosDelete(antiddosClient *golangsdk.ServiceClient, antiddosId string) resource.StateRefreshFunc {
-	return func() (interface{}, string, error) {
-
-		//r, err := antiddos.Get(antiddosClient, antiddosId).Extract()
 		ddosstatus, err := antiddos.ListStatus(antiddosClient, antiddos.ListStatusOpts{FloatingIpId: antiddosId})
 		if err != nil {
-			if _, ok := err.(golangsdk.ErrDefault404); ok {
+			if _, ok := err.(golangsdk.ErrDefault403); ok {
 				log.Printf("[INFO] Successfully deleted AntiDdos %s", antiddosId)
 				return ddosstatus, "notConfig", nil
 			}
@@ -280,9 +227,9 @@ func waitForAntiDdosDelete(antiddosClient *golangsdk.ServiceClient, antiddosId s
 		}
 		r := ddosstatus[0]
 		if r.Status != "configging" {
-			err := backups.Delete(antiddosClient, antiddosId).ExtractErr()
+			_, err = antiddos.Delete(antiddosClient, antiddosId).Extract()
 			if err != nil {
-				if _, ok := err.(golangsdk.ErrDefault404); ok {
+				if _, ok := err.(golangsdk.ErrDefault403); ok {
 					log.Printf("[INFO] Successfully deleted VBS backup %s", antiddosId)
 					return r, "notConfig", nil
 				}
@@ -292,4 +239,4 @@ func waitForAntiDdosDelete(antiddosClient *golangsdk.ServiceClient, antiddosId s
 
 		return r, "normal", nil
 	}
-}*/
+}
