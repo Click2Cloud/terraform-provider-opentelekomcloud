@@ -254,6 +254,7 @@ func Provider() terraform.ResourceProvider {
 			"opentelekomcloud_vbs_backup_policy_v2":               resourceVBSBackupPolicyV2(),
 			"opentelekomcloud_vbs_backup_v2":                      resourceVBSBackupV2(),
 			"opentelekomcloud_vbs_backup_share_v2":                resourceVBSBackupShareV2(),
+			"opentelekomcloud_antiddos_v1":                        resourceAntiDdosV1(),
 		},
 
 		ConfigureFunc: configureProvider,
