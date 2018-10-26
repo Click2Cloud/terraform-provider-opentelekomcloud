@@ -67,6 +67,30 @@
             <li<%= sidebar_current("docs-opentelekomcloud-datasource-rts-software-config-v1") %>>
                <a href="/docs/providers/opentelekomcloud/d/rts_software_config.html">opentelekomcloud_rts_software_config_v1</a>
             </li>
+             <li<%= sidebar_current("docs-opentelekomcloud-compute-bms-flavors-v2") %>>
+              <a href="/docs/providers/opentelekomcloud/d/compute_bms_flavors_v2.html">opentelekomcloud_compute_bms_flavors_v2</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-compute-bms-keypairs-v2") %>>
+              <a href="/docs/providers/opentelekomcloud/d/compute_bms_keypairs_v2.html">opentelekomcloud_compute_bms_keypairs_v2</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-compute-bms-nic-v2") %>>
+              <a href="/docs/providers/opentelekomcloud/d/compute_bms_nic_v2.html">opentelekomcloud_compute_bms_nic_v2</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-compute-bms-server-v2") %>>
+              <a href="/docs/providers/opentelekomcloud/d/compute_bms_server_v2.html">opentelekomcloud_compute_bms_server_v2</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-csbs-backup-v1") %>>
+              <a href="/docs/providers/opentelekomcloud/d/csbs_backup_v1.html">opentelekomcloud_csbs_backup_v1</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-csbs-backup-policy-v1") %>>
+              <a href="/docs/providers/opentelekomcloud/d/csbs_backup_policy_v1.html">opentelekomcloud_csbs_backup_policy_v1</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-datasource-deh-server-v1") %>>
+               <a href="/docs/providers/opentelekomcloud/d/deh_server_v1.html">opentelekomcloud_deh_server_v1</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-datasource-deh-host-v1") %>>
+               <a href="/docs/providers/opentelekomcloud/d/deh_host_v1.html">opentelekomcloud_deh_host_v1</a>
+            </li>
           </ul>
         </li>
 
@@ -154,6 +178,18 @@
           </ul>
         </li>
 
+        <li<%= sidebar_current("docs-opentelekomcloud-resource-nat") %>>
+          <a href="#">Nat Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-opentelekomcloud-resource-nat-gateway-v2") %>>
+              <a href="/docs/providers/opentelekomcloud/r/nat_gateway_v2.html">opentelekomcloud_nat_gateway_v2</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-resource-nat-snat-rule-v2") %>>
+              <a href="/docs/providers/opentelekomcloud/r/nat_snat_rule_v2.html">opentelekomcloud_nat_snat_rule_v2</a>
+            </li>
+          </ul>
+        </li>
+
         <li<%= sidebar_current("docs-opentelekomcloud-resource-networking") %>>
           <a href="#">Networking Resources</a>
           <ul class="nav nav-visible">
@@ -198,6 +234,12 @@
             </li>
             <li<%= sidebar_current("docs-opentelekomcloud-resource-vpc-peering-accepter-v2") %>>
               <a href="/docs/providers/opentelekomcloud/r/vpc_peering_accepter_v2.html">opentelekomcloud_vpc_peering_connection_accepter_v2</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-resource-networking-vip-v2") %>>
+              <a href="/docs/providers/opentelekomcloud/r/networking_vip_v2.html">opentelekomcloud_networking_vip_v2</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-resource-networking-vip-associate-v2") %>>
+              <a href="/docs/providers/opentelekomcloud/r/networking_vip_associate_v2.html">opentelekomcloud_networking_vip_associate_v2</a>
             </li>
           </ul>
         </li>
@@ -292,6 +334,15 @@
           </ul>
         </li>
 
+        <li<%= sidebar_current("docs-opentelekomcloud-compute-bms-tags") %>>
+          <a href="#">BMS Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-opentelekomcloud-compute-bms-tags-v2") %>>
+              <a href="/docs/providers/opentelekomcloud/r/compute_bms_tags_v2.html">opentelekomcloud_compute_bms_tags_v2</a>
+            </li>
+          </ul>
+        </li>
+
         <li<%= sidebar_current("docs-opentelekomcloud-resource-rts") %>>
           <a href="#">RTS Resources</a>
           <ul class="nav nav-visible">
@@ -308,19 +359,57 @@
           </ul>
         </li>
 
-        <li<%= sidebar_current("docs-opentelekomcloud-resource-rts-stack") %>>
-          <a href="#">RTS Resources</a>
-          <ul class="nav nav-visible">
-            <li<%= sidebar_current("docs-opentelekomcloud-resource-rts-stack-v1") %>>
-              <a href="/docs/providers/opentelekomcloud/r/rts_stack_v1.html">opentelekomcloud-resource-rts-stack-v1</a>
-            </li>
-          </ul>
-        </li>
         <li<%= sidebar_current("docs-opentelekomcloud-resource-sfs") %>>
           <a href="#">SFS Resources</a>
           <ul class="nav nav-visible">
             <li<%= sidebar_current("docs-opentelekomcloud-resource-sfs-file-system-v2") %>>
               <a href="/docs/providers/opentelekomcloud/r/sfs_file_system_v2.html">opentelekomcloud_sfs_file_system_v2</a>
+            </li>
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-opentelekomcloud-resource-deh") %>>
+          <a href="#">DeH Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-opentelekomcloud-resource-deh-host-v1") %>>
+              <a href="/docs/providers/opentelekomcloud/r/deh_host_v1.html">opentelekomcloud_deh_host_v1</a>
+            </li>
+          </ul>
+        </li>
+
+        <li<%= sidebar_current("docs-opentelekomcloud-resource-as") %>>
+          <a href="#">Auto Scaling Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-opentelekomcloud-resource-as-configuration-v1") %>>
+              <a href="/docs/providers/opentelekomcloud/r/as_configuration_v1.html">opentelekomcloud_as_configuration_v1</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-resource-as-group-v1") %>>
+              <a href="/docs/providers/opentelekomcloud/r/as_group_v1.html">opentelekomcloud_as_group_v1</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-resource-as-policy-v1") %>>
+              <a href="/docs/providers/opentelekomcloud/r/as_policy_v1.html">opentelekomcloud_as_policy_v1</a>
+            </li>
+          </ul>
+        </li>
+        <li<%= sidebar_current("docs-opentelekomcloud-resource-csbs") %>>
+          <a href="#">CSBS Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-opentelekomcloud-resource-csbs-backup-v1") %>>
+              <a href="/docs/providers/opentelekomcloud/r/csbs_backup_v1.html">opentelekomcloud_csbs_backup_v1</a>
+            </li>
+            <li<%= sidebar_current("docs-opentelekomcloud-resource-csbs-backup-policy-v1") %>>
+              <a href="/docs/providers/opentelekomcloud/r/csbs_backup_policy_v1.html">opentelekomcloud_csbs_backup_policy_v1</a>
+            </li>
+          </ul>
+        </li>
+        <li<%= sidebar_current("docs-opentelekomcloud-resource-dms") %>>
+          <a href="#">DMS Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-opentelekomcloud-resource-dms-queue-v1") %>>
+              <a href="/docs/providers/opentelekomcloud/r/dms_queue_v1.html">opentelekomcloud_dms_queue_v1</a>
+            </li>
+			      <li<%= sidebar_current("docs-opentelekomcloud-resource-dms-group-v1") %>>
+              <a href="/docs/providers/opentelekomcloud/r/dms_group_v1.html">opentelekomcloud_dms_group_v1</a>
             </li>
           </ul>
         </li>
