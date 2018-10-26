@@ -210,7 +210,6 @@ func (r ListLogsResult) Extract() ([]Logs, error) {
 	}
 	return s.Logs, nil
 }
-
 type ListLogsResponse struct {
 	// Total number of EIPs
 	Total int `json:"total,"`
