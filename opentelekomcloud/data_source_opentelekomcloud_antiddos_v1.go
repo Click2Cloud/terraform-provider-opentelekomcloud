@@ -73,10 +73,6 @@ func dataSourceAntiDdosV1() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
-			"total_eips": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
 			"start_time": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
