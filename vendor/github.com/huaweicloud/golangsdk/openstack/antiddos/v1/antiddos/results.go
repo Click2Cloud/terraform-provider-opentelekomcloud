@@ -36,12 +36,6 @@ type DailyReportResult struct {
 	commonResult
 }
 
-/*func (r DailyReportResult) Extract() (*DailyReportResponse, error) {
-	var response DailyReportResponse
-	err := r.ExtractInto(&response)
-	return &response, err
-}
-*/
 func (r DailyReportResult) Extract() ([]Data, error) {
 	var s DailyReportResponse
 	err := r.ExtractInto(&s)
@@ -53,29 +47,29 @@ func (r DailyReportResult) Extract() ([]Data, error) {
 
 type DailyReportResponse struct {
 	// Traffic in the last 24 hours
-	Data []Data		`json:"data"`
+	Data []Data `json:"data"`
 }
 type Data struct {
-// Start time
-PeriodStart int `json:"period_start,"`
+	// Start time
+	PeriodStart int `json:"period_start,"`
 
-// Inbound traffic (bit/s)
-BpsIn int `json:"bps_in,"`
+	// Inbound traffic (bit/s)
+	BpsIn int `json:"bps_in,"`
 
-// Attack traffic (bit/s)
-BpsAttack int `json:"bps_attack,"`
+	// Attack traffic (bit/s)
+	BpsAttack int `json:"bps_attack,"`
 
-// Total traffic
-TotalBps int `json:"total_bps,"`
+	// Total traffic
+	TotalBps int `json:"total_bps,"`
 
-// Inbound packet rate (number of packets per second)
-PpsIn int `json:"pps_in,"`
+	// Inbound packet rate (number of packets per second)
+	PpsIn int `json:"pps_in,"`
 
-// Attack packet rate (number of packets per second)
-PpsAttack int `json:"pps_attack,"`
+	// Attack packet rate (number of packets per second)
+	PpsAttack int `json:"pps_attack,"`
 
-// Total packet rate
-TotalPps int `json:"total_pps,"`
+	// Total packet rate
+	TotalPps int `json:"total_pps,"`
 }
 
 type DeleteResult struct {
@@ -208,10 +202,13 @@ type ListLogsResult struct {
 	commonResult
 }
 
-func (r ListLogsResult) Extract() (*Logs, error) {
-	var response Logs
-	err := r.ExtractInto(&response)
-	return &response, err
+func (r ListLogsResult) Extract() ([]Logs, error) {
+	var s ListLogsResponse
+	err := r.ExtractInto(&s)
+	if err != nil {
+		return nil, err
+	}
+	return s.Logs, nil
 }
 
 type ListLogsResponse struct {
@@ -241,6 +238,7 @@ type Logs struct {
 	// HTTP request rate at the triggering point
 	TriggerHttpPps int `json:"trigger_http_pps,"`
 }
+
 type ListStatusResult struct {
 	commonResult
 }
