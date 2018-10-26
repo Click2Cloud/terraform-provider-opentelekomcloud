@@ -213,16 +213,16 @@ func dataSourceAntiDdosV1Read(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func flattenLogs(logObject *antiddos.Logs) []map[string]interface{} {
+func flattenLogs(logObject []antiddos.Logs) []map[string]interface{} {
 	var log []map[string]interface{}
 
 	mapping := map[string]interface{}{
-		"start_time":       logObject.StartTime,
-		"end_time":         logObject.EndTime,
-		"status":           logObject.Status,
-		"trigger_bps":      logObject.TriggerBps,
-		"trigger_pps":      logObject.TriggerPps,
-		"trigger_http_pps": logObject.TriggerHttpPps,
+		"start_time":       logObject[0].StartTime,
+		"end_time":         logObject[0].EndTime,
+		"status":           logObject[0].Status,
+		"trigger_bps":      logObject[0].TriggerBps,
+		"trigger_pps":      logObject[0].TriggerPps,
+		"trigger_http_pps": logObject[0].TriggerHttpPps,
 	}
 
 	log = append(log, mapping)
