@@ -2,10 +2,11 @@ package opentelekomcloud
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/huaweicloud/golangsdk/openstack/antiddos/v1/antiddos"
 	"log"
 	"time"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/huaweicloud/golangsdk/openstack/antiddos/v1/antiddos"
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/huaweicloud/golangsdk"
@@ -128,7 +129,7 @@ func resourceAntiDdosV1Read(d *schema.ResourceData, meta interface{}) error {
 
 		return fmt.Errorf("Error retrieving AntiDdos: %s", err)
 	}
-
+	d.Set("floating_ip_id", d.Id())
 	d.Set("enable_l7", n.EnableL7)
 	d.Set("app_type_id", n.AppTypeId)
 	d.Set("cleaning_access_pos_id", n.CleaningAccessPosId)
@@ -171,7 +172,7 @@ func resourceAntiDdosV1Update(d *schema.ResourceData, meta interface{}) error {
 	_, stateErr := stateConf.WaitForState()
 	if stateErr != nil {
 		return fmt.Errorf(
-			"Error waiting for AntiDdos (%s) to become normal: %s", stateErr)
+			"Error waiting for AntiDdos to become normal: %s", stateErr)
 	}
 
 	return resourceAntiDdosV1Read(d, meta)
@@ -186,7 +187,7 @@ func resourceAntiDdosV1Delete(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	stateConf := &resource.StateChangeConf{
-		Pending:    []string{"normal","configging"},
+		Pending:    []string{"normal", "configging"},
 		Target:     []string{"notConfig"},
 		Refresh:    waitForAntiDdosDelete(antiddosClient, d.Id()),
 		Timeout:    d.Timeout(schema.TimeoutDelete),
