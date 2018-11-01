@@ -118,8 +118,8 @@ func resourceCTSTrackerRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return fmt.Errorf("Error creating cts Client: %s", err)
 	}
-
-	trackers, err := tracker.Get(ctsClient).ExtractTracker()
+	listOpts := tracker.ListOpts{}
+	trackers, err := tracker.List(ctsClient, listOpts)
 	if err != nil {
 		if _, ok := err.(golangsdk.ErrDefault404); ok {
 			log.Printf("[WARN] Removing cts tracker %s as it's already gone", d.Id())

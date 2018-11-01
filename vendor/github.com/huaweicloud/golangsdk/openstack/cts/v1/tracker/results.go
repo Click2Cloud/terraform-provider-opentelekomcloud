@@ -56,6 +56,3 @@ type DeleteResult struct {
 type ListResult struct {
 	commonResult
 }
-type GetResult struct {
-	commonResult
-}

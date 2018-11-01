@@ -44,12 +44,6 @@ Example to Update a Tracker
 	fmt.Println(out)
 
 
-Example to Get Tracker
-	result, err:=tracker.Get(client).ExtractTracker()
-	fmt.Println(result)
-	fmt.Println(err)
-
-
 Example to Delete a Tracker
 	out:= tracker.Delete(client).ExtractErr()
 	fmt.Println(out)

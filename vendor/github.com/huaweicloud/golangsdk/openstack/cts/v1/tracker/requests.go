@@ -148,14 +148,6 @@ func Update(client *golangsdk.ServiceClient, opts UpdateOptsBuilder) (r UpdateRe
 	return
 }
 
-// Get retrieves a particular tracker.
-func Get(c *golangsdk.ServiceClient) (r GetResult) {
-	_, r.Err = c.Get(rootURL(c), &r.Body, &golangsdk.RequestOpts{
-		OkCodes: []int{200},
-	})
-	return
-}
-
 // Delete will permanently delete a particular tracker.
 func Delete(client *golangsdk.ServiceClient) (r DeleteResult) {
 	_, r.Err = client.Delete(rootURL(client), &golangsdk.RequestOpts{
