@@ -129,6 +129,7 @@ func resourceAntiDdosV1Read(d *schema.ResourceData, meta interface{}) error {
 
 		return fmt.Errorf("Error retrieving AntiDdos: %s", err)
 	}
+
 	d.Set("floating_ip_id", d.Id())
 	d.Set("enable_l7", n.EnableL7)
 	d.Set("app_type_id", n.AppTypeId)

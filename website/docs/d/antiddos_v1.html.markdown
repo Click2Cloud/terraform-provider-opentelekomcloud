@@ -12,7 +12,6 @@ The OpenTelekomCloud Antiddos data source allows to query the status of EIP, reg
 
 ## Example Usage
 
-
 ```hcl
 variable "id" { }
 

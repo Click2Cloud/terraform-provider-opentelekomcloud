@@ -24,7 +24,6 @@ Anti-DDoS monitors the service traffic from the Internet to ECSs, ELB instances,
      app_type_id = 0
  }
 
-
  ```
 ## Argument Reference
 The following arguments are supported:
