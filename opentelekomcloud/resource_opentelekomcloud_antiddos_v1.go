@@ -232,7 +232,7 @@ func waitForAntiDdosDelete(antiddosClient *golangsdk.ServiceClient, antiddosId s
 			_, err = antiddos.Delete(antiddosClient, antiddosId).Extract()
 			if err != nil {
 				if _, ok := err.(golangsdk.ErrDefault403); ok {
-					log.Printf("[INFO] Successfully deleted VBS backup %s", antiddosId)
+					log.Printf("[INFO] Successfully deleted Antiddos %s", antiddosId)
 					return r, "notConfig", nil
 				}
 				return r, r.Status, err
