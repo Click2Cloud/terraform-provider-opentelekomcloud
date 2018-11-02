@@ -47,9 +47,10 @@ func resourceCTSTrackerV1() *schema.Resource {
 				Required: true,
 			},
 			"file_prefix_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validateName,
 			},
 			"is_support_smn": &schema.Schema{
 				Type:     schema.TypeBool,
@@ -89,7 +90,7 @@ func resourceCTSTrackerCreate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error creating cts Client: %s", err)
 	}
 
-	createOpts := tracker.CreateOpts{
+	createOpts := tracker.CreateOptsWithSMN{
 		BucketName:     d.Get("bucket_name").(string),
 		FilePrefixName: d.Get("file_prefix_name").(string),
 		SimpleMessageNotification: tracker.SimpleMessageNotification{
@@ -118,7 +119,13 @@ func resourceCTSTrackerRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return fmt.Errorf("Error creating cts Client: %s", err)
 	}
-	listOpts := tracker.ListOpts{}
+
+	listOpts := tracker.ListOpts{
+		TrackerName:    d.Get("tracker_name").(string),
+		BucketName:     d.Get("bucket_name").(string),
+		FilePrefixName: d.Get("file_prefix_name").(string),
+		Status:         d.Get("status").(string),
+	}
 	trackers, err := tracker.List(ctsClient, listOpts)
 	if err != nil {
 		if _, ok := err.(golangsdk.ErrDefault404); ok {
@@ -154,7 +161,7 @@ func resourceCTSTrackerUpdate(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return fmt.Errorf("Error creating cts Client: %s", err)
 	}
-	var updateOpts tracker.UpdateOpts
+	var updateOpts tracker.UpdateOptsWithSMN
 
 	//as bucket_name is mandatory while updating tracker
 	updateOpts.BucketName = d.Get("bucket_name").(string)

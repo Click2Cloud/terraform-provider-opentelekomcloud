@@ -11,7 +11,7 @@ import (
 )
 
 func TestAccCTSTrackerV1_basic(t *testing.T) {
-	var tracker []tracker.Tracker
+	var tracker tracker.Tracker
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -21,7 +21,7 @@ func TestAccCTSTrackerV1_basic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccCTSTrackerV1_basic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", tracker),
+					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", &tracker),
 					resource.TestCheckResourceAttr(
 						"opentelekomcloud_cts_tracker_v1.tracker_v1", "bucket_name", "tf-test-bucket"),
 					resource.TestCheckResourceAttr(
@@ -31,7 +31,7 @@ func TestAccCTSTrackerV1_basic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccCTSTrackerV1_update,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", tracker),
+					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", &tracker),
 					resource.TestCheckResourceAttr(
 						"opentelekomcloud_cts_tracker_v1.tracker_v1", "bucket_name", "tf-test-bucket1"),
 					resource.TestCheckResourceAttr(
@@ -43,7 +43,7 @@ func TestAccCTSTrackerV1_basic(t *testing.T) {
 }
 
 func TestAccCTSTrackerV1_timeout(t *testing.T) {
-	var tracker []tracker.Tracker
+	var tracker tracker.Tracker
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -53,7 +53,7 @@ func TestAccCTSTrackerV1_timeout(t *testing.T) {
 			resource.TestStep{
 				Config: testAccCTSTrackerV1_timeout,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", tracker),
+					testAccCheckCTSTrackerV1Exists("opentelekomcloud_cts_tracker_v1.tracker_v1", &tracker),
 				),
 			},
 		},
@@ -72,7 +72,7 @@ func testAccCheckCTSTrackerV1Destroy(s *terraform.State) error {
 			continue
 		}
 
-		_, err := tracker.Get(ctsClient).ExtractTracker()
+		_, err := tracker.List(ctsClient, tracker.ListOpts{TrackerName: rs.Primary.ID})
 		if err != nil {
 			return fmt.Errorf("cts tracker still exists.")
 		}
@@ -84,7 +84,7 @@ func testAccCheckCTSTrackerV1Destroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckCTSTrackerV1Exists(n string, trackers []tracker.Tracker) resource.TestCheckFunc {
+func testAccCheckCTSTrackerV1Exists(n string, trackers *tracker.Tracker) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -101,16 +101,16 @@ func testAccCheckCTSTrackerV1Exists(n string, trackers []tracker.Tracker) resour
 			return fmt.Errorf("Error creating cts client: %s", err)
 		}
 
-		found, err := tracker.Get(ctsClient).ExtractTracker()
+		trackerList, err := tracker.List(ctsClient, tracker.ListOpts{TrackerName: rs.Primary.ID})
 		if err != nil {
 			return err
 		}
-
-		if found[0].TrackerName != rs.Primary.ID {
+		found := trackerList[0]
+		if found.TrackerName != rs.Primary.ID {
 			return fmt.Errorf("cts tracker not found")
 		}
 
-		trackers = found
+		*trackers = found
 
 		return nil
 	}
