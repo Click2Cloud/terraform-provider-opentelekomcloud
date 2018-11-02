@@ -3,7 +3,7 @@ layout: "opentelekomcloud"
 page_title: "OpenTelekomCloud: opentelekomcloud_antiddos_v1"
 sidebar_current: "docs-opentelekomcloud-resource-antiddos-v1"
 description: |-
-  Defends resources on the public cloud against network and  monitors the service traffic from the Internet to ECSs, ELB instances, and BMSs to detect attack traffic in real time.
+  Anti-DDoS Defends resources on the public cloud against network and  monitors the service traffic from the Internet to ECSs, ELB instances, and BMSs to detect attack traffic in real time.
 ---
 
 # opentelekomcloud_antiddos_v1
@@ -30,15 +30,15 @@ The following arguments are supported:
 
 * `enable_l7` - (Required) Specifies whether to enable L7 defense.
 
-* `traffic_pos_id` - (Required) Specifies the position ID of traffic. The value ranges from 1 to 9.
+* `traffic_pos_id` - (Required) The position ID of traffic. The value ranges from 1 to 9.
 
-* `http_request_pos_id` - (Required) Specifies the position ID of number of HTTP requests. The value ranges from 1 to 15.
+* `http_request_pos_id` - (Required) The position ID of number of HTTP requests. The value ranges from 1 to 15.
 
-* `cleaning_access_pos_id` - (Required) Specifies the position ID of access limit during cleaning. The value ranges from 1 to 8.
+* `cleaning_access_pos_id` - (Required)The position ID of access limit during cleaning. The value ranges from 1 to 8.
 
-* `app_type_id` - (Required) Specifies the application type ID. 
+* `app_type_id` - (Required) The application type ID. 
 
-* `floating_ip_id` - (Required) Specifies the ID corresponding to the Elastic IP Address (EIP) of a user.
+* `floating_ip_id` - (Required) The ID corresponding to the Elastic IP Address (EIP) of a user.
 
 ## Attributes Reference
 All above argument parameters can be exported as attribute parameters.

@@ -16,7 +16,7 @@ The OpenTelekomCloud Antiddos data source allows to query the status of EIP, reg
 variable "id" { }
 
 data "opentelekomcloud_antiddos_v1" "antiddos" {
-  floating_ip_id = "${opentelekomcloud_antiddos_v1.antiddos_1.id}"
+  floating_ip_id ="${var.eip_id}"
 }
 
 ```
@@ -24,41 +24,40 @@ data "opentelekomcloud_antiddos_v1" "antiddos" {
 ## Argument Reference
 The following arguments are supported:
 
-* `floating_ip_id` - (Optional) Specifies the id of an eip.
+* `floating_ip_id` - (Optional) The Elastic IP ID.
 
-* `floating_ip_address` - (Optional) Specifies the floating ip address.
+* `floating_ip_address` - (Optional) The Elastic IP address.
 
-* `status` - (Optional) Specifies the defense status.
+* `status` - (Optional) The defense status.
 
 ## Attributes Reference
 
 In addition to all arguments above, the following attributes are exported:
 
-* `network_type` - Specifies the EIP type.
+* `network_type` - The EIP type.
 
-* `period_start` - Provides the Start time.
+* `period_start` - The Start time.
 
-* `bps_attack` - Specifies the Attack traffic in (bit/s).
+* `bps_attack` - The Attack traffic in (bit/s).
 
-* `bps_in` - Specifies the inbound traffic in (bit/s).
+* `bps_in` - The inbound traffic in (bit/s).
 
-* `total_bps` - Specifies the total traffic.
+* `total_bps` - The total traffic.
 
-* `pps_in` - Specifies the inbound packet rate (number of packets per second).
+* `pps_in` - The inbound packet rate (number of packets per second).
 
-* `pps_attack` - Specifies the attack packet rate (number of packets per second).
+* `pps_attack` - The attack packet rate (number of packets per second).
 
-* `total_pps` - Specifies the total packet rate.
+* `total_pps` - The total packet rate.
 
-* `start_time` - Specifies the start time of cleaning and blackhole event.
+* `start_time` - The start time of cleaning and blackhole event.
 
-* `end_time` - Specifies the end time of cleaning and blackhole event.
+* `end_time` - The end time of cleaning and blackhole event.
 
-* `traffic_cleaning_status` - Specifies the traffic cleaning status.
+* `traffic_cleaning_status` - The traffic cleaning status.
 
-* `trigger_bps` - Specifies the traffic at the triggering point.
+* `trigger_bps` - The traffic at the triggering point.
 
-* `trigger_pps` - Specifies the packet rate at the triggering point.
+* `trigger_pps` - The packet rate at the triggering point.
 
-* `trigger_http_pps` - Specifies the HTTP request rate at the triggering point.
-
+* `trigger_http_pps` - The HTTP request rate at the triggering point.
