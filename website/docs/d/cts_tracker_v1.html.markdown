@@ -3,7 +3,7 @@ layout: "opentelekomcloud"
 page_title: "OpenTelekomCloud: opentelekomcloud_cts_tracker_v1"
 sidebar_current: "docs-opentelekomcloud-datasource-cts-tracker-v1"
 description: |-
-  Allows you to collect, store, and query cloud resource operation records and use these records for security analysis, compliance auditing, resource tracking, and fault locating.
+  CTS tracker allows you to collect, store, and query cloud resource operation records and use these records for security analysis, compliance auditing, resource tracking, and fault locating.
 ---
 
 # Data Source: opentelekomcloud_cts_tracker_v1
@@ -25,29 +25,27 @@ data "opentelekomcloud_cts_tracker_v1" "tracker_v1" {
 ## Argument Reference
 The following arguments are supported:
 
-* `tracker_name` - (Optional) Specifies the tracker name. 
+* `tracker_name` - (Optional) The tracker name. 
 
-* `bucket_name` - (Optional) Specifies the OBS bucket name.
+* `bucket_name` - (Optional) The OBS bucket name for a tracker.
 
-* `file_prefix_name` - (Optional) Specifies the prefix of a log that needs to be stored in an OBS bucket. 
+* `file_prefix_name` - (Optional) The prefix of a log that needs to be stored in an OBS bucket. 
 
-* `status` - (Optional) Specifies the status of a tracker. 
+* `status` - (Optional) Status of a tracker. 
 
 
 ## Attributes Reference
 
 In addition to all arguments above, the following attributes are exported:
 
-* `smn` block supports the following arguments:
-
-    * `is_support_smn` - Specifies whether SMN is supported.
+* `is_support_smn` -Specifies SMN support.
     
-    * `topic_id` - 	Specifies the theme of the SMN service.
+* `topic_id` - The theme of the SMN service.
 
-    * `operations` - Specifies trigger conditions for sending a notification
+* `operations` -The trigger conditions for sending a notification
 
-    * `is_send_all_key_operation` - When the value is false, operations cannot be left empty.
-
-    * `need_notify_user_list` - Specifies the users using the login function. When these users log in, notifications will be sent.
+* `is_send_all_key_operation` - Specifies Typical or All operations for Trigger Condition.
+    
+* `need_notify_user_list` - The users using the login function.
 
     
