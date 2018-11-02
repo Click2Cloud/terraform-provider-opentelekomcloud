@@ -30,7 +30,7 @@ Allows you to collect, store, and query cloud resource operation records.
 ## Argument Reference
 The following arguments are supported:
 
-* `bucket_name` - (Required) The OBS bucket namefor a tracker.
+* `bucket_name` - (Required) The OBS bucket name for a tracker.
 
 * `file_prefix_name` - (Optional) The prefix of a log that needs to be stored in an OBS bucket. 
 
