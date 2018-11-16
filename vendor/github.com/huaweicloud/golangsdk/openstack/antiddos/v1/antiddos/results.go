@@ -210,6 +210,7 @@ func (r ListLogsResult) Extract() ([]Logs, error) {
 	}
 	return s.Logs, nil
 }
+
 type ListLogsResponse struct {
 	// Total number of EIPs
 	Total int `json:"total,"`
@@ -237,7 +238,6 @@ type Logs struct {
 	// HTTP request rate at the triggering point
 	TriggerHttpPps int `json:"trigger_http_pps,"`
 }
-
 type ListStatusResult struct {
 	commonResult
 }
@@ -328,7 +328,7 @@ type WeeklyReportResponse struct {
 	DdosInterceptTimes int `json:"ddos_intercept_times,"`
 
 	// Number of DDoS attacks intercepted in a week
-	Weekdata []WeekData `json:"weekdata,"`
+	Weekdata []WeekData `json:"-"`
 
 	// Top 10 attacked IP addresses
 	Top10 []struct {
