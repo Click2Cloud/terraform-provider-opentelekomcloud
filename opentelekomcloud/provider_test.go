@@ -34,6 +34,7 @@ var (
 	OS_BMS_FLAVOR_NAME        = os.Getenv("OS_BMS_FLAVOR_NAME")
 	OS_NIC_ID                 = os.Getenv("OS_NIC_ID")
 	OS_TO_TENANT_ID           = os.Getenv("OS_TO_TENANT_ID")
+	OS_SSH_KEY                = os.Getenv("OS_SSH_KEY")
 )
 
 var testAccProviders map[string]terraform.ResourceProvider
@@ -356,4 +357,11 @@ func testAccVBSBackupShareCheck(t *testing.T) {
 		t.Skip("OS_TO_TENANT_ID must be set for acceptance tests")
 	}
 
+}
+
+func testAccPreCheckCCENode(t *testing.T) {
+	testAccPreCheckRequiredEnvVars(t)
+	if OS_SSH_KEY == "" {
+		t.Skip("OS_SSH_KEY must be set for CCE Node acceptance tests")
+	}
 }
