@@ -71,21 +71,6 @@ func dataSourceCCEClusterV3() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			/*"endpoints": &schema.Schema{
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"url": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"type": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-					}},
-			},*/
 			"internal": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -137,15 +122,6 @@ func dataSourceCCEClusterV3Read(d *schema.ResourceData, meta interface{}) error 
 	Cluster := refinedClusters[0]
 
 	log.Printf("[DEBUG] Retrieved Clusters using given filter %s: %+v", Cluster.Metadata.Id, Cluster)
-	/*var v []map[string]interface{}
-	for _, endpoint := range Cluster.Status.Endpoints {
-
-		mapping := map[string]interface{}{
-			"url":  endpoint.Url,
-			"type": endpoint.Type,
-		}
-		v = append(v, mapping)
-	}*/
 
 	d.SetId(Cluster.Metadata.Id)
 
@@ -164,9 +140,6 @@ func dataSourceCCEClusterV3Read(d *schema.ResourceData, meta interface{}) error 
 	d.Set("internal", Cluster.Status.Endpoints[0].Internal)
 	d.Set("external", Cluster.Status.Endpoints[0].External)
 	d.Set("external_otc", Cluster.Status.Endpoints[0].ExternalOTC)
-	/*if err := d.Set("endpoints", v); err != nil {
-		return err
-	}*/
 	d.Set("region", GetRegion(d, config))
 
 	return nil
