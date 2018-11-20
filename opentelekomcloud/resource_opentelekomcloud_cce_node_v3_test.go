@@ -138,17 +138,12 @@ resource "opentelekomcloud_cce_node_v3" "node_1" {
 cluster_id = "${opentelekomcloud_cce_cluster_v3.cluster_1.id}"
   name = "test-node"
   flavor="s1.medium"
-  iptype="5_bgp"
-  billing_mode=0
   az= "%s"
   sshkey="%s"
   root_volume = {
     size= 40,
     volumetype= "SATA"
   }
-  bandwidth_charge_mode="traffic"
-  sharetype= "PER"
-  bandwidth_size= 100,
   data_volumes = [
     {
       size= 100,
@@ -172,17 +167,12 @@ resource "opentelekomcloud_cce_node_v3" "node_1" {
 cluster_id = "${opentelekomcloud_cce_cluster_v3.cluster_1.id}"
   name = "test-node2"
   flavor="s1.medium"
-  iptype="5_bgp"
-  billing_mode=0
   az= "%s"
   sshkey="%s"
   root_volume = {
     size= 40,
     volumetype= "SATA"
   }
-  bandwidth_charge_mode="traffic"
-  sharetype= "PER"
-  bandwidth_size= 100,
   data_volumes = [
     {
       size= 100,
@@ -206,17 +196,12 @@ resource "opentelekomcloud_cce_node_v3" "node_1" {
   cluster_id = "${opentelekomcloud_cce_cluster_v3.cluster_1.id}"
   name = "test-node2"
   flavor="s1.medium"
-  iptype="5_bgp"
-  billing_mode=0
   az= "%s"
   sshkey="%s"
   root_volume = {
     size= 40,
     volumetype= "SATA"
   }
-  bandwidth_charge_mode="traffic"
-  sharetype= "PER"
-  bandwidth_size= 100,
   data_volumes = [
     {
       size= 100,
