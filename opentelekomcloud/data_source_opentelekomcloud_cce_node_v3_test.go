@@ -10,7 +10,7 @@ import (
 
 func TestAccCCENodesV3DataSource_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccBmsKeyPairPreCheck(t) },
+		PreCheck:  func() { testAccCCEKeyPairPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			resource.TestStep{

@@ -14,7 +14,7 @@ func TestAccCCENodesV3_basic(t *testing.T) {
 	var node nodes.Nodes
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccBmsKeyPairPreCheck(t) },
+		PreCheck:     func() { testAccCCEKeyPairPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCCENodeV3Destroy,
 		Steps: []resource.TestStep{
@@ -43,7 +43,7 @@ func TestAccCCENodesV3_timeout(t *testing.T) {
 	var node nodes.Nodes
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccBmsKeyPairPreCheck(t) },
+		PreCheck:     func() { testAccCCEKeyPairPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCCENodeV3Destroy,
 		Steps: []resource.TestStep{
