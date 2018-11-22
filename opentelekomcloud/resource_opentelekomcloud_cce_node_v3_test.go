@@ -14,7 +14,7 @@ func TestAccCCENodesV3_basic(t *testing.T) {
 	var node nodes.Nodes
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheckCCENode(t) },
+		PreCheck:     func() { testAccBmsKeyPairPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCCENodeV3Destroy,
 		Steps: []resource.TestStep{
@@ -43,7 +43,7 @@ func TestAccCCENodesV3_timeout(t *testing.T) {
 	var node nodes.Nodes
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheckCCENode(t) },
+		PreCheck:     func() { testAccBmsKeyPairPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckCCENodeV3Destroy,
 		Steps: []resource.TestStep{
@@ -150,7 +150,7 @@ cluster_id = "${opentelekomcloud_cce_cluster_v3.cluster_1.id}"
       volumetype= "SATA"
     },
   ]
-}`, OS_VPC_ID, OS_NETWORK_ID, OS_AVAILABILITY_ZONE, OS_SSH_KEY)
+}`, OS_VPC_ID, OS_NETWORK_ID, OS_AVAILABILITY_ZONE, OS_KEYPAIR_NAME)
 
 var testAccCCENodeV3_update = fmt.Sprintf(`
 resource "opentelekomcloud_cce_cluster_v3" "cluster_1" {
@@ -179,7 +179,7 @@ cluster_id = "${opentelekomcloud_cce_cluster_v3.cluster_1.id}"
       volumetype= "SATA"
     },
   ]
-}`, OS_VPC_ID, OS_NETWORK_ID, OS_AVAILABILITY_ZONE, OS_SSH_KEY)
+}`, OS_VPC_ID, OS_NETWORK_ID, OS_AVAILABILITY_ZONE, OS_KEYPAIR_NAME)
 
 var testAccCCENodeV3_timeout = fmt.Sprintf(`
 resource "opentelekomcloud_cce_cluster_v3" "cluster_1" {
@@ -213,4 +213,4 @@ create = "10m"
 delete = "10m"
 } 
 }
-`, OS_VPC_ID, OS_NETWORK_ID, OS_AVAILABILITY_ZONE, OS_SSH_KEY)
+`, OS_VPC_ID, OS_NETWORK_ID, OS_AVAILABILITY_ZONE, OS_KEYPAIR_NAME)

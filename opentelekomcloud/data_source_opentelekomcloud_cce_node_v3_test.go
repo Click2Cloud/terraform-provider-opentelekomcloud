@@ -10,7 +10,7 @@ import (
 
 func TestAccCCENodesV3DataSource_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheckCCENode(t) },
+		PreCheck:  func() { testAccBmsKeyPairPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			resource.TestStep{
@@ -72,4 +72,4 @@ data "opentelekomcloud_cce_node_v3" "nodes" {
 		cluster_id = "${opentelekomcloud_cce_cluster_v3.cluster_1.id}"
 		name = "${opentelekomcloud_cce_node_v3.node_1.name}"
 }
-`, OS_VPC_ID, OS_NETWORK_ID, OS_AVAILABILITY_ZONE, OS_SSH_KEY)
+`, OS_VPC_ID, OS_NETWORK_ID, OS_AVAILABILITY_ZONE, OS_KEYPAIR_NAME)
